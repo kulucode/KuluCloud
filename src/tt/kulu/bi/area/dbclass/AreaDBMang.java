@@ -38,7 +38,7 @@ public class AreaDBMang extends BSDBBase {
 
 	/**
 	 * <p>
-	 * 方法名称: getAreaList
+	 * 方法名称: getAreaList  
 	 * </p>
 	 * <p>
 	 * 方法功能描述: 得到行政区域。
