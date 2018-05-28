@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+	<BS_DB DBID="KULUDB">
+		<KULUDB EXPLAIN="" DEFAULT="true">
+			<DB_SELECT TYPENAME="POSTGRE" README="" />
+			<BS_CONNETION TYPE="1" README="0 jdbc, 1 dataSource" />
+			<POSTGRE>
+				<JDBC DRIVER="" URL="" USER="" PASSWORD="" />
+				<!--65公网数据库配置信息kulu_pg_lc kulu_pg_bdy -->
+				<DATASOURCE NAME="kulu_pg_lc" />
+				<GUIDSQL SQL="select sys_guid() as GUID from dual" />
+				<DATE SQL="current_timestamp" />
+				<DATEBETWEEN
+					SQL="BETWEEN to_date('fdate','YYYY-MM-DD HH24:MI:SS') AND to_date('tdate','YYYY-MM-DD HH24:MI:SS')" />
+				<DATETOCHAR SQL="to_char(fdate, 'format')" FORMAT="YYYY-MM-DD HH24:MI:SS" />
+				<CHARTODATE SQL="to_date('fdate', 'format')" FORMAT="YYYY-MM-DD HH24:MI:SS" />
+			</POSTGRE>
+		</KULUDB>
+	</BS_DB>
+	<!-- <redis path="localhost" port="6379" password="tyantop2012" pre="KULU_" 
+		session="7200" /> -->
+	<redis path="localhost" port="6379" password="tyantop2012" pre="KULU_"
+		session="7200" />
+	<mq open="false" type="activetmq" server="tcp://182.61.56.21" port="61616"
+		password="kulu###2018" pre="KULU_" />
+	<!-- <mq open="false" type="activetmq" server="tcp://182.61.20.179" port="61616" 
+		password="kulu###2018" pre="KULU_HAS_" /> -->
+	<!-- <redis path="182.61.56.21" port="6379" password="kulu###2018" pre="KULU_" 
+		session="7200" /> -->
+	<upload path="C:\lh_work\tyantop\kulu\source\html\kulutest\files"
+		type="1" url="http://hanshan.vip.coollu.com.cn/kulu/files" sftpuser="kulu"
+		sftpkey="login@75" sftpserv="hanshan.vip.coollu.com.cn" sftpport="22"
+		basepath="/usr/share/nginx/html/has/kulu/files" />
+	<debug islocal="true" level="4" path="" />
+	<license password="D0D53C834FAD9793398E6E15ED6753AF" /><!-- system128 -->
+	<userconfig>
+		<loginobj type="true" javabean="tt.kulu.bi.base.CheckLogin"
+			name="loginUser" usermax="2000" userkey="hqBAY7dq" urlkey="JZhAA5V2"
+			mpkey="tTCsu128" redisdb="1" instpre="kulu" />
+		<company id="KULU000000000" />
+	</userconfig>
+</root>

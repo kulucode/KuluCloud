@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<BS>
+	<BS_PAGE>
+		<DCLOGIN CREATER="lh" BSID="DCLOGIN" BS_URL="system/index.jsp"
+			BS_PAGE_BEAN="tt.kulu.out.base.BSLogin" BS_DETAIL="登录" />
+		<DCFUNC CREATER="mw" BSID="DCFUNC" BS_URL="index.jsp"
+			BS_PAGE_BEAN="tt.kulu.out.base.BSFunc" BS_DETAIL="功能管理" />
+		<DCROLE CREATER="lianghao" BSID="DCROLE" BS_URL="index.jsp"
+			BS_PAGE_BEAN="tt.kulu.out.base.BSRole" BS_DETAIL="角色" />
+		<DCUSER CREATER="lianghao" BSID="DCUSER" BS_URL="index.jsp"
+			BS_PAGE_BEAN="tt.kulu.out.base.BSUser" BS_DETAIL="用户管理" />
+		<DCFILE CREATER="lianghao" BSID="DCFILE" BS_URL="index.jsp"
+			BS_PAGE_BEAN="tt.kulu.out.base.BSFile" BS_DETAIL="文件管理" />
+		<DCDIC CREATER="lianghao" BSID="DCDIC" BS_URL="index.jsp"
+			BS_PAGE_BEAN="tt.kulu.out.base.BSDic" BS_DETAIL="数据字典" />
+		<DCAREA CREATER="lianghao" BSID="DCAREA" BS_URL="index.jsp"
+			BS_PAGE_BEAN="tt.kulu.out.base.BSArea" BS_DETAIL="行政区域" />
+	</BS_PAGE>
+</BS>

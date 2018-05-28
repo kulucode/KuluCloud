@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<BS>
+	<BS_PAGE>
+		<KULUINTERFACE CREATER="lh" BSID="WEBINFACE" BS_URL="system/index.jsp"
+			BS_PAGE_BEAN="tt.kulu.out.biss.BSInterface" BS_DETAIL="酷路接口" />
+		<EQUIPMENT CREATER="lh" BSID="EQUIPMENT" BS_URL="system/index.jsp"
+			BS_PAGE_BEAN="tt.kulu.out.biss.BSEquipment" BS_DETAIL="设备管理" />
+		<COMPANY CREATER="lh" BSID="COMPANY" BS_URL="system/index.jsp"
+			BS_PAGE_BEAN="tt.kulu.out.biss.BSCompany" BS_DETAIL="企业管理" />
+		<TRUCK CREATER="lh" BSID="TRUCK" BS_URL="system/index.jsp"
+			BS_PAGE_BEAN="tt.kulu.out.biss.BSTruck" BS_DETAIL="车辆管理" />
+		<WATCH CREATER="lh" BSID="WATCH" BS_URL="system/index.jsp"
+			BS_PAGE_BEAN="tt.kulu.out.biss.BSWatch" BS_DETAIL="手表管理" />
+		<VEHICLE CREATER="lh" BSID="VEHICLE" BS_URL="system/index.jsp"
+			BS_PAGE_BEAN="tt.kulu.out.biss.BSVehicle" BS_DETAIL="车载管理" />
+		<FAULT CREATER="lh" BSID="FAULT" BS_URL="system/index.jsp"
+			BS_PAGE_BEAN="tt.kulu.out.biss.BSFault" BS_DETAIL="报警管理" />
+		<FANCE CREATER="lh" BSID="FANCE" BS_URL="system/index.jsp"
+			BS_PAGE_BEAN="tt.kulu.out.biss.BSFance" BS_DETAIL="围栏管理" />
+		<STATS CREATER="lh" BSID="STATS" BS_URL="system/index.jsp"
+			BS_PAGE_BEAN="tt.kulu.out.biss.BSStats" BS_DETAIL="统计报表管理" />
+		<INSPECT CREATER="lh" BSID="INSPECT" BS_URL="system/index.jsp"
+			BS_PAGE_BEAN="tt.kulu.out.biss.BSInspect" BS_DETAIL="保养规程管理" />
+	</BS_PAGE>
+</BS>
