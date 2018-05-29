@@ -482,8 +482,8 @@ public class EquipmentDBMang extends BSDBBase {
 		vList.add(wyCode);
 		CachedRowSet rs = this.sqlHelper.queryCachedBySql(
 				this._getEquipmentInstSelectSQL(
-						" and (t.EQP_WYCODE=? OR t.EQP_TOKEN=?)", "").toString(),
-				vList);
+						" and (t.EQP_WYCODE=? OR t.EQP_TOKEN=?)", "")
+						.toString(), vList);
 		if (rs != null) {
 			if (rs.next()) {
 				onePojo = (this._setOneEquipmentInstPojo(rs));

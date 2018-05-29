@@ -1082,13 +1082,13 @@ public class BITruck extends BSDBBase {
 						// 停车超时，新的段号
 						new BIEquipment(m_bs).setEqpInstFDIdToRedis(oneEqpGeo
 								.getEqpInst().getInstId());
-						oneEqpGeo.setLastStopDate(oneEqpGeo.getCreateDate());
+						oneEqpGeo.setLastStopDate(oneEqpGeo.getSysDate());
 					} else if (!lastDate.getString("fdId").equals(
 							(new BIEquipment(null))
 									.getEqpInstFDIdByRedis(oneEqpGeo
 											.getEqpInst().getInstId()))) {
 						// 如果分段ID重置了
-						oneEqpGeo.setLastStopDate(oneEqpGeo.getCreateDate());
+						oneEqpGeo.setLastStopDate(oneEqpGeo.getSysDate());
 					}
 				}
 

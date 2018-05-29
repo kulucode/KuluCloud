@@ -1698,7 +1698,7 @@ public class TruckDBMang extends BSDBBase {
 				onePojo.put("createDate", lastGeo.getCreateDate());// 时间
 				onePojo.put("dir", lastGeo.getDir());// 方向
 				onePojo.put("speed", lastGeo.getSpeed());
-				onePojo.put("fdId ", lastGeo.getFdId());// 分段ID
+				onePojo.put("fdId", lastGeo.getFdId());// 分段ID
 				onePojo.put("lastStopDate", lastGeo.getLastStopDate());// 上次停车时间
 				onePojo.put("fanceFlg", lastGeo.getFanceFlg());
 			}
