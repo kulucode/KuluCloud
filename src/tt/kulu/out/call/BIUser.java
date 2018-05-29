@@ -100,6 +100,9 @@ public class BIUser extends BSDBBase {
 			onePojo = (OrgPojo) JSONObject.toBean(
 					JSONObject.fromObject(redisS), OrgPojo.class, config);
 		}
+		if (onePojo == null) {
+			onePojo = new OrgPojo();
+		}
 		return onePojo;
 	}
 
@@ -687,7 +690,7 @@ public class BIUser extends BSDBBase {
 			throw ep;
 		}
 		if (count > 0) {
-			this.setGroupToRedis(orgId);
+			this.deleteGroupToRedis(orgId);
 		}
 		return count;
 	}

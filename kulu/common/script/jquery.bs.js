@@ -1,11 +1,9 @@
 var origin = window.location.origin == null ? window.location.protocol + "//" + window.location.host : window.location.origin;
-var thisDomain = "http://localhost:8080/KuluCloud";
-var thisFileDomain = "http://localhost:8080/KuluCloud";
-//ws://182.61.56.21/kulucloud/TTWebsocket/
-//ws://localhost:8080/KuluCloud/TTWebsocket/
-var thisWebSocket = "ws://localhost:8080/KuluCloud/TTWebsocket/";
+var thisDomain = origin + "/kulucloud";
+var thisFileDomain = thisDomain;
+var thisWebSocket = "ws://" + window.location.host + "/kulucloud/TTWebsocket/";
 var COOKIE_NAME = "KULUCOOKIE";
-var webHome = origin + "/kulutest";
+var webHome = origin + "/kulu";
 var pointDownTime = 300000;
 
 var vActionRefresh = thisDomain + "/TTService?curPageOperID=refresh&curBSID=";

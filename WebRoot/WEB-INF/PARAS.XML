@@ -19,7 +19,7 @@
 	</BS_DB>
 	<!-- <redis path="localhost" port="6379" password="tyantop2012" pre="KULU_" 
 		session="7200" /> -->
-	<redis path="192.168.1.251" port="6379" password="tyantop2012" pre="KULU_" session="7200" />
+	<redis path="192.168.1.251" port="6379" password="kulu###2018" pre="KULU_" session="7200" />
 	<mq open="false" type="activetmq" server="tcp://192.168.1.251" port="61616"
 		password="kulu###2018" pre="KULU_" />
 	<!-- <mq open="false" type="activetmq" server="tcp://182.61.20.179" port="61616" 

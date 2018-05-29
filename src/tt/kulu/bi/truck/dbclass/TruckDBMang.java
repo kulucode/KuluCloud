@@ -586,9 +586,11 @@ public class TruckDBMang extends BSDBBase {
 					"delete from T_FANCE_TRUCK_R where TRUCK_ID=?", vList);
 			count += sqlHelper.updateBySql(
 					"delete from T_TRUCK_INST_USER where TRUCK_ID=?", vList);
-
+			count += sqlHelper.updateBySql(
+					"delete from T_TRUCK_INST_VIDEO where  TRUCK_ID=?", vList);
 			count += sqlHelper.updateBySql(
 					"delete from T_TRUCK_INST where  TRUCK_ID=?", vList);
+			
 		}
 		return count;
 	}
