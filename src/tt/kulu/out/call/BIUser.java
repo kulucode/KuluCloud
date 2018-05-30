@@ -1738,6 +1738,21 @@ public class BIUser extends BSDBBase {
 							where += " and (" + whereEx + ")";
 						}
 					}
+					if (key.equals("role")) {
+						// 角色
+						where += " and us.USER_INSTID in (select r.USER_INSTID from T_ROLE_USER_R r where r.ROLE_ID in(";
+						String[] vs = v.split(",");
+						String whereEx = "";
+						for (String oneV : vs) {
+							if (!oneV.equals("")) {
+								whereEx += ",?";
+								vList.add(oneV);
+							}
+						}
+						where += ((whereEx.equals("") ? "" : whereEx
+								.substring(1)) + "))");
+					}
+
 					if (key.equals("hasgeo")) {
 						// 关键字
 						where += " and (t.geo <> '' and t.geo is not null)";

@@ -435,6 +435,7 @@ public class BSInterface {
 		String areaId = m_bs.getPrivateMap().get("pg_areaid");
 		String areaName = m_bs.getPrivateMap().get("pg_areaname");
 		String geoArea = m_bs.getPrivateMap().get("pg_geoarea");
+		String role = m_bs.getPrivateMap().get("pg_role");
 		JSONObject paras = new JSONObject();
 		if (sText != null) {
 			paras.put("key", sText);
@@ -447,6 +448,11 @@ public class BSInterface {
 		}
 		if (areaName != null) {
 			paras.put("areaname", areaName);
+		}
+		if (role != null && !role.equals("")) {
+			paras.put("role", role);
+		} else {
+			paras.put("role", "OUTDOORS_STAFF");
 		}
 		paras.put("state", 1);
 		if (geoArea != null) {
@@ -658,6 +664,7 @@ public class BSInterface {
 		String group = m_bs.getPrivateMap().get("pg_group");
 		String userId = m_bs.getPrivateMap().get("pg_uinst");
 		String geoArea = m_bs.getPrivateMap().get("pg_geoarea");
+		String role = m_bs.getPrivateMap().get("pg_role");
 		JSONObject paras = new JSONObject();
 		if (sText != null) {
 			paras.put("key", sText);
@@ -673,6 +680,11 @@ public class BSInterface {
 			paras.put("login", user.getGroupId());
 		}
 		paras.put("state", 0);
+		if (role != null && !role.equals("")) {
+			paras.put("role", role);
+		} else {
+			paras.put("role", "OUTDOORS_STAFF");
+		}
 		paras.put("hasgeo", "1");
 		if (geoArea != null) {
 			// 转化坐标系

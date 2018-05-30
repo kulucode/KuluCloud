@@ -941,6 +941,7 @@ public class BIFile extends BSDBBase {
 						continue;
 					}
 					boolean isNew = false;
+					boolean isNewEqp = false;
 					onePojo = userBI.getOneUserById((sheet.getCell(2, r)
 							.getContents()).trim());
 					if (onePojo == null) {
@@ -1078,22 +1079,36 @@ public class BIFile extends BSDBBase {
 							}
 						}
 						// 云环设备信息
-						oneEqp = eqpBI.getOneEquipmentInstByWyCode(sheet
-								.getCell(12, r).getContents().trim()
-								+ "|"
-								+ sheet.getCell(13, r).getContents().trim());
-						if (oneEqp == null) {
-							// 该设备不能存在
-							oneEqp = new EquipmentInstPojo();
-							oneEqp.setWyCode(sheet.getCell(12, r).getContents()
-									.trim()
-									+ "|"
-									+ sheet.getCell(13, r).getContents().trim());
-							oneEqp.setToken(oneEqp.getWyCode());
+						if (!sheet.getCell(12, r).getContents().trim()
+								.equals("")
+								&& !sheet.getCell(13, r).getContents().trim()
+										.equals("")) {
+							oneEqp = eqpBI
+									.getOneEquipmentInstByWyCode(sheet
+											.getCell(12, r).getContents()
+											.trim()
+											+ "|"
+											+ sheet.getCell(13, r)
+													.getContents().trim());
+							isNewEqp = false;
+							if (oneEqp == null) {
+								// 该设备不能存在
+								oneEqp = new EquipmentInstPojo();
+								oneEqp.setWyCode(sheet.getCell(12, r)
+										.getContents().trim()
+										+ "|"
+										+ sheet.getCell(13, r).getContents()
+												.trim());
+								oneEqp.setToken(oneEqp.getWyCode());
+								isNewEqp = true;
+							}
 							oneEqp.setQrCode(sheet.getCell(11, r).getContents()
 									.trim());
 							oneEqp.setProDate(this.bsDate.getThisDate(0, 0));
 							oneEqp.setUpdateDate(oneEqp.getProDate());
+							// ICCID
+							oneEqp.setPara1(sheet.getCell(14, r).getContents()
+									.trim());
 							oneEqp.setName("云环 " + oneEqp.getQrCode());
 							oneEqp.setEqpDef(eqpBI
 									.getEqpDefByRedis(sheet.getCell(9, r)
@@ -1101,6 +1116,10 @@ public class BIFile extends BSDBBase {
 											+ "_"
 											+ sheet.getCell(10, r)
 													.getContents().trim()));
+							oneEqp.setMangUser(onePojo);
+							if (temSubOrg != null) {
+								oneEqp.setOrg(temSubOrg);
+							}
 							if (oneEqp.getEqpDef() == null) {
 								// 设备类型不存在，则新增
 								oneEqp.setEqpDef(new EquipmentDefPojo());
@@ -1127,17 +1146,15 @@ public class BIFile extends BSDBBase {
 										.setId("EQUIPMENT_DEFTYPE_1");
 								eqpBI.insertEquipmentDef(oneEqp.getEqpDef());
 							}
-							oneEqp.setMangUser(onePojo);
-							if (temSubOrg != null) {
-								oneEqp.setOrg(temSubOrg);
+							if (isNewEqp) {
+								oneEqp.setMangUser(onePojo);
+								if (temSubOrg != null) {
+									oneEqp.setOrg(temSubOrg);
+								}
+								eqpBI.insertEquipmentInst(oneEqp);
+							} else {
+								eqpBI.updateEquipmentInst(oneEqp);
 							}
-							eqpBI.insertEquipmentInst(oneEqp);
-						} else {
-							oneEqp.setMangUser(onePojo);
-							if (temSubOrg != null) {
-								oneEqp.setOrg(temSubOrg);
-							}
-							eqpBI.updateEquipmentInstMUser(oneEqp);
 						}
 						okRow++;
 					}
