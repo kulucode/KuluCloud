@@ -805,6 +805,7 @@ public class BSInterface {
 		String group = m_bs.getPrivateMap().get("pg_group");
 		String userInst = m_bs.getPrivateMap().get("pg_user");
 		String sDate = m_bs.getPrivateMap().get("pg_sdate");
+		String role = m_bs.getPrivateMap().get("pg_role");
 		JSONObject paras = new JSONObject();
 		if (sText != null) {
 			paras.put("key", sText);
@@ -825,6 +826,12 @@ public class BSInterface {
 			paras.put("date", sDate.substring(0, 10) + " 00:00:00");
 		}
 		paras.put("state", 1);
+		if (role != null && !role.equals("")) {
+			paras.put("role", role);
+		} else {
+			paras.put("role", "OUTDOORS_STAFF");
+		}
+
 		// 调用BI
 		BIUser userBI = new BIUser(null, m_bs);
 		// 返回数据
@@ -1840,7 +1847,8 @@ public class BSInterface {
 			oneObj.put("username", onePojo.getTruck().getMangUser().getName());
 			oneObj.put("userphone", onePojo.getTruck().getMangUser()
 					.getmPhone());
-			oneObj.put("oil", onePojo.getOil());
+			oneObj.put("oil",
+					URLlImplBase.AllPrinceDiv(onePojo.getOil(), 10000));
 			oneObj.put("distance",
 					URLlImplBase.AllPrinceDiv(onePojo.getDistance(), 1000));
 			oneObj.put("worktimes",

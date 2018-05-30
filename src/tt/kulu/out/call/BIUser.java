@@ -1890,6 +1890,20 @@ public class BIUser extends BSDBBase {
 					userWhere += " and t1.USER_INSTID=?";
 					vUserList.add(v);
 				}
+				if (key.equals("role")) {
+					// 关键字
+					userWhere += " and t1.USER_INSTID in (select b.USER_INSTID from T_ROLE_USER_R b where b.ROLE_ID in (";
+					String[] vs = v.split(",");
+					String whereEx = "";
+					for (String oneV : vs) {
+						if (!oneV.equals("")) {
+							whereEx += ",?";
+							vUserList.add(oneV);
+						}
+					}
+					userWhere += ((whereEx.equals("") ? "" : whereEx
+							.substring(1)) + "))");
+				}
 				if (key.equals("state")) {
 					// 根
 					userWhere += " and t1.USER_STATE=?";

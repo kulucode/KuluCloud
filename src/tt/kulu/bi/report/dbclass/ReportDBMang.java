@@ -198,7 +198,7 @@ public class ReportDBMang extends BSDBBase {
 		strSQL.append(",t.ORG_ID");
 		// 报表
 		strSQL.append(",sum( to_number( t1.log_distance, '9999999999999999999.99' )) as ALL_DIS");
-		strSQL.append(",sum( to_number( t1.log_oil, '9999999999999999999.99' )) as ALL_OIL");
+		strSQL.append(",sum( to_number( t1.log_oil, '9999999999999999999.99' )) as ALL_OIL");// 0.1mm
 		strSQL.append(",sum( to_number( t1.WORK_TIME, '9999999999999999999.99' )) as ALL_TIME");// 秒
 
 		strSQL.append(" from T_TRUCK_INST t left outer join T_USER tu on t.TRUCK_MANGUSER = tu.USER_INSTID");

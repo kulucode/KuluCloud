@@ -275,25 +275,25 @@
         <div class="dialog-body" style="overflow-y:auto;">
             <form id="vehicleparas-form" name="vehicleparas-form" method="post"
                   class="form-x">
-                <input type="hidden" id="t_dicid" name="t_dicid" value="WATCH_PARAS"/>
+                <input type="hidden" id="t_dicid" name="t_dicid" value="VEHICLE_PARAS"/>
                 <div class="form-group">
                     <div class="label" style="width: 25%;">
-                        <strong>位置上传间隔(分钟)</strong>
+                        <strong>停车时间阈值(分)</strong>
                     </div>
                     <div class="field" style="width: 75%;">
-                        <input class="input" type="text" id="t_eqpr_0" name="t_eqpr_8"
-                               placeholder="位置上传间隔"
-                               data-validate="required:必填,plusinteger:必须是正整数,compare#<300:介于0-200之间"/>
+                        <input class="input" type="text" id="t_dicitem_2" name="t_dicitem_2"
+                               placeholder="停车时间阈值"
+                               data-validate="plusinteger:必须是正整数,compare#<60:介于0-60之间"/>
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="label" style="width: 25%;">
-                        <strong>油量时间间隔(分钟)</strong>
+                        <strong>油量差额阈值(0.1mm)</strong>
                     </div>
                     <div class="field" style="width: 75%;">
-                        <input class="input" type="text" id="t_eqpr_1" name="t_eqpr_1"
-                               placeholder="油量时间间隔"
-                               data-validate="required:必填,plusinteger:必须是正整数,compare#<300:介于0-200之间"/>
+                        <input class="input" type="text" id="t_dicitem_3" name="t_dicitem_3"
+                               placeholder="油量差额阈值"
+                               data-validate="required:必填,plusinteger:必须是正整数,compare#<100000:介于0-100000之间"/>
                     </div>
                 </div>
             </form>

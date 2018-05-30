@@ -200,6 +200,7 @@ function showEqpInstBase(_data, _type) {
     $("#t_eqpname").val(_data.name);
     $("#t_eqpimei").val(_im[0]);
     $("#t_eqpimsi").val(_im[1]);
+    $("#t_eqppara1").val(_data.para1);
     $("#s_eqpdef").val(_data.def);
     $("#t_eqpqr").val(_data.qr);
     $("#t_eqpphone").val(_data.phone);

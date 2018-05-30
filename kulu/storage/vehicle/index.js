@@ -243,9 +243,10 @@ function setUserOrg(_org) {
 function getVehicleParas(_vehickeId, _name) {
     doRefresh(null, "VEHICLE", "getVehicleParas", "&vehickeid=" + _vehickeId, function (_data) {
         if (_data.r == 0) {
-            $("#t_eqpr_0").val(_data.gps_date);
-            $("#t_eqpr_1").val(_data.oil_date);
-
+            //$("#t_eqpr_0").val(_data.gps_date);
+            //$("#t_eqpr_1").val(_data.oil_date);
+            $("#t_dicitem_2").val(_data.stop_date);
+            $("#t_dicitem_3").val(_data.oil_diff);
         } else {
             alert(_data.error);
         }

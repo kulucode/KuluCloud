@@ -179,37 +179,68 @@ public class BSVehicle {
 	 */
 	public BSObject do_updateVehicleParas(BSObject m_bs) throws Exception {
 		JSONObject retJSON = new JSONObject();
-		String dicid = m_bs.getPrivateMap().get("vehickeid");
+		String dicid = m_bs.getPrivateMap().get("t_dicid");
 		// 调用BI
 		BIDic dicBI = new BIDic(null, m_bs);
 		// 返回数据
 		DicItemPojo oneItem = new DicItemPojo();
 		// 位置上传间隔
-		oneItem = dicBI.getDicItemByRedis("VEHICLE_PARAS_0");
+		// oneItem = dicBI.getDicItemByRedis("VEHICLE_PARAS_0");
+		// if (oneItem == null) {
+		// oneItem = new DicItemPojo();
+		// oneItem.getDic().setId(dicid);
+		// oneItem.setName("位置上传间隔");
+		// oneItem.setIndex(0);
+		// oneItem.setValue("gps_date");
+		// oneItem.setValue2(m_bs.getPrivateMap().get("t_dicitem_0"));
+		// dicBI.insertDicItem(oneItem);
+		// } else {
+		// oneItem.setValue2(m_bs.getPrivateMap().get("t_dicitem_0"));
+		// dicBI.updateDicItem(oneItem);
+		// }
+		// // 油量时间间隔
+		// oneItem = dicBI.getDicItemByRedis("VEHICLE_PARAS_1");
+		// if (oneItem == null) {
+		// oneItem = new DicItemPojo();
+		// oneItem.getDic().setId(dicid);
+		// oneItem.setName("油量时间间隔");
+		// oneItem.setIndex(0);
+		// oneItem.setValue("oil_date");
+		// oneItem.setValue2(m_bs.getPrivateMap().get("t_dicitem_1"));
+		// dicBI.insertDicItem(oneItem);
+		// } else {
+		// oneItem.setValue2(m_bs.getPrivateMap().get("t_dicitem_1"));
+		// dicBI.updateDicItem(oneItem);
+		// }
+		// 停车时间阈值
+		oneItem = dicBI.getDicItemByRedis("VEHICLE_PARAS_2");
 		if (oneItem == null) {
 			oneItem = new DicItemPojo();
+			oneItem.setId("VEHICLE_PARAS_2");
 			oneItem.getDic().setId(dicid);
-			oneItem.setName("位置上传间隔");
+			oneItem.setName("停车时间阈值");
 			oneItem.setIndex(0);
-			oneItem.setValue("gps_date");
-			oneItem.setValue2(m_bs.getPrivateMap().get("t_dicitem_0"));
+			oneItem.setValue("stop_date");
+			oneItem.setValue2(m_bs.getPrivateMap().get("t_dicitem_2"));
 			dicBI.insertDicItem(oneItem);
 		} else {
-			oneItem.setValue2(m_bs.getPrivateMap().get("t_dicitem_0"));
+			oneItem.setValue2(m_bs.getPrivateMap().get("t_dicitem_2"));
 			dicBI.updateDicItem(oneItem);
 		}
-		// 油量时间间隔
-		oneItem = dicBI.getDicItemByRedis("VEHICLE_PARAS_1");
+		// 油量差额阈值
+		oneItem = dicBI.getDicItemByRedis("VEHICLE_PARAS_3");
 		if (oneItem == null) {
 			oneItem = new DicItemPojo();
+			oneItem.setId("VEHICLE_PARAS_3");
 			oneItem.getDic().setId(dicid);
-			oneItem.setName("油量时间间隔");
+			oneItem.setName("油量差额阈值");
 			oneItem.setIndex(0);
-			oneItem.setValue("oil_date");
-			oneItem.setValue2(m_bs.getPrivateMap().get("t_dicitem_1"));
+			oneItem.setValue("oil_diff");
+			oneItem.setValue2(m_bs.getPrivateMap().get("t_dicitem_3"));
 			dicBI.insertDicItem(oneItem);
 		} else {
-			oneItem.setValue2(m_bs.getPrivateMap().get("t_dicitem_1"));
+			oneItem.getDic().setId(dicid);
+			oneItem.setValue2(m_bs.getPrivateMap().get("t_dicitem_3"));
 			dicBI.updateDicItem(oneItem);
 		}
 		retJSON.put("r", 0);

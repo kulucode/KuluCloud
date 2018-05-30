@@ -1048,6 +1048,7 @@ public class BITruck extends BSDBBase {
 		List<Object> vList = new ArrayList<Object>();
 		vList.add(oneEqpGeo.getEqpInst().getInstId());
 		// 写入位置
+		BIDic dicBI = new BIDic(null, null);
 		EquipmentDBMang quipmentDB = new EquipmentDBMang(sqlHelper, m_bs);
 		oneEqpGeo.setSpeed(String.valueOf(onePojo.getSpeed()));
 		oneEqpGeo.setLastStopDate("");
@@ -1069,7 +1070,6 @@ public class BITruck extends BSDBBase {
 					oneEqpGeo.setLastStopDate(lastDate
 							.getString("lastStopDate"));
 					// 得到停车间隔的时间
-					BIDic dicBI = new BIDic(null, null);
 					DicItemPojo oneItem = dicBI
 							.getDicItemByRedis("VEHICLE_PARAS_2");
 					int stopDate = 30;
@@ -1097,6 +1097,11 @@ public class BITruck extends BSDBBase {
 		count += quipmentDB.insertEquipmentGeometry(oneEqpGeo);
 		// 得到油量算法
 		// 得到上一条记录
+		DicItemPojo oneOilItem = dicBI.getDicItemByRedis("VEHICLE_PARAS_3");
+		String oilDiffMax = "1000";
+		if (oneOilItem != null && !oneOilItem.getValue2().equals("")) {
+			oilDiffMax = oneOilItem.getValue2();
+		}
 		String lastDiff = "";
 		// String lastDiff = (String) sqlHelper
 		// .queryObjectBySql(
@@ -1112,6 +1117,9 @@ public class BITruck extends BSDBBase {
 		float diff = Float.valueOf(lastDiff)
 				- Float.valueOf(onePojo.getOilLevel());
 		if (diff <= 0) {
+			diff = 0;
+		}
+		if (diff - Float.valueOf(oilDiffMax) >= 0) {
 			diff = 0;
 		}
 		float valume = 0;
