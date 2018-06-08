@@ -183,6 +183,71 @@ public class BIEquipment extends BSDBBase {
 
 	/**
 	 * <p>
+	 * 方法名称: getEqpInstLastWorkTimeByRedis
+	 * </p>
+	 * <p>
+	 * 方法功能描述: 从redis得到车辆类型
+	 * </p>
+	 * <p>
+	 * 创建人: 梁浩
+	 * </p>
+	 * <p>
+	 * 输入参数描述: BSObject m_bs:BinaryStar框架参数集。
+	 * </p>
+	 * <p>
+	 * 输出参数描述: BSObject：BinaryStar框架参数集。
+	 * </p>
+	 * 
+	 * @throws Exception
+	 */
+	public String getEqpInstLastWorkTimeByRedis(String instid) throws Exception {
+		BIRedis redisBI = new BIRedis();
+		String redisS = redisBI.getMapData("EQPLASTWT_MAP", instid,
+				URLlImplBase.REDIS_KULUDATA);
+		if (redisS == null || redisS.trim().equals("")) {
+			// 从数据库的到
+			EquipmentInstWorkLogPojo openLog = new BIEquipment(null)
+					.getLastEquipmentInstWorkLog(instid, -1, 0);
+			if (openLog != null) {
+				if (openLog.getState() == 0) {
+					openLog.setDate("-1");
+				}
+				redisS = openLog.getDate();
+				redisBI.setMapData("EQPLASTWT_MAP", instid, openLog.getDate(),
+						URLlImplBase.REDIS_KULUDATA);
+			}
+		}
+		return redisS;
+	}
+
+	/**
+	 * <p>
+	 * 方法名称: getEqpInstLastWorkTimeByRedis
+	 * </p>
+	 * <p>
+	 * 方法功能描述: 从redis得到车辆类型
+	 * </p>
+	 * <p>
+	 * 创建人: 梁浩
+	 * </p>
+	 * <p>
+	 * 输入参数描述: BSObject m_bs:BinaryStar框架参数集。
+	 * </p>
+	 * <p>
+	 * 输出参数描述: BSObject：BinaryStar框架参数集。
+	 * </p>
+	 * 
+	 * @throws Exception
+	 */
+	public void setEqpInstLastWorkTimeByRedis(String instid, String date)
+			throws Exception {
+		BIRedis redisBI = new BIRedis();
+		redisBI.setMapData("EQPLASTWT_MAP", instid, date,
+				URLlImplBase.REDIS_KULUDATA);
+	}
+
+	/**
+	 * <p>
 	 * 方法名称: getEquipmentDefList
 	 * </p>
 	 * <p>
@@ -930,6 +995,8 @@ public class BIEquipment extends BSDBBase {
 		}
 		if (count > 0 && onePojo != null && !onePojo.getInstId().equals("")) {
 			this.setEqpInstFDIdToRedis(onePojo.getInstId());
+			this.setEqpInstLastWorkTimeByRedis(onePojo.getInstId(),
+					this.bsDate.getThisDate(0, 0));
 		}
 		return count;
 	}
@@ -1007,6 +1074,10 @@ public class BIEquipment extends BSDBBase {
 			sqlHelper.rollback();
 			ep.printStackTrace();
 			throw ep;
+		}
+		if (count > 0) {
+			// 设备离线
+			this.setEqpInstLastWorkTimeByRedis(onePojo.getInstId(), "-1");
 		}
 		return count;
 	}

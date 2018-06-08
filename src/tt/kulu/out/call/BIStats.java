@@ -188,12 +188,12 @@ public class BIStats extends BSDBBase {
 	 * 
 	 * @throws Exception
 	 */
-	public ArrayList<TruckReportPojo> getTruckReportList(JSONObject paras)
-			throws Exception {
+	public ArrayList<TruckReportPojo> getTruckReportList(JSONObject paras,
+			long f, long t) throws Exception {
 		ArrayList<TruckReportPojo> list = new ArrayList<TruckReportPojo>();
 		SqlExecute sqlHelper = new SqlExecute();
 		try {
-			list = this.getTruckReportList(sqlHelper, paras);
+			list = this.getTruckReportList(sqlHelper, paras, f, t);
 		} catch (Exception ep) {
 			ep.printStackTrace();
 			throw ep;
@@ -230,7 +230,7 @@ public class BIStats extends BSDBBase {
 	 * @throws Exception
 	 */
 	public ArrayList<TruckReportPojo> getTruckReportList(SqlExecute sqlHelper,
-			JSONObject paras) throws Exception {
+			JSONObject paras, long f, long t) throws Exception {
 		Iterator<String> keys = paras.keys();
 		List<Object> vWorkList = new ArrayList<Object>();
 		List<Object> vUserList = new ArrayList<Object>();
@@ -287,6 +287,11 @@ public class BIStats extends BSDBBase {
 					truckWhere += " and t.TRUCK_ID=?";
 					vUserList.add(v);
 				}
+				if (key.equals("truck")) {
+					// 车辆ID
+					truckWhere += " and t.TRUCK_STATE=?";
+					vUserList.add(Integer.parseInt(v));
+				}
 			}
 		}
 		where.put("work", workWhere);
@@ -303,7 +308,8 @@ public class BIStats extends BSDBBase {
 								dp.getString("maxdate")));
 			}
 		}
-		return reportDB.getTruckReportList(where, orderBy, vWorkList);
+		paras.put("max", reportDB.getTruckReportCount(where, vWorkList));
+		return reportDB.getTruckReportList(where, orderBy, vWorkList, f, t);
 	}
 
 	/**
@@ -332,12 +338,12 @@ public class BIStats extends BSDBBase {
 	 * 
 	 * @throws Exception
 	 */
-	public ArrayList<UserReportPojo> getUserReportList(JSONObject paras)
-			throws Exception {
+	public ArrayList<UserReportPojo> getUserReportList(JSONObject paras,
+			long f, long t) throws Exception {
 		ArrayList<UserReportPojo> list = new ArrayList<UserReportPojo>();
 		SqlExecute sqlHelper = new SqlExecute();
 		try {
-			list = this.getUserReportList(sqlHelper, paras);
+			list = this.getUserReportList(sqlHelper, paras, f, t);
 		} catch (Exception ep) {
 			ep.printStackTrace();
 			throw ep;
@@ -374,7 +380,7 @@ public class BIStats extends BSDBBase {
 	 * @throws Exception
 	 */
 	public ArrayList<UserReportPojo> getUserReportList(SqlExecute sqlHelper,
-			JSONObject paras) throws Exception {
+			JSONObject paras, long f, long t) throws Exception {
 		Iterator<String> keys = paras.keys();
 		List<Object> vWorkList = new ArrayList<Object>();
 		List<Object> vUserList = new ArrayList<Object>();
@@ -459,7 +465,8 @@ public class BIStats extends BSDBBase {
 								dp.getString("maxdate")));
 			}
 		}
-		return reportDB.getUserReportList(where, orderBy, vWorkList);
+		paras.put("max", reportDB.getUserReportCount(where, vWorkList));
+		return reportDB.getUserReportList(where, orderBy, vWorkList, f, t);
 	}
 
 	/**

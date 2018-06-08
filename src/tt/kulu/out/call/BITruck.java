@@ -994,6 +994,7 @@ public class BITruck extends BSDBBase {
 			throw ep;
 		}
 		// 关联了车辆则执行如下代码
+		BIEquipment eqpBI = new BIEquipment(null);
 		if (oneEqpGeo.getEqpInst().getTruck() != null
 				&& !oneEqpGeo.getEqpInst().getTruck().getId().equals("")) {
 			// 判断围栏，并写入数据
@@ -1001,24 +1002,31 @@ public class BITruck extends BSDBBase {
 					oneEqpGeo);
 			// 修改工作时长
 			// 得到上次开机时间
-			EquipmentInstWorkLogPojo openLog = new BIEquipment(null)
-					.getLastEquipmentInstWorkLog(oneEqpGeo.getEqpInst()
-							.getInstId(), -1, 0);
+			EquipmentInstWorkLogPojo openLog = new EquipmentInstWorkLogPojo();
+			openLog.getEqpInst().setInstId(oneEqpGeo.getEqpInst().getInstId());
+			openLog.setState(1);
+			String lastD = eqpBI.getEqpInstLastWorkTimeByRedis(oneEqpGeo
+					.getEqpInst().getInstId());
+			lastD = (lastD == null || lastD.equals("-1")) ? oneEqpGeo
+					.getSysDate() : lastD;
+			openLog.setDate(lastD);
 			if (openLog != null
 					&& openLog.getState() == 1
 					&& this.bsDate.getDateMillCount(openLog.getDate(),
-							oneEqpGeo.getCreateDate()) > 0) {
-				// 更新上次开机时间
+							oneEqpGeo.getSysDate()) > 0) {
+				// 更新车辆工作时长
 				this.updateTruckWorkTime(oneEqpGeo.getEqpInst().getTruck()
-						.getId(), openLog.getDate(), oneEqpGeo.getCreateDate());
-				openLog.setDate(oneEqpGeo.getCreateDate());
-				new BIEquipment(null).updateEquipmentInstWorkLog(openLog);
+						.getId(), openLog.getDate(), oneEqpGeo.getSysDate());
+				openLog.setDate(oneEqpGeo.getSysDate());
+				// new BIEquipment(null).updateEquipmentInstWorkLog(openLog);
 			}
 		}
 		if (count > 0) {
 			// 设置最新数据如redis
 			this.setVehicleNewestToRedis(this.getVehicleNewestByInst(oneEqpGeo
 					.getEqpInst().getInstId()));
+			eqpBI.setEqpInstLastWorkTimeByRedis(oneEqpGeo.getEqpInst()
+					.getInstId(), oneEqpGeo.getSysDate());
 		}
 
 		return count;
@@ -1429,7 +1437,7 @@ public class BITruck extends BSDBBase {
 				eDate) / 1000));
 		count += truckDB.updateTruckWorkStatsWorkTime(oneStats);
 
-		// 修改当天日志表的时长
+		// 更新车辆当天日志表的时长
 		TruckWorkDayLogsPojo oneDay = new TruckWorkDayLogsPojo();
 		oneDay.getTruck().setId(truckId);
 		oneDay.setDate(eDate);

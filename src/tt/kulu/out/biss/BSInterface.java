@@ -680,6 +680,7 @@ public class BSInterface {
 			paras.put("login", user.getGroupId());
 		}
 		paras.put("state", 0);
+		paras.put("usstate", 1);
 		if (role != null && !role.equals("")) {
 			paras.put("role", role);
 		} else {
@@ -800,12 +801,17 @@ public class BSInterface {
 	 */
 	public BSObject do_searchUserWordDayList(BSObject m_bs) throws Exception {
 		LoginUserPojo user = BILogin.getLoginUser(m_bs);
+		long startNum = 0;
+		int pageNum = 0;
+		int pageSize = 0;
 		JSONObject retJSON = new JSONObject();
 		String sText = m_bs.getPrivateMap().get("pg_keyword");
 		String group = m_bs.getPrivateMap().get("pg_group");
 		String userInst = m_bs.getPrivateMap().get("pg_user");
 		String sDate = m_bs.getPrivateMap().get("pg_sdate");
 		String role = m_bs.getPrivateMap().get("pg_role");
+		String pageNumStr = m_bs.getPrivateMap().get("pg_num");
+		String pageSizeStr = m_bs.getPrivateMap().get("pg_size");
 		JSONObject paras = new JSONObject();
 		if (sText != null) {
 			paras.put("key", sText);
@@ -831,13 +837,26 @@ public class BSInterface {
 		} else {
 			paras.put("role", "OUTDOORS_STAFF");
 		}
-
+		if (pageNumStr != null) {
+			pageNum = Integer.parseInt(pageNumStr);
+		} else {
+			pageNum = 0;
+		}
+		if (pageNum < 0) {
+			pageNum = 0;
+		}
+		if (pageSizeStr != null) {
+			pageSize = Integer.parseInt(pageSizeStr);
+		} else {
+			pageSize = 200;
+		}
+		startNum = pageSize * pageNum;
 		// 调用BI
 		BIUser userBI = new BIUser(null, m_bs);
 		// 返回数据
 		JSONArray userlist = new JSONArray();
-		ArrayList<UserWorkDayLogsPojo> list = userBI
-				.getUserWorkDayLogsList(paras);
+		ArrayList<UserWorkDayLogsPojo> list = userBI.getUserWorkDayLogsList(
+				paras, startNum, startNum + pageSize - 1);
 		for (UserWorkDayLogsPojo onePojo : list) {
 			JSONObject oneObj = new JSONObject();
 			oneObj.put("tbindex", userlist.size() + 1);
@@ -875,7 +894,7 @@ public class BSInterface {
 			userlist.add(oneObj);
 		}
 		retJSON.put("data", userlist);
-		retJSON.put("count", userlist.size());
+		retJSON.put("count", paras.getLong("max"));
 		retJSON.put("code", 0);
 		retJSON.put("msg", URLlImplBase.ErrorMap.get(retJSON.getInt("code")));
 		m_bs.setRetrunObj(retJSON);
@@ -1786,12 +1805,18 @@ public class BSInterface {
 	 */
 	public BSObject do_searchTruckReportList(BSObject m_bs) throws Exception {
 		LoginUserPojo user = BILogin.getLoginUser(m_bs);
+		long startNum = 1;
+		int pageNum = 0;
+		int pageSize = 0;
 		JSONObject retJSON = new JSONObject();
 		String sText = m_bs.getPrivateMap().get("pg_keyword");
 		String group = m_bs.getPrivateMap().get("pg_group");
 		String truck = m_bs.getPrivateMap().get("pg_truck");
 		String sDate = m_bs.getPrivateMap().get("pg_sdate");
 		String eDate = m_bs.getPrivateMap().get("pg_edate");
+		String pageNumStr = m_bs.getPrivateMap().get("pg_num");
+		String pageSizeStr = m_bs.getPrivateMap().get("pg_size");
+
 		long days = 0;
 		JSONObject paras = new JSONObject();
 		if (sText != null) {
@@ -1824,11 +1849,26 @@ public class BSInterface {
 				&& user.getRoleWhere().indexOf("'ADMIN'") < 0) {
 			paras.put("login", user.getGroupId());
 		}
+		if (pageNumStr != null) {
+			pageNum = Integer.parseInt(pageNumStr);
+		} else {
+			pageNum = 0;
+		}
+		if (pageNum < 0) {
+			pageNum = 0;
+		}
+		if (pageSizeStr != null) {
+			pageSize = Integer.parseInt(pageSizeStr);
+		} else {
+			pageSize = 500;
+		}
+		startNum = pageSize * pageNum;
 		// 调用BI
 		BIStats statsBI = new BIStats(null, m_bs);
 		// 返回数据
 		JSONArray retlist = new JSONArray();
-		ArrayList<TruckReportPojo> list = statsBI.getTruckReportList(paras);
+		ArrayList<TruckReportPojo> list = statsBI.getTruckReportList(paras,
+				startNum, startNum + pageSize - 1);
 		if (days == 0 && paras.containsKey("days")) {
 			days = paras.getLong("days");
 		}
@@ -1867,7 +1907,7 @@ public class BSInterface {
 			retlist.add(oneObj);
 		}
 		retJSON.put("data", retlist);
-		retJSON.put("count", retlist.size());
+		retJSON.put("count", paras.getLong("max"));
 		retJSON.put("code", 0);
 		retJSON.put("msg", URLlImplBase.ErrorMap.get(retJSON.getInt("code")));
 		m_bs.setRetrunObj(retJSON);
@@ -1876,7 +1916,7 @@ public class BSInterface {
 
 	/**
 	 * <p>
-	 * 方法名：do_searchTruckReportList
+	 * 方法名：do_searchUserReportList
 	 * </p>
 	 * <p>
 	 * 方法描述：搜索车辆工作报告情况
@@ -1890,12 +1930,18 @@ public class BSInterface {
 	 */
 	public BSObject do_searchUserReportList(BSObject m_bs) throws Exception {
 		LoginUserPojo user = BILogin.getLoginUser(m_bs);
+		long startNum = 1;
+		int pageNum = 0;
+		int pageSize = 0;
 		JSONObject retJSON = new JSONObject();
 		String sText = m_bs.getPrivateMap().get("pg_keyword");
 		String group = m_bs.getPrivateMap().get("pg_group");
 		String userInst = m_bs.getPrivateMap().get("pg_user");
 		String sDate = m_bs.getPrivateMap().get("pg_sdate");
 		String eDate = m_bs.getPrivateMap().get("pg_edate");
+		String pageNumStr = m_bs.getPrivateMap().get("pg_num");
+		String pageSizeStr = m_bs.getPrivateMap().get("pg_size");
+
 		JSONObject paras = new JSONObject();
 		long days = 0;
 		paras.put("role", "OUTDOORS_STAFF,USER_MANG,TRUCK_MANG,DRIVER");
@@ -1929,11 +1975,26 @@ public class BSInterface {
 				&& user.getRoleWhere().indexOf("'ADMIN'") < 0) {
 			paras.put("login", user.getGroupId());
 		}
+		if (pageNumStr != null) {
+			pageNum = Integer.parseInt(pageNumStr);
+		} else {
+			pageNum = 0;
+		}
+		if (pageNum < 0) {
+			pageNum = 0;
+		}
+		if (pageSizeStr != null) {
+			pageSize = Integer.parseInt(pageSizeStr);
+		} else {
+			pageSize = 500;
+		}
+		startNum = pageSize * pageNum;
 		// 调用BI
 		BIStats statsBI = new BIStats(null, m_bs);
 		// 返回数据
 		JSONArray retlist = new JSONArray();
-		ArrayList<UserReportPojo> list = statsBI.getUserReportList(paras);
+		ArrayList<UserReportPojo> list = statsBI.getUserReportList(paras,
+				startNum, startNum + pageSize - 1);
 		if (days == 0 && paras.containsKey("days")) {
 			days = paras.getLong("days");
 		}
@@ -1967,7 +2028,7 @@ public class BSInterface {
 			retlist.add(oneObj);
 		}
 		retJSON.put("data", retlist);
-		retJSON.put("count", retlist.size());
+		retJSON.put("count", paras.getLong("max"));
 		retJSON.put("code", 0);
 		retJSON.put("msg", URLlImplBase.ErrorMap.get(retJSON.getInt("code")));
 		m_bs.setRetrunObj(retJSON);
@@ -1991,12 +2052,17 @@ public class BSInterface {
 	public BSObject do_searchUserReportListByWeek(BSObject m_bs)
 			throws Exception {
 		LoginUserPojo user = BILogin.getLoginUser(m_bs);
+		long startNum = 1;
+		int pageNum = 0;
+		int pageSize = 0;
 		JSONObject retJSON = new JSONObject();
 		String sText = m_bs.getPrivateMap().get("pg_keyword");
 		String userInst = m_bs.getPrivateMap().get("pg_uinst");
 		String sDate = m_bs.getPrivateMap().get("pg_sdate");
 		String eDate = m_bs.getPrivateMap().get("pg_edate");
 		String daysStr = m_bs.getPrivateMap().get("pg_days");// 间隔时间
+		String pageNumStr = m_bs.getPrivateMap().get("pg_num");
+		String pageSizeStr = m_bs.getPrivateMap().get("pg_size");
 		JSONObject paras = new JSONObject();
 		long days = 6;
 		if (daysStr != null && !daysStr.equals("")) {
@@ -2033,7 +2099,20 @@ public class BSInterface {
 							- eCdate.get(Calendar.DAY_OF_WEEK) - 1);
 		}
 		days = (m_bs.getDateEx().getDateCount(sDate, eDate) + 1) / 7;
-		// 调用BI
+		if (pageNumStr != null) {
+			pageNum = Integer.parseInt(pageNumStr);
+		} else {
+			pageNum = 0;
+		}
+		if (pageNum < 0) {
+			pageNum = 0;
+		}
+		if (pageSizeStr != null) {
+			pageSize = Integer.parseInt(pageSizeStr);
+		} else {
+			pageSize = 500;
+		}
+		startNum = pageSize * pageNum; // 调用BI
 		BIStats statsBI = new BIStats(null, m_bs);
 		// 返回数据
 		JSONArray retlist = new JSONArray();
@@ -2042,7 +2121,8 @@ public class BSInterface {
 			sCdate.add(Calendar.DATE, 6);
 			eDate = m_bs.getDateEx().getCalendarToString(sCdate) + " 23:59:59";
 			paras.put("date", sDate + "," + eDate);
-			ArrayList<UserReportPojo> list = statsBI.getUserReportList(paras);
+			ArrayList<UserReportPojo> list = statsBI.getUserReportList(paras,
+					startNum, startNum + pageSize - 1);
 			for (UserReportPojo onePojo : list) {
 				JSONObject oneObj = new JSONObject();
 				oneObj.put("date", m_bs.getDateEx().getCalendarToString(sCdate));
@@ -3831,7 +3911,8 @@ public class BSInterface {
 			BIStats statsBI = new BIStats(null, m_bs);
 			// 返回数据
 			JSONArray retlist = new JSONArray();
-			ArrayList<UserReportPojo> list = statsBI.getUserReportList(paras);
+			ArrayList<UserReportPojo> list = statsBI.getUserReportList(paras,
+					0, -1);
 			if (days == 0 && paras.containsKey("days")) {
 				days = paras.getLong("days");
 			}
@@ -4023,7 +4104,8 @@ public class BSInterface {
 			BIStats statsBI = new BIStats(null, m_bs);
 			// 返回数据
 			JSONArray retlist = new JSONArray();
-			ArrayList<TruckReportPojo> list = statsBI.getTruckReportList(paras);
+			ArrayList<TruckReportPojo> list = statsBI.getTruckReportList(paras,
+					0, -1);
 			if (days == 0 && paras.containsKey("days")) {
 				days = paras.getLong("days");
 			}

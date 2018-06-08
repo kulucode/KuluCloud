@@ -24,12 +24,18 @@ function ReportIni() {
 }
 
 //搜索车辆
-function searchUserReport() {
+function searchUserReport(_page) {
+    if (_page == null) {
+        _page = $("#report_page_thisp").val();
+    }
+    if (_page == null || _page == "" || _page == 0) {
+        _page = 1;
+    }
     doRefresh(
         "frmBusiness",
         "STATS",
         "searchUserReportList",
-        "",
+        "&pg_size=50&pg_num=" + (_page - 1),
         function (_data) {
             clearTable("report_tab");
             if (_data.r == 0) {
@@ -46,7 +52,7 @@ function searchUserReport() {
                     addTableCell("report_tab", _oneTr, "abs", oneD.abs);
                     addTableCell("report_tab", _oneTr, "late", oneD.late);
                 }
-                setPage("report_page", _data.data.length, _data.data.length, 1, "");
+                setPage("report_page", _data.max, 50, _page, "searchUserReport");
                 $(document).scrollTop(0);
             }
         });

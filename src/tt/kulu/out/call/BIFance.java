@@ -800,9 +800,9 @@ public class BIFance extends BSDBBase {
 			// 车载，人用
 			TruckWorkDayLogsPojo oneUWDL = new TruckWorkDayLogsPojo();
 			oneUWDL.setTruck(oneEqpGeo.getEqpInst().getTruck());
-			oneUWDL.setDate(oneEqpGeo.getCreateDate());
+			oneUWDL.setDate(oneEqpGeo.getSysDate());
 			oneUWDL.setId(oneEqpGeo.getEqpInst().getTruck().getId() + "_"
-					+ oneEqpGeo.getCreateDate().substring(0, 10));
+					+ oneEqpGeo.getSysDate().substring(0, 10));
 			oneUWDL.setOpType(0);
 			oneUWDL.setOil(String.valueOf(onePojo.getOilDeff()));
 			oneUWDL.setDistance(eqpDB.getGeometryLastDisdance(oneEqpGeo, 1));

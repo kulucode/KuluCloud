@@ -6,15 +6,15 @@ import java.util.List;
 
 import net.sf.json.JSONObject;
 
+import com.alibaba.fastjson.JSON;
 import com.tt4j2ee.db.SqlExecute;
 import com.tt4j2ee.m.BSObject;
 
 import tt.kulu.bi.base.BSDBBase;
 import tt.kulu.bi.base.URLlImplBase;
 import tt.kulu.bi.storage.dbclass.EquipmentDBMang;
-import tt.kulu.bi.truck.dbclass.TruckDBMang;
-import tt.kulu.bi.user.dbclass.BSUserDBMang;
 import tt.kulu.bi.user.pojo.UserWorkDayLogsPojo;
+import tt.kulu.bi.user.pojo.UserWorkParasMinPojo;
 import tt.kulu.bi.user.pojo.UserWorkParasPojo;
 import tt.kulu.bi.watch.dbclass.WatchDBMang;
 import tt.kulu.bi.watch.pojo.InBloodPressureOkCmd;
@@ -46,6 +46,74 @@ public class BIWatch extends BSDBBase {
 
 	public BIWatch(SqlExecute sqlHelper, BSObject m_bs) throws Exception {
 		super(sqlHelper, m_bs);
+	}
+
+	/**
+	 * <p>
+	 * 方法名称: getTruckDefByRedis
+	 * </p>
+	 * <p>
+	 * 方法功能描述: 从redis得到车辆类型
+	 * </p>
+	 * <p>
+	 * 创建人: 梁浩
+	 * </p>
+	 * <p>
+	 * 输入参数描述: BSObject m_bs:BinaryStar框架参数集。
+	 * </p>
+	 * <p>
+	 * 输出参数描述: BSObject：BinaryStar框架参数集。
+	 * </p>
+	 * 
+	 * @throws Exception
+	 */
+	public UserWorkParasMinPojo getWatchLastDataByRedis(String instid)
+			throws Exception {
+		UserWorkParasMinPojo onePojo = new UserWorkParasMinPojo();
+		if (!instid.equals("")) {
+			BIRedis redisBI = new BIRedis();
+			String redisS = redisBI.getMapData("WATCHLASTDATA_MAP", instid,
+					URLlImplBase.REDIS_KULUDATA);
+			if (redisS == null || redisS.trim().equals("")) {
+				// 从数据库的到
+				onePojo = this.getOneWatchWordParasMinByInstId(instid);
+				if (onePojo != null) {
+					redisBI.setMapData("WATCHLASTDATA_MAP", instid,
+							JSON.toJSONString(onePojo),
+							URLlImplBase.REDIS_KULUDATA);
+				}
+			} else {
+				onePojo = JSON.parseObject(redisS, UserWorkParasMinPojo.class);
+			}
+		}
+		return onePojo;
+	}
+
+	/**
+	 * <p>
+	 * 方法名称: getTruckDefByRedis
+	 * </p>
+	 * <p>
+	 * 方法功能描述: 从redis得到车辆类型
+	 * </p>
+	 * <p>
+	 * 创建人: 梁浩
+	 * </p>
+	 * <p>
+	 * 输入参数描述: BSObject m_bs:BinaryStar框架参数集。
+	 * </p>
+	 * <p>
+	 * 输出参数描述: BSObject：BinaryStar框架参数集。
+	 * </p>
+	 * 
+	 * @throws Exception
+	 */
+	public void setWatchLastDataToRedis(UserWorkParasMinPojo onePojo)
+			throws Exception {
+		BIRedis redisBI = new BIRedis();
+		redisBI.setMapData("WATCHLASTDATA_MAP", onePojo.getEqpInst(),
+				JSON.toJSONString(onePojo), URLlImplBase.REDIS_KULUDATA);
+		return;
 	}
 
 	/**
@@ -528,6 +596,66 @@ public class BIWatch extends BSDBBase {
 		WatchDBMang watchDB = new WatchDBMang(sqlHelper, m_bs);
 		paras.put("max", watchDB.getWatchWordParasCount(where, vList));
 		return watchDB.getWatchWordParasList(where, orderBy, vList, f, t);
+	}
+
+	/**
+	 * <p>
+	 * 方法名称: getOneWatchWordParasMinByInstId
+	 * </p>
+	 * <p>
+	 * 方法功能描述: 根据ID得到单个云环最新数据。
+	 * </p>
+	 * <p>
+	 * 创建人: 梁浩
+	 * </p>
+	 * <p>
+	 * 输入参数描述: JSONObject paras：输入的条件。
+	 * </p>
+	 * <p>
+	 * 输出参数描述: ArrayList<ActivityPojo> list :活动列表。
+	 * </p>
+	 * 
+	 * @throws Exception
+	 */
+	public UserWorkParasMinPojo getOneWatchWordParasMinByInstId(
+			String equipmentId) throws Exception {
+		UserWorkParasMinPojo onePojo = null;
+		SqlExecute sqlHelper = new SqlExecute();
+		try {
+			onePojo = this.getOneWatchWordParasMinByInstId(sqlHelper,
+					equipmentId);
+		} catch (Exception ep) {
+			ep.printStackTrace();
+			throw ep;
+		} finally {
+			sqlHelper.close();
+		}
+		return onePojo;
+	}
+
+	/**
+	 * <p>
+	 * 方法名称: getOneWatchWordParasMinByInstId
+	 * </p>
+	 * <p>
+	 * 方法功能描述: 根据ID得到单个云环最新数据。
+	 * </p>
+	 * <p>
+	 * 创建人: 梁浩
+	 * </p>
+	 * <p>
+	 * 输入参数描述: JSONObject paras：输入的条件。
+	 * </p>
+	 * <p>
+	 * 输出参数描述: ArrayList<ActivityPojo> list :活动列表。
+	 * </p>
+	 * 
+	 * @throws Exception
+	 */
+	public UserWorkParasMinPojo getOneWatchWordParasMinByInstId(
+			SqlExecute sqlHelper, String equipmentId) throws Exception {
+		WatchDBMang watchDB = new WatchDBMang(sqlHelper, m_bs);
+		return watchDB.getOneWatchWordParasMinByInstId(equipmentId);
 	}
 
 	/**

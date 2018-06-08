@@ -10,13 +10,30 @@ var newLayers = {};
 var FancePoints = null;
 var FanceUsers = {};
 var FanceTrucks = {};
+var COMPCenter = null;
 jQuery(function ($) {
     getLoginUser("div_user", "FANCE_INST", "FANCE_MANG", function () {
-        FanceIni();
-        searchFance();
+        getPlateMsg();
     });
 
 });
+
+function getPlateMsg() {
+    doRefresh(
+        null,
+        "STATS",
+        "searchSysBaseStats",
+        "",
+        function (_data) {
+            if (_data.r == 0) {
+                if (_data.company.lat != "" && _data.company.lon != "") {
+                    COMPCenter = [parseFloat(_data.company.lon), parseFloat(_data.company.lat)];
+                }
+                FanceIni();
+                searchFance();
+            }
+        });
+}
 
 function FanceIni() {
     doRefresh(
@@ -84,6 +101,9 @@ function editFance(_defid) {
         });
         showFanceBase(_data, editType);
         var _center = [112.9380, 28.1711];
+        if (COMPCenter != null) {
+            _center = COMPCenter;
+        }
         if (_data.cenlon != null) {
             _center = [parseFloat(_data.cenlon), parseFloat(_data.cenlat)];
         }

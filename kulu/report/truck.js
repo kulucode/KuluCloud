@@ -24,12 +24,18 @@ function ReportIni() {
 }
 
 //搜索车辆
-function searchTruckReport() {
+function searchTruckReport(_page) {
+    if (_page == null) {
+        _page = $("#report_page_thisp").val();
+    }
+    if (_page == null || _page == "" || _page == 0) {
+        _page = 1;
+    }
     doRefresh(
         "frmBusiness",
         "STATS",
         "searchTruckReportList",
-        "",
+        "&pg_size=50&pg_num=" + (_page - 1),
         function (_data) {
             clearTable("report_tab");
             if (_data.r == 0) {
@@ -45,7 +51,7 @@ function searchTruckReport() {
                     addTableCell("report_tab", _oneTr, "worktimes", oneD.worktimes);
                     addTableCell("report_tab", _oneTr, "useeff", oneD.useff);
                 }
-                setPage("report_page", _data.data.length, _data.data.length, 1, "");
+                setPage("report_page", _data.max, 50, _page, "searchTruckReport");
                 $(document).scrollTop(0);
             }
         });

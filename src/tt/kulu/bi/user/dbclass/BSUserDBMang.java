@@ -17,11 +17,13 @@ import tt.kulu.bi.user.pojo.UserOrgRPojo;
 import tt.kulu.bi.user.pojo.UserPojo;
 import tt.kulu.bi.user.pojo.UserSchedulingPojo;
 import tt.kulu.bi.user.pojo.UserWorkDayLogsPojo;
+import tt.kulu.bi.user.pojo.UserWorkParasMinPojo;
 import tt.kulu.bi.user.pojo.UserWorkParasPojo;
 import tt.kulu.out.call.BIArea;
 import tt.kulu.out.call.BICompany;
 import tt.kulu.out.call.BIDic;
 import tt.kulu.out.call.BIUser;
+import tt.kulu.out.call.BIWatch;
 
 import com.tt4j2ee.BSCommon;
 import com.tt4j2ee.BSDateEx;
@@ -178,8 +180,9 @@ public class BSUserDBMang extends BSDBBase {
 		OrgPojo onePojo = null;
 		List<Object> vList = new ArrayList<Object>();
 		vList.add(name);
-		CachedRowSet rs = this.sqlHelper.queryCachedBySql(this
-				._getOrgSelectSQL(" and t.ORG_NAME=?", "").toString(), vList);
+		ResultSet rs = this.sqlHelper.queryBySql(
+				this._getOrgSelectSQL(" and t.ORG_NAME=?", "").toString(),
+				vList);
 		if (rs != null && rs.next()) {
 			onePojo = this._setOneOrgPojo(rs, true);
 		}
@@ -357,8 +360,7 @@ public class BSUserDBMang extends BSDBBase {
 		if (where != null && !where.trim().equals("")) {
 			strSQL.append(where);
 		}
-		CachedRowSet rs = this.sqlHelper.queryCachedBySql(strSQL.toString(),
-				vList);
+		ResultSet rs = this.sqlHelper.queryBySql(strSQL.toString(), vList);
 		if (rs != null && rs.next()) {
 			count = rs.getLong("OBJ_COUNT");
 		}
@@ -536,6 +538,21 @@ public class BSUserDBMang extends BSDBBase {
 		if (orgId != null && !orgId.equals("")) {
 			// 更新该用户到上级目录
 			OrgPojo onePojo = this.getOneOrgById(orgId);
+			OrgPojo hszO = this.getOneOrgById("UNKNOWN_GROUP");
+			if (hszO == null) {
+				// 如果没有回收站，则新增
+				hszO = new OrgPojo();
+				hszO.setId("UNKNOWN_GROUP");
+				hszO.setName("删除机构回收站");
+				hszO.setAllName("无");
+				hszO.setPorgId("UNKNOWN_GROUP");
+				hszO.setCompany((new BICompany(null, null))
+						.getThisCompanyByRedis());
+				hszO.getArea().setId("430000");
+				hszO.getCreateStaff().setInstId("SUPER_ADMIN");
+				hszO.setCreateDate(this.bsDate.getThisDate(0, 0));
+				this.insertOrg(hszO);
+			}
 			if (onePojo != null) {
 				List<Object> vList = new ArrayList<Object>();
 				if (onePojo.getId().equals(onePojo.getPorgId())) {
@@ -1146,7 +1163,9 @@ public class BSUserDBMang extends BSDBBase {
 		ArrayList<UserWorkParasPojo> list = new ArrayList<UserWorkParasPojo>();
 		StringBuffer strSQL = new StringBuffer(this._getUserWordParasSelectSQL(
 				where, orderBy));
-		strSQL.append(" LIMIT " + (t - f + 1) + " OFFSET " + f);
+		if (f >= 0 && t > 0) {
+			strSQL.append(" LIMIT " + (t - f + 1) + " OFFSET " + f);
+		}
 		ResultSet rs = this.sqlHelper.queryBySql(strSQL.toString(), vList);
 		if (rs != null) {
 			while (rs.next()) {
@@ -1159,7 +1178,7 @@ public class BSUserDBMang extends BSDBBase {
 
 	/**
 	 * <p>
-	 * 方法名称: getUserCount
+	 * 方法名称: getUserWordParasCount
 	 * </p>
 	 * <p>
 	 * 方法功能描述: 得到单个资源实例。
@@ -1239,10 +1258,13 @@ public class BSUserDBMang extends BSDBBase {
 	 * @throws Exception
 	 */
 	public ArrayList<UserWorkDayLogsPojo> getUserWorkDayLogsList(
-			JSONObject where, List<Object> vList, String orderBy)
+			JSONObject where, List<Object> vList, String orderBy, long f, long t)
 			throws Exception {
 		ArrayList<UserWorkDayLogsPojo> list = new ArrayList<UserWorkDayLogsPojo>();
 		StringBuffer strSQL = _getUserWorkDayLogsSelectSQL(where, orderBy);
+		if (f >= 0 && t > 0) {
+			strSQL.append(" LIMIT " + (t - f + 1) + " OFFSET " + f);
+		}
 		ResultSet rs = this.sqlHelper.queryBySql(strSQL.toString(), vList);
 		if (rs != null) {
 			while (rs.next()) {
@@ -1251,6 +1273,45 @@ public class BSUserDBMang extends BSDBBase {
 			rs.close();
 		}
 		return list;
+	}
+
+	/**
+	 * <p>
+	 * 方法名称: getOrgCount
+	 * </p>
+	 * <p>
+	 * 方法功能描述: 得到群组数量。
+	 * </p>
+	 * <p>
+	 * 输入参数描述:
+	 * </p>
+	 * <p>
+	 * 输出参数描述:
+	 * </p>
+	 * 
+	 * @throws Exception
+	 * 
+	 */
+	public long getUserWorkDayLogsCount(JSONObject where, List<Object> vList)
+			throws Exception {
+		long count = 0;
+		StringBuffer strSQL = new StringBuffer(
+				"select count(t1.user_id) as OBJ_COUNT");
+		strSQL.append(" from T_USER t1 left outer join T_USER_WORK_DAY_LOGS t on t.USER_INSTID = t1.user_instid ");
+		if (where != null && where.containsKey("logs")) {
+			strSQL.append(where.getString("logs"));
+		}
+		strSQL.append(" where t1.USER_INSTID is not null ");
+
+		if (where != null && where.containsKey("user")) {
+			strSQL.append(where.getString("user"));
+		}
+
+		ResultSet rs = this.sqlHelper.queryBySql(strSQL.toString(), vList);
+		if (rs != null && rs.next()) {
+			count = rs.getLong("OBJ_COUNT");
+		}
+		return count;
 	}
 
 	/**
@@ -1497,10 +1558,6 @@ public class BSUserDBMang extends BSDBBase {
 		strSQL.append(",t.eqp_online");
 		strSQL.append(",t.user_id");
 		strSQL.append(",t.user_name");
-		strSQL.append(",t.step");
-		strSQL.append(",t.bro");
-		strSQL.append(",t.hr");
-		strSQL.append(",t.geo");
 		strSQL.append(",t1.log_state");
 		strSQL.append(",t1.LOG_BJDATE");
 
@@ -1542,38 +1599,21 @@ public class BSUserDBMang extends BSDBBase {
 			onePojo.setThisState(1);
 		}
 
-		String[] values = null;
-		if (rs.getString("step") != null) {
-			values = rs.getString("step").split(",");
-			if (values.length > 0) {
-				onePojo.setStep(values[0]);
-				onePojo.setStepDate(values[1]);
-			}
-		}
-		if (rs.getString("bro") != null) {
-			values = rs.getString("bro").split(",");
-			if (values.length > 0) {
-				onePojo.setBroHigh(values[0]);
-				onePojo.setBroLow(values[1]);
-				onePojo.setBroDate(values[2]);
-			}
-		}
-		if (rs.getString("hr") != null) {
-			values = rs.getString("hr").split(",");
-			if (values.length > 0) {
-				onePojo.setHeartRate(values[0]);
-				onePojo.setEleValue(values[1]);
-				onePojo.setHrDate(values[2]);
-			}
-		}
-		if (rs.getString("geo") != null) {
-			values = rs.getString("geo").split(",");
-			if (values.length > 0) {
-				onePojo.setLatitude(values[0]);
-				onePojo.setLongitude(values[1]);
-				onePojo.setGeoDate(values[2]);
-				onePojo.setFanceFlg(Integer.parseInt(values[3]));
-			}
+		// 数据
+		UserWorkParasMinPojo oneMin = (new BIWatch(null, null))
+				.getWatchLastDataByRedis(onePojo.getEqpInst().getInstId());
+		if (oneMin != null) {
+			onePojo.setStep(oneMin.getStep());
+			onePojo.setStepDate(oneMin.getStepDate());
+			onePojo.setBroHigh(oneMin.getBroHigh());
+			onePojo.setBroLow(oneMin.getBroLow());
+			onePojo.setBroDate(oneMin.getBroDate());
+			onePojo.setHeartRate(oneMin.getHeartRate());
+			onePojo.setEleValue(oneMin.getEleValue());
+			onePojo.setHrDate(oneMin.getHrDate());
+			onePojo.setLatitude(oneMin.getLatitude());
+			onePojo.setLongitude(oneMin.getLongitude());
+			onePojo.setGeoDate(oneMin.getGeoDate());
 		}
 
 		return onePojo;
@@ -1616,7 +1656,7 @@ public class BSUserDBMang extends BSDBBase {
 	}
 
 	// 加载一个资源实例对象
-	private OrgPojo _setOneOrgPojo(CachedRowSet rs, boolean isAll)
+	private OrgPojo _setOneOrgPojo(ResultSet rs, boolean isAll)
 			throws Exception {
 		OrgPojo onePojo = new OrgPojo();
 		// 设置群组信息

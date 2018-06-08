@@ -16,7 +16,6 @@ jQuery(function ($) {
     getLoginUser("div_user", "TRUCK_EQP", "EQP_MANG", function () {
         EqpInstIni();
         UserIni();
-        searchVehicle();
     });
 });
 
@@ -55,6 +54,7 @@ function EqpInstIni() {
                 $("#s_eqpdef").val(_defId);
             }
         });
+    searchVehicle();
 }
 
 function iniOrgTree(_name, _div) {

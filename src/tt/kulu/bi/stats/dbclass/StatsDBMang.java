@@ -96,7 +96,8 @@ public class StatsDBMang extends BSDBBase {
 		}
 		// 员工
 		String sql = "select count(t.USER_INSTID) as DATA_COUNT from T_ORG_USER_R t where t.ORG_ID in (select v.ORG_ID from T_ORG_USER_R v where v.USER_INSTID=? "
-				+ (hasGroup ? " and v.ORG_ID=?" : "") + ")";
+				+ (hasGroup ? " and v.ORG_ID=?" : "")
+				+ ") and t.USER_INSTID in (select v.USER_INSTID from T_USER v where v.USER_STATE=1)";
 		ResultSet rs = this.sqlHelper.queryBySql(sql, vList);
 		retObj.put("user_count", 0);
 		if (rs != null && rs.next()) {
@@ -105,7 +106,7 @@ public class StatsDBMang extends BSDBBase {
 		}
 		// 车辆
 		sql = "select count(t.TRUCK_ID) as DATA_COUNT from T_TRUCK_INST t where t.ORG_ID in (select v.ORG_ID from T_ORG_USER_R v where v.USER_INSTID=? "
-				+ (hasGroup ? " and v.ORG_ID=?" : "") + ")";
+				+ (hasGroup ? " and v.ORG_ID=?" : "") + ") and t.TRUCK_STATE=0";
 		rs = this.sqlHelper.queryBySql(sql, vList);
 		retObj.put("truck_count", 0);
 		if (rs != null && rs.next()) {

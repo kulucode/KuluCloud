@@ -27,6 +27,7 @@ import tt.kulu.bi.user.pojo.UserWorkParasPojo;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import com.alibaba.fastjson.JSON;
 import com.tt4j2ee.db.SqlExecute;
 import com.tt4j2ee.m.BSObject;
 
@@ -79,26 +80,17 @@ public class BIUser extends BSDBBase {
 	public OrgPojo getGroupByRedis(String orgId) throws Exception {
 		OrgPojo onePojo = new OrgPojo();
 		BIRedis redisBI = new BIRedis();
-		String redisS = redisBI.getStringData("KGROUP_" + orgId,
+		String redisS = redisBI.getMapData("KGROUP_MAP", orgId,
 				URLlImplBase.REDIS_KULUDATA);
 		if (redisS == null || redisS.trim().equals("")) {
 			// 从数据库的到
 			onePojo = this.getOneOrgById(orgId);
 			if (onePojo != null) {
-				redisBI.setStringData("KGROUP_" + orgId,
-						JSONObject.fromObject(onePojo).toString(),
-						URLlImplBase.REDIS_KULUDATA);
+				redisBI.setMapData("KGROUP_MAP", orgId,
+						JSON.toJSONString(onePojo), URLlImplBase.REDIS_KULUDATA);
 			}
 		} else {
-			Map config = new HashMap();
-			config.put("company", CompanyPojo.class);
-			config.put("area", AreaPojo.class);
-			config.put("createStaff", UserPojo.class);
-			// config.put("mangStaff", ArrayList.class);
-			// config.put("user", UserPojo.class);
-			// config.put("org", OrgPojo.class);
-			onePojo = (OrgPojo) JSONObject.toBean(
-					JSONObject.fromObject(redisS), OrgPojo.class, config);
+			onePojo = JSON.parseObject(redisS, OrgPojo.class);
 		}
 		if (onePojo == null) {
 			onePojo = new OrgPojo();
@@ -1723,6 +1715,16 @@ public class BIUser extends BSDBBase {
 						where += " and t.eqp_muser=?";
 						vList.add(v);
 					}
+					if (key.equals("state")) {
+						// 关键字
+						where += " and t.EQP_STATE=?";
+						vList.add(Integer.parseInt(v));
+					}
+					if (key.equals("usstate")) {
+						// 关键字
+						where += " and us.USER_STATE=?";
+						vList.add(Integer.parseInt(v));
+					}
 					if (key.equals("login")) {
 						String[] vs = v.split(",");
 						String whereEx = "";
@@ -1755,7 +1757,7 @@ public class BIUser extends BSDBBase {
 
 					if (key.equals("hasgeo")) {
 						// 关键字
-						where += " and (t.geo <> '' and t.geo is not null)";
+						where += " and (t.geo_id <> '' and t.geo_id is not null)";
 					}
 					if (key.equals("geoarea")) {
 						// 关键字
@@ -1823,11 +1825,11 @@ public class BIUser extends BSDBBase {
 	 * @throws Exception
 	 */
 	public ArrayList<UserWorkDayLogsPojo> getUserWorkDayLogsList(
-			JSONObject paras) throws Exception {
+			JSONObject paras, long f, long t) throws Exception {
 		ArrayList<UserWorkDayLogsPojo> list = new ArrayList<UserWorkDayLogsPojo>();
 		SqlExecute sqlHelper = new SqlExecute();
 		try {
-			list = this.getUserWorkDayLogsList(sqlHelper, paras);
+			list = this.getUserWorkDayLogsList(sqlHelper, paras, f, t);
 		} catch (Exception ep) {
 			ep.printStackTrace();
 			throw ep;
@@ -1864,7 +1866,8 @@ public class BIUser extends BSDBBase {
 	 * @throws Exception
 	 */
 	public ArrayList<UserWorkDayLogsPojo> getUserWorkDayLogsList(
-			SqlExecute sqlHelper, JSONObject paras) throws Exception {
+			SqlExecute sqlHelper, JSONObject paras, long f, long t)
+			throws Exception {
 		Iterator<String> keys = paras.keys();
 		List<Object> vLogList = new ArrayList<Object>();
 		List<Object> vUserList = new ArrayList<Object>();
@@ -1942,7 +1945,8 @@ public class BIUser extends BSDBBase {
 		where.put("user", userWhere);
 		vLogList.addAll(vUserList);
 		BSUserDBMang userDB = new BSUserDBMang(sqlHelper, m_bs);
-		return userDB.getUserWorkDayLogsList(where, vLogList, orderBy);
+		paras.put("max", userDB.getUserWorkDayLogsCount(where, vLogList));
+		return userDB.getUserWorkDayLogsList(where, vLogList, orderBy, f, t);
 	}
 
 	/**

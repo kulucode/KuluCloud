@@ -13,12 +13,14 @@ import tt.kulu.bi.base.BSDBBase;
 import tt.kulu.bi.storage.dbclass.EquipmentDBMang;
 import tt.kulu.bi.storage.pojo.EquipmentDefPojo;
 import tt.kulu.bi.storage.pojo.EquipmentGeometryPojo;
+import tt.kulu.bi.user.pojo.UserWorkParasMinPojo;
 import tt.kulu.bi.user.pojo.UserWorkParasPojo;
 import tt.kulu.bi.watch.pojo.InBloodPressureOkCmd;
 import tt.kulu.bi.watch.pojo.InHeartRateCmd;
 import tt.kulu.bi.watch.pojo.InStepCmd;
 import tt.kulu.out.call.BIEquipment;
 import tt.kulu.out.call.BIUser;
+import tt.kulu.out.call.BIWatch;
 
 /**
  * <p>
@@ -258,6 +260,76 @@ public class WatchDBMang extends BSDBBase {
 
 	/**
 	 * <p>
+	 * 方法名称: getWatchWordParasList
+	 * </p>
+	 * <p>
+	 * 方法功能描述: 得到用户列表。
+	 * </p>
+	 * <p>
+	 * 输入参数描述:
+	 * </p>
+	 * <p>
+	 * 输出参数描述:
+	 * </p>
+	 * 
+	 * @throws Exception
+	 */
+	public UserWorkParasMinPojo getOneWatchWordParasMinByInstId(String instId)
+			throws Exception {
+		// 翻页代码
+		UserWorkParasMinPojo onePojo = new UserWorkParasMinPojo();
+		StringBuffer strSQL = new StringBuffer(
+				"select t.eqp_inst,tg.S_LAT,tg.S_LON");
+		strSQL.append(",(select tws.a_value || ',' || tws.s_cdate from t_watch_step tws where tws.eqp_inst = t.eqp_inst order by tws.s_cdate desc limit 1) as step");
+		strSQL.append(",(select twb.bre_high || ',' || twb.bre_low || ',' || twb.s_cdate from t_watch_bro twb where twb.eqp_inst = t.eqp_inst order by twb.s_cdate desc limit 1) as bro");
+		strSQL.append(",(select twh.bbe_value || ',' || twh.bbe_ele || ',' || twh.s_cdate from t_watch_hr twh where twh.eqp_inst = t.eqp_inst order by twh.s_cdate desc limit 1) as hr");
+		strSQL.append(",(select twh.bbe_value || ',' || twh.bbe_ele || ',' || twh.s_cdate from t_watch_hr twh where twh.eqp_inst = t.eqp_inst order by twh.s_cdate desc limit 1) as hr");
+		strSQL.append(" from t_equipment_def def,t_equipment_inst t left outer join t_eqp_inst_geometry tg on tg.eqp_inst = t.EQP_GEO_ID");
+		strSQL.append(" where t.eqp_def = def.eqp_code");
+		strSQL.append(" and def.eqp_type = 'EQUIPMENT_DEFTYPE_1'");
+		strSQL.append(" and t.eqp_inst=?");
+		List<Object> vList = new ArrayList<Object>();
+		vList.add(instId);
+		ResultSet rs = this.sqlHelper.queryBySql(strSQL.toString(), vList);
+		if (rs != null && rs.next()) {
+			onePojo = new UserWorkParasMinPojo();
+			onePojo.setEqpInst(rs.getString("eqp_inst"));
+			if (rs.getString("S_LAT") != null) {
+				onePojo.setLatitude(rs.getString("S_LAT"));
+			}
+			if (rs.getString("S_LON") != null) {
+				onePojo.setLongitude(rs.getString("S_LON"));
+			}
+			String[] values = null;
+			if (rs.getString("step") != null) {
+				values = rs.getString("step").split(",");
+				if (values.length > 0) {
+					onePojo.setStep(values[0]);
+					onePojo.setStepDate(values[1]);
+				}
+			}
+			if (rs.getString("bro") != null) {
+				values = rs.getString("bro").split(",");
+				if (values.length > 0) {
+					onePojo.setBroHigh(values[0]);
+					onePojo.setBroLow(values[1]);
+					onePojo.setBroDate(values[2]);
+				}
+			}
+			if (rs.getString("hr") != null) {
+				values = rs.getString("hr").split(",");
+				if (values.length > 0) {
+					onePojo.setHeartRate(values[0]);
+					onePojo.setEleValue(values[1]);
+					onePojo.setHrDate(values[2]);
+				}
+			}
+		}
+		return onePojo;
+	}
+
+	/**
+	 * <p>
 	 * 方法名称: getWatchWordParasCount
 	 * </p>
 	 * <p>
@@ -383,11 +455,6 @@ public class WatchDBMang extends BSDBBase {
 		strSQL.append(",t1.EQP_STATE");
 		// 定义
 		strSQL.append(",t1.EQP_DEF");
-		// 数据
-		strSQL.append(",t.step");
-		strSQL.append(",t.bro");
-		strSQL.append(",t.hr");
-		strSQL.append(",t.geo");
 		// 机构
 		strSQL.append(",t1.ORG_ID");
 		// 管理用户
@@ -444,40 +511,22 @@ public class WatchDBMang extends BSDBBase {
 						.setmPhone(rs.getString("MPHONE"));
 			}
 		}
-		String[] values = null;
-		if (rs.getString("step") != null) {
-			values = rs.getString("step").split(",");
-			if (values.length > 0) {
-				onePojo.setStep(values[0]);
-				onePojo.setStepDate(values[1]);
-			}
+		// 数据
+		UserWorkParasMinPojo oneMin = (new BIWatch(null, null))
+				.getWatchLastDataByRedis(onePojo.getEqpInst().getInstId());
+		if (oneMin != null) {
+			onePojo.setStep(oneMin.getStep());
+			onePojo.setStepDate(oneMin.getStepDate());
+			onePojo.setBroHigh(oneMin.getBroHigh());
+			onePojo.setBroLow(oneMin.getBroLow());
+			onePojo.setBroDate(oneMin.getBroDate());
+			onePojo.setHeartRate(oneMin.getHeartRate());
+			onePojo.setEleValue(oneMin.getEleValue());
+			onePojo.setHrDate(oneMin.getHrDate());
+			onePojo.setLatitude(oneMin.getLatitude());
+			onePojo.setLongitude(oneMin.getLongitude());
+			onePojo.setGeoDate(oneMin.getGeoDate());
 		}
-		if (rs.getString("bro") != null) {
-			values = rs.getString("bro").split(",");
-			if (values.length > 0) {
-				onePojo.setBroHigh(values[0]);
-				onePojo.setBroLow(values[1]);
-				onePojo.setBroDate(values[2]);
-			}
-		}
-		if (rs.getString("hr") != null) {
-			values = rs.getString("hr").split(",");
-			if (values.length > 0) {
-				onePojo.setHeartRate(values[0]);
-				onePojo.setEleValue(values[1]);
-				onePojo.setHrDate(values[2]);
-			}
-		}
-		if (rs.getString("geo") != null) {
-			values = rs.getString("geo").split(",");
-			if (values.length > 0) {
-				onePojo.setLatitude(values[0]);
-				onePojo.setLongitude(values[1]);
-				onePojo.setGeoDate(values[2]);
-				onePojo.setFanceFlg(Integer.parseInt(values[3]));
-			}
-		}
-
 		// 机构
 		if (rs.getString("ORG_ID") != null) {
 			onePojo.getEqpInst().setOrg(

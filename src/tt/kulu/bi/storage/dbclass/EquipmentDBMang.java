@@ -1052,10 +1052,14 @@ public class EquipmentDBMang extends BSDBBase {
 						+ oneEqpGeo.getLongitude()
 						+ " "
 						+ oneEqpGeo.getLatitude()
-						+ ")',4326),t.S_GEOMETRY) as GEO_DIS from T_EQP_INST_GEOMETRY t where t.EQP_INST=? order by t.S_CDATE desc  LIMIT 1 OFFSET "
+						+ ")',4326),t.S_GEOMETRY) as GEO_DIS from T_EQP_INST_GEOMETRY t where t.EQP_INST=? and t.C_DATE BETWEEN ? AND ? order by t.C_DATE desc  LIMIT 1 OFFSET "
 						+ offset);
 		List<Object> vList = new ArrayList<Object>();
 		vList.add(oneEqpGeo.getEqpInst().getInstId());
+		vList.add(Timestamp.valueOf(oneEqpGeo.getSysDate().substring(0, 10)
+				+ " 00:00:00"));
+		vList.add(Timestamp.valueOf(oneEqpGeo.getSysDate().substring(0, 10)
+				+ " 23:59:59"));
 		ResultSet rs = this.sqlHelper.queryBySql(sql.toString(), vList);
 		if (rs != null) {
 			if (rs.next()) {

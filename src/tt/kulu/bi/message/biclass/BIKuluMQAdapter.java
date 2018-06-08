@@ -1,8 +1,6 @@
 package tt.kulu.bi.message.biclass;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
 
 import com.tt4j2ee.BSDateEx;
 
@@ -18,6 +16,7 @@ import tt.kulu.bi.storage.pojo.EquipmentInstPojo;
 import tt.kulu.bi.storage.pojo.EquipmentInstWorkLogPojo;
 import tt.kulu.bi.truck.pojo.PacketLocationReport;
 import tt.kulu.bi.truck.pojo.TruckWorkDayLogsPojo;
+import tt.kulu.bi.user.pojo.UserWorkParasMinPojo;
 import tt.kulu.bi.watch.pojo.InBloodPressureOkCmd;
 import tt.kulu.bi.watch.pojo.InHeartRateCmd;
 import tt.kulu.bi.watch.pojo.InStepCmd;
@@ -195,7 +194,6 @@ public class BIKuluMQAdapter {
 				oneInst.setThisDate(time);
 				oneInst.setUpdateDate(this.bsDate.getThisDate(0, 0));
 				oneInst.setProDate(oneInst.getUpdateDate());
-
 				if (eqpBI.equipmentInstLogin(oneInst) > 0) {
 					// 登录
 					// 得到手表设备参数
@@ -276,6 +274,19 @@ public class BIKuluMQAdapter {
 							fanceBI.doCheckPoineInFanceByUser(oneEqpGeo);
 							// 更新员工工作日志中的路程
 							userBI.updateUserWorkDayLogsDis(oneEqpGeo);
+							// 更新实时数据
+							UserWorkParasMinPojo oneWPM = watchBI
+									.getWatchLastDataByRedis(oneEqpGeo
+											.getEqpInst().getInstId());
+							if (oneWPM == null) {
+								oneWPM = new UserWorkParasMinPojo();
+								oneWPM.setEqpInst(oneEqpGeo.getEqpInst()
+										.getInstId());
+							}
+							oneWPM.setLatitude(oneEqpGeo.getLatitude());
+							oneWPM.setLongitude(oneEqpGeo.getLongitude());
+							oneWPM.setGeoDate(oneEqpGeo.getSysDate());
+							watchBI.setWatchLastDataToRedis(oneWPM);
 							// 往页面推送位置信息
 							bodyData.clear();
 							bodyData.put("opfun", "gps");
@@ -305,6 +316,17 @@ public class BIKuluMQAdapter {
 					step.getEqpInst().setWyCode(_oldData.getString("eqpid"));
 					step.setCreateDate(time);
 					if (watchBI.insertWatchStep(step) > 0) {
+						// 更新步数数据
+						UserWorkParasMinPojo oneWPM = watchBI
+								.getWatchLastDataByRedis(step.getEqpInst()
+										.getInstId());
+						if (oneWPM == null) {
+							oneWPM = new UserWorkParasMinPojo();
+							oneWPM.setEqpInst(step.getEqpInst().getInstId());
+						}
+						oneWPM.setStep(step.getStep());
+						oneWPM.setStepDate(time);
+						watchBI.setWatchLastDataToRedis(oneWPM);
 						// 往页面推送位置信息
 						bodyData.clear();
 						bodyData.put("opfun", "step");
@@ -325,6 +347,18 @@ public class BIKuluMQAdapter {
 					bpo.getEqpInst().setWyCode(_oldData.getString("eqpid"));
 					bpo.setCreateDate(time);
 					if (watchBI.insertWatchBloodPressureOK(bpo) > 0) {
+						// 更新血压数据
+						UserWorkParasMinPojo oneWPM = watchBI
+								.getWatchLastDataByRedis(bpo.getEqpInst()
+										.getInstId());
+						if (oneWPM == null) {
+							oneWPM = new UserWorkParasMinPojo();
+							oneWPM.setEqpInst(bpo.getEqpInst().getInstId());
+						}
+						oneWPM.setBroHigh(bpo.getHigh());
+						oneWPM.setBroLow(bpo.getLow());
+						oneWPM.setBroDate(time);
+						watchBI.setWatchLastDataToRedis(oneWPM);
 						// 往页面推送位置信息
 						bodyData.clear();
 						bodyData.put("opfun", "bpo");
@@ -346,6 +380,18 @@ public class BIKuluMQAdapter {
 					hr.getEqpInst().setWyCode(_oldData.getString("eqpid"));
 					hr.setCreateDate(time);
 					if (watchBI.insertWatchInHeartRate(hr) > 0) {
+						// 更新血压数据
+						UserWorkParasMinPojo oneWPM = watchBI
+								.getWatchLastDataByRedis(hr.getEqpInst()
+										.getInstId());
+						if (oneWPM == null) {
+							oneWPM = new UserWorkParasMinPojo();
+							oneWPM.setEqpInst(hr.getEqpInst().getInstId());
+						}
+						oneWPM.setHeartRate(hr.getHeartRate());
+						oneWPM.setEleValue(hr.getElectricity());
+						oneWPM.setHrDate(time);
+						watchBI.setWatchLastDataToRedis(oneWPM);
 						// 往页面推送位置信息
 						bodyData.clear();
 						bodyData.put("opfun", "hr");
@@ -365,6 +411,17 @@ public class BIKuluMQAdapter {
 					hr.getEqpInst().setWyCode(_oldData.getString("eqpid"));
 					hr.setCreateDate(time);
 					if (watchBI.insertWatchInHeartRateError(hr) > 0) {
+						// 更新血压数据
+						UserWorkParasMinPojo oneWPM = watchBI
+								.getWatchLastDataByRedis(hr.getEqpInst()
+										.getInstId());
+						if (oneWPM == null) {
+							oneWPM = new UserWorkParasMinPojo();
+							oneWPM.setEqpInst(hr.getEqpInst().getInstId());
+						}
+						oneWPM.setHeartRate(hr.getHeartRate());
+						oneWPM.setHrDate(time);
+						watchBI.setWatchLastDataToRedis(oneWPM);
 						// 报警故障
 						FaultReportPojo frPojo = new FaultReportPojo();
 						frPojo.setEqpInst(hr.getEqpInst());
@@ -399,6 +456,19 @@ public class BIKuluMQAdapter {
 					bpo.getEqpInst().setWyCode(_oldData.getString("eqpid"));
 					bpo.setCreateDate(time);
 					if (watchBI.insertWatchBloodPressureError(bpo) > 0) {
+						// 更新血压数据
+						UserWorkParasMinPojo oneWPM = watchBI
+								.getWatchLastDataByRedis(bpo.getEqpInst()
+										.getInstId());
+						if (oneWPM == null) {
+							oneWPM = new UserWorkParasMinPojo();
+							oneWPM.setEqpInst(bpo.getEqpInst().getInstId());
+						}
+						oneWPM.setBroHigh(bpo.getHigh());
+						oneWPM.setBroLow(bpo.getLow());
+						oneWPM.setBroDate(time);
+						watchBI.setWatchLastDataToRedis(oneWPM);
+
 						// 往页面推送位置信息
 						bodyData.clear();
 						bodyData.put("opfun", "bpoerr");
@@ -561,14 +631,14 @@ public class BIKuluMQAdapter {
 				if (oneInst != null) {
 					clearVehicleGeoToFromRedis(oneInst.getInstId());
 					_sendBodyMQ.put("r", 0);
-					oneInst.setThisDate(time);
+					oneInst.setThisDate(this.bsDate.getThisDate(0, 0));
 					if (eqpBI.equipmentInstLogin(oneInst) > 0) {
 						// 写入车辆日志 （开机时间）
 						oneWork.setTruck(oneInst.getTruck());
-						oneWork.setDate(time);
+						oneWork.setDate(this.bsDate.getThisDate(0, 0));
 						oneWork.setType(0);
 						oneWork.setOpType(1);
-						oneWork.setWorkSDate(time);
+						oneWork.setWorkSDate(this.bsDate.getThisDate(0, 0));
 						truckBI.updateTruckWorkDayLogs(oneWork);
 						// 发送配置信息
 						JSONArray wp = dicBI
@@ -576,7 +646,7 @@ public class BIKuluMQAdapter {
 						for (int i = 0; i < wp.size(); i++) {
 							JSONObject oneWP = wp.getJSONObject(i);
 							_sendBodyMQ.put(oneWP.getString("value"),
-									oneWP.getInt("value2"));
+									oneWP.getString("value2"));
 						}
 
 					}
@@ -597,8 +667,8 @@ public class BIKuluMQAdapter {
 						.getString("token"));
 				if (oneInst != null) {
 					clearVehicleGeoToFromRedis(oneInst.getInstId());
-					oneInst.setLastLoginDate(time);
-					oneInst.setThisDate(time);
+					oneInst.setLastLoginDate(this.bsDate.getThisDate(0, 0));
+					oneInst.setThisDate(this.bsDate.getThisDate(0, 0));
 					if (eqpBI.equipmentInstLoginOut(oneInst) > 0) {
 						// 车辆工作时长录入
 						if (oneInst.getTruck() != null

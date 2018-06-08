@@ -215,7 +215,7 @@ function addUserMapPoint(_data) {
     _desc += "<div><strong>当天步数：" + _oneD.step + "</strong></div>";
     _desc += "<div><strong>心率：每分钟" + _oneD.hr + "次</strong></div>";
     _desc += "<div><strong>剩余电量：" + _oneD.ele + "%</strong></div>";
-    _desc += "<div><strong>心率电量时间：" + _oneD.hrdate + "</strong></div>";
+    _desc += "<div><strong>电量时间：" + _oneD.hrdate + "</strong></div>";
     _desc += "<div><strong>经度：" + _oneD.lon + "</strong></div>";
     _desc += "<div><strong>纬度：" + _oneD.lat + "</strong></div>";
     _desc += "<div><strong>位置时间：" + _oneD.geodate + "</strong></div>";

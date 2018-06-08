@@ -62,9 +62,13 @@ public class ReportDBMang extends BSDBBase {
 	 * </p>
 	 */
 	public ArrayList<TruckReportPojo> getTruckReportList(JSONObject where,
-			String orderBy, List<Object> vList) throws Exception {
+			String orderBy, List<Object> vList, long f, long t)
+			throws Exception {
 		ArrayList<TruckReportPojo> list = new ArrayList<TruckReportPojo>();
 		StringBuffer strSQL = this._getTruckReportSelectSQL(where, orderBy);
+		if (f >= 0 && t > 0) {
+			strSQL.append(" LIMIT " + (t - f + 1) + " OFFSET " + f);
+		}
 		ResultSet rs = this.sqlHelper.queryBySql(strSQL.toString(), vList);
 		if (rs != null) {
 			while (rs.next()) {
@@ -72,6 +76,44 @@ public class ReportDBMang extends BSDBBase {
 			}
 		}
 		return list;
+	}
+
+	/**
+	 * <p>
+	 * 方法名称: getUserWordParasCount
+	 * </p>
+	 * <p>
+	 * 方法功能描述: 得到单个资源实例。
+	 * </p>
+	 * <p>
+	 * 输入参数描述:
+	 * </p>
+	 * <p>
+	 * 输出参数描述:
+	 * </p>
+	 * 
+	 * @throws Exception
+	 * 
+	 */
+	public long getTruckReportCount(JSONObject where, List<Object> vList)
+			throws Exception {
+		long count = 0;
+		StringBuffer strSQL = new StringBuffer(
+				"select count(distinct t.TRUCK_ID) as TAB_COUNT");
+		strSQL.append(" from T_TRUCK_INST t left outer join T_USER tu on t.TRUCK_MANGUSER = tu.USER_INSTID");
+		strSQL.append(" left outer join T_TRUCK_WORK_DAY_LOGS t1 on (t1.TRUCK_ID = t.TRUCK_ID "
+				+ (where.containsKey("work") ? where.getString("work") : "")
+				+ ")");
+		strSQL.append(" where t.TRUCK_ID is not null ");
+		if (where.containsKey("truck")) {
+			strSQL.append(" " + where.getString("truck"));
+		}
+		ResultSet rs = this.sqlHelper.queryBySql(strSQL.toString(), vList);
+		if (rs != null && rs.next()) {
+			count = rs.getLong("TAB_COUNT");
+			rs.close();
+		}
+		return count;
 	}
 
 	/**
@@ -89,9 +131,13 @@ public class ReportDBMang extends BSDBBase {
 	 * </p>
 	 */
 	public ArrayList<UserReportPojo> getUserReportList(JSONObject where,
-			String orderBy, List<Object> vList) throws Exception {
+			String orderBy, List<Object> vList, long f, long t)
+			throws Exception {
 		ArrayList<UserReportPojo> list = new ArrayList<UserReportPojo>();
 		StringBuffer strSQL = this._getUserReportSelectSQL(where, orderBy);
+		if (f >= 0 && t > 0) {
+			strSQL.append(" LIMIT " + (t - f + 1) + " OFFSET " + f);
+		}
 		ResultSet rs = this.sqlHelper.queryBySql(strSQL.toString(), vList);
 		if (rs != null) {
 			while (rs.next()) {
@@ -99,6 +145,44 @@ public class ReportDBMang extends BSDBBase {
 			}
 		}
 		return list;
+	}
+
+	/**
+	 * <p>
+	 * 方法名称: getUserReportCount
+	 * </p>
+	 * <p>
+	 * 方法功能描述: 得到用户统计数目。
+	 * </p>
+	 * <p>
+	 * 输入参数描述:
+	 * </p>
+	 * <p>
+	 * 输出参数描述:
+	 * </p>
+	 * 
+	 * @throws Exception
+	 * 
+	 */
+	public long getUserReportCount(JSONObject where, List<Object> vList)
+			throws Exception {
+		long count = 0;
+		StringBuffer strSQL = new StringBuffer(
+				"select count(distinct t.USER_INSTID) as TAB_COUNT");
+		strSQL.append(" from T_USER t");
+		strSQL.append(" left outer join T_USER_WORK_DAY_LOGS t1 on (t1.USER_INSTID = t.USER_INSTID "
+				+ (where.containsKey("work") ? where.getString("work") : "")
+				+ ")");
+		strSQL.append(" where t.USER_INSTID is not null ");
+		if (where.containsKey("user")) {
+			strSQL.append(" " + where.getString("user"));
+		}
+		ResultSet rs = this.sqlHelper.queryBySql(strSQL.toString(), vList);
+		if (rs != null && rs.next()) {
+			count = rs.getLong("TAB_COUNT");
+			rs.close();
+		}
+		return count;
 	}
 
 	/**
