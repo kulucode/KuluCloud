@@ -398,6 +398,9 @@ public class BSInterface {
 			fretObj = statsBI.searchSysBaseStats();
 			fretObj.put("code", 0);
 		} else {
+			if (group.equals("")) {
+				group = user.getGroupId();
+			}
 			fretObj = statsBI.searchMyBaseStats(user.getUserInst(), group);
 			fretObj.put("code", 0);
 		}
@@ -941,6 +944,7 @@ public class BSInterface {
 				&& user.getRoleWhere().indexOf("'ADMIN'") < 0) {
 			paras.put("login", user.getGroupId());
 		}
+		paras.put("hasgeo", "1");
 		if (geoArea != null) {
 			// 转化坐标系
 			String gps = "";
@@ -1645,7 +1649,7 @@ public class BSInterface {
 				}
 				// 起点
 				fdIndex++;
-				oneFDObj.put("分段", "分段" + (fdIndex));
+				oneFDObj.put("seg", fdIndex);
 				oneFDObj.put("fdid", onePojo.getFdId());
 				oneFDObj.put("fdate", oneObj.getString("date"));
 				oneFDObj.put("tdate", oneObj.getString("date"));
@@ -1680,7 +1684,7 @@ public class BSInterface {
 					fdId = onePojo.getFdId();
 					fdIndex++;
 					oneFDObj = new JSONObject();
-					oneFDObj.put("分段", "分段" + (fdIndex));
+					oneFDObj.put("seg", fdIndex);
 					// 新的分段起点
 					oneFDObj.put("fdid", onePojo.getFdId());
 					oneFDObj.put("fdate", oneObj.getString("date"));
@@ -1780,7 +1784,13 @@ public class BSInterface {
 				allJOSN.put("speed", oneFDObj.getString("speed"));
 			}
 		}
+
 		retObj.add(0, allJOSN);
+		/*
+		 * for (int i = 0; i < retObj.size(); ++i) { JSONObject json =
+		 * retObj.getJSONObject(i); json.put("speed", json.getDouble("speed"));
+		 * json.put("distance", json.getDouble("distance")); }
+		 */
 		fretObj.put("data", retObj);
 		fretObj.put("count", retObj.size());
 		fretObj.put("code", 0);
@@ -1838,6 +1848,7 @@ public class BSInterface {
 			eDate = eDate + " 23:59:59";
 		}
 		paras.put("date", sDate + "," + eDate);
+		paras.put("state", "0,1,3");
 		days = m_bs.getDateEx().getDateCount(sDate, eDate);
 		if (group != null) {
 			paras.put("group", group);
@@ -1944,7 +1955,8 @@ public class BSInterface {
 
 		JSONObject paras = new JSONObject();
 		long days = 0;
-		paras.put("role", "OUTDOORS_STAFF,USER_MANG,TRUCK_MANG,DRIVER");
+		paras.put("role", "OUTDOORS_STAFF");
+		paras.put("state", "1");
 		if (sText != null) {
 			paras.put("key", sText);
 		}

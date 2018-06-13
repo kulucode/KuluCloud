@@ -279,7 +279,9 @@ public class EquipmentDBMang extends BSDBBase {
 			throws Exception {
 		ArrayList<EquipmentInstPojo> list = new ArrayList<EquipmentInstPojo>();
 		StringBuffer strSQL = _getEquipmentInstSelectSQL(where, orderBy);
-		strSQL.append(" LIMIT " + (t - f + 1) + " OFFSET " + f);
+		if (f >= 0 && t > 0) {
+			strSQL.append(" LIMIT " + (t - f + 1) + " OFFSET " + f);
+		}
 		ResultSet rs = this.sqlHelper.queryBySql(strSQL.toString(), vList);
 		if (rs != null) {
 			while (rs.next()) {
@@ -1091,7 +1093,9 @@ public class EquipmentDBMang extends BSDBBase {
 			throws Exception {
 		ArrayList<EquipmentGeometryPojo> list = new ArrayList<EquipmentGeometryPojo>();
 		StringBuffer strSQL = _getEqpGeometrySelectSQL(where, orderBy);
-		strSQL.append(" LIMIT " + (t - f + 1) + " OFFSET " + f);
+		if (f >= 0 && t > 0) {
+			strSQL.append(" LIMIT " + (t - f + 1) + " OFFSET " + f);
+		}
 		ResultSet rs = this.sqlHelper.queryBySql(strSQL.toString(), vList);
 		if (rs != null) {
 			while (rs.next()) {

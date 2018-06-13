@@ -88,16 +88,25 @@ public class StatsDBMang extends BSDBBase {
 			throws Exception {
 		JSONObject retObj = new JSONObject();
 		List<Object> vList = new ArrayList<Object>();
-		vList.add(userInstId);
-		boolean hasGroup = false;
-		if (groupId != null && !groupId.equals("")) {
-			vList.add(groupId);
-			hasGroup = true;
-		}
+		String groupW = "";
 		// 员工
-		String sql = "select count(t.USER_INSTID) as DATA_COUNT from T_ORG_USER_R t where t.ORG_ID in (select v.ORG_ID from T_ORG_USER_R v where v.USER_INSTID=? "
-				+ (hasGroup ? " and v.ORG_ID=?" : "")
-				+ ") and t.USER_INSTID in (select v.USER_INSTID from T_USER v where v.USER_STATE=1)";
+		if (groupId != null && !groupId.equals("")) {
+			String[] vs = groupId.split(",");
+			String whereEx = "";
+			for (String oneV : vs) {
+				if (!oneV.equals("")) {
+					whereEx += (whereEx.equals("") ? "" : " or ")
+							+ "t.ORG_ID in " + URLlImplBase.LOGIN_GROUP_WHERE;
+					vList.add("%," + oneV + "%");
+				}
+			}
+			if (!whereEx.equals("")) {
+				groupW += " and (" + whereEx + ")";
+			}
+		}
+		String sql = "select count(t.USER_INSTID) as DATA_COUNT from T_ORG_USER_R t where t.ORG_ID is not null "
+				+ groupW
+				+ " and t.USER_INSTID in (select v.USER_INSTID from T_USER v where v.USER_STATE=1) and t.USER_INSTID in (select r.USER_INSTID from T_ROLE_USER_R r where r.ROLE_ID in('OUTDOORS_STAFF'))";
 		ResultSet rs = this.sqlHelper.queryBySql(sql, vList);
 		retObj.put("user_count", 0);
 		if (rs != null && rs.next()) {
@@ -105,8 +114,8 @@ public class StatsDBMang extends BSDBBase {
 			rs.close();
 		}
 		// 车辆
-		sql = "select count(t.TRUCK_ID) as DATA_COUNT from T_TRUCK_INST t where t.ORG_ID in (select v.ORG_ID from T_ORG_USER_R v where v.USER_INSTID=? "
-				+ (hasGroup ? " and v.ORG_ID=?" : "") + ") and t.TRUCK_STATE=0";
+		sql = "select count(t.TRUCK_ID) as DATA_COUNT from T_TRUCK_INST t where t.ORG_ID is not null "
+				+ groupW + " and t.TRUCK_STATE not in (2,4)";
 		rs = this.sqlHelper.queryBySql(sql, vList);
 		retObj.put("truck_count", 0);
 		if (rs != null && rs.next()) {
@@ -114,14 +123,38 @@ public class StatsDBMang extends BSDBBase {
 			rs.close();
 		}
 		// 故障报警
-		vList.add(userInstId);
-		if (hasGroup) {
-			vList.add(groupId);
+		vList.clear();
+		groupW = "";
+		String groupW2 = "";
+		if (groupId != null && !groupId.equals("")) {
+			String[] vs = groupId.split(",");
+			String whereEx = "";
+			for (String oneV : vs) {
+				if (!oneV.equals("")) {
+					whereEx += (whereEx.equals("") ? "" : " or ")
+							+ " t1.ORG_ID in " + URLlImplBase.LOGIN_GROUP_WHERE;
+					vList.add("%," + oneV + "%");
+				}
+			}
+			if (!whereEx.equals("")) {
+				groupW += " and (" + whereEx + ")";
+			}
+			whereEx = "";
+			for (String oneV : vs) {
+				if (!oneV.equals("")) {
+					whereEx += (whereEx.equals("") ? "" : " or ")
+							+ " t2.ORG_ID in " + URLlImplBase.LOGIN_GROUP_WHERE;
+					vList.add("%," + oneV + "%");
+				}
+			}
+			if (!whereEx.equals("")) {
+				groupW2 += " and (" + whereEx + ")";
+			}
 		}
-		sql = "select count(t.FR_REPORTID) as DATA_COUNT from T_FAULTREPORT t where (t.FR_TRUCK in (select t1.TRUCK_ID from T_TRUCK_INST t1 where t1.ORG_ID in (select v.ORG_ID from T_ORG_USER_R v where v.USER_INSTID=?) "
-				+ (hasGroup ? " and t1.ORG_ID=?" : "")
-				+ ")) OR t.FR_USER in (select t2.USER_INSTID from T_ORG_USER_R t2 where t2.ORG_ID in (select v.ORG_ID from T_ORG_USER_R v where v.USER_INSTID=? "
-				+ (hasGroup ? " and v.ORG_ID=?" : "") + "))";
+		sql = "select count(t.FR_REPORTID) as DATA_COUNT from T_FAULTREPORT t where (t.FR_TRUCK in (select t1.TRUCK_ID from T_TRUCK_INST t1 where t1.ORG_ID is not null "
+				+ groupW
+				+ " OR t.FR_USER in (select t2.USER_INSTID from T_ORG_USER_R t2 where t2.ORG_ID is not null "
+				+ groupW2 + ")))";
 		rs = this.sqlHelper.queryBySql(sql, vList);
 		retObj.put("fault_count", 0);
 		if (rs != null && rs.next()) {
@@ -129,14 +162,24 @@ public class StatsDBMang extends BSDBBase {
 			rs.close();
 		}
 		// 未完成工单
-		String where = "";
 		vList.clear();
-		if (hasGroup) {
-			where += " and t1.ORG_ID in " + URLlImplBase.LOGIN_GROUP_WHERE;
-			vList.add("%," + groupId + "%");
+		groupW = "";
+		if (groupId != null && !groupId.equals("")) {
+			String[] vs = groupId.split(",");
+			String whereEx = "";
+			for (String oneV : vs) {
+				if (!oneV.equals("")) {
+					whereEx += (whereEx.equals("") ? "" : " or ")
+							+ "t1.ORG_ID in " + URLlImplBase.LOGIN_GROUP_WHERE;
+					vList.add("%," + oneV + "%");
+				}
+			}
+			if (!whereEx.equals("")) {
+				groupW += " and (" + whereEx + ")";
+			}
 		}
 		sql = "select count(t.PLAN_ID) as DATA_COUNT from T_INSPECT_PLAN t,T_TRUCK_INST t1 where t.TRUCK_ID=t1.TRUCK_ID and t.PLAN_STATE <> 1 and current_timestamp > t.PLAN_DATE "
-				+ where;
+				+ groupW;
 		rs = this.sqlHelper.queryBySql(sql, vList);
 		retObj.put("order_count", 0);
 		if (rs != null && rs.next()) {

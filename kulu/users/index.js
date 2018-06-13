@@ -202,16 +202,18 @@ function commitUserBase() {
         alert("机构输入无效。")
         return;
     }
-    if (checkForm("userbase-form") && confirm("是否保存用户信息？")) {
-        doRefresh("userbase-form", "DCUSER", "updateUser", "&in_type="
-            + editType, function (_data) {
-            if (_data.r == 0) {
-                closeDialog("user-base");
-                searchUser();
-            } else {
-                alert(_data.error);
-            }
-        });
+    if (CheckIdCard($("#t_idcard").val())) {
+        if (checkForm("userbase-form") && confirm("是否保存用户信息？")) {
+            doRefresh("userbase-form", "DCUSER", "updateUser", "&in_type="
+                + editType, function (_data) {
+                if (_data.r == 0) {
+                    closeDialog("user-base");
+                    searchUser();
+                } else {
+                    alert(_data.error);
+                }
+            });
+        }
     }
 
 }

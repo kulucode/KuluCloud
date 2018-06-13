@@ -1570,7 +1570,7 @@ public class BIEquipment extends BSDBBase {
 		// 参数设定
 		String where = "";
 		String key = "";
-		String orderBy = " t.s_cdate";
+		String orderBy = " t.c_date";
 		List<Object> vList = new ArrayList<Object>();
 		if (paras != null) {
 			Iterator<String> keys = paras.keys();

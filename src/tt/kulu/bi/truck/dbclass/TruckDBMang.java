@@ -247,7 +247,9 @@ public class TruckDBMang extends BSDBBase {
 			long f, long t, List<Object> vList) throws Exception {
 		ArrayList<TruckPojo> list = new ArrayList<TruckPojo>();
 		StringBuffer strSQL = _getTruckSelectSQL(where, orderBy);
-		strSQL.append(" LIMIT " + (t - f + 1) + " OFFSET " + f);
+		if (f >= 0 && t > 0) {
+			strSQL.append(" LIMIT " + (t - f + 1) + " OFFSET " + f);
+		}
 		ResultSet rs = this.sqlHelper.queryBySql(strSQL.toString(), vList);
 		if (rs != null) {
 			while (rs.next()) {
@@ -617,7 +619,9 @@ public class TruckDBMang extends BSDBBase {
 		ArrayList<TruckWorkParasPojo> list = new ArrayList<TruckWorkParasPojo>();
 		StringBuffer strSQL = new StringBuffer(
 				this._getVehicleWordParasSelectSQL(where, orderBy));
-		strSQL.append(" LIMIT " + (t - f + 1) + " OFFSET " + f);
+		if (f >= 0 && t > 0) {
+			strSQL.append(" LIMIT " + (t - f + 1) + " OFFSET " + f);
+		}
 		ResultSet rs = this.sqlHelper.queryBySql(strSQL.toString(), vList);
 		if (rs != null) {
 			while (rs.next()) {
@@ -900,7 +904,9 @@ public class TruckDBMang extends BSDBBase {
 		ArrayList<TruckWorkParasPojo> list = new ArrayList<TruckWorkParasPojo>();
 		StringBuffer strSQL = new StringBuffer(
 				this._getTruckWordParasSelectSQL(where, orderBy));
-		strSQL.append(" LIMIT " + (t - f + 1) + " OFFSET " + f);
+		if (f >= 0 && t > 0) {
+			strSQL.append(" LIMIT " + (t - f + 1) + " OFFSET " + f);
+		}
 		ResultSet rs = this.sqlHelper.queryBySql(strSQL.toString(), vList);
 		if (rs != null) {
 			while (rs.next()) {
@@ -1435,7 +1441,9 @@ public class TruckDBMang extends BSDBBase {
 			throws Exception {
 		ArrayList<TruckFixLogsPojo> list = new ArrayList<TruckFixLogsPojo>();
 		StringBuffer strSQL = _getTruckFixLogsSelectSQL(where, orderBy);
-		strSQL.append(" LIMIT " + (t - f + 1) + " OFFSET " + f);
+		if (f >= 0 && t > 0) {
+			strSQL.append(" LIMIT " + (t - f + 1) + " OFFSET " + f);
+		}
 		ResultSet rs = this.sqlHelper.queryBySql(strSQL.toString(), vList);
 		if (rs != null) {
 			while (rs.next()) {

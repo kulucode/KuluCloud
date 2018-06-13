@@ -1603,6 +1603,10 @@ public class BITruck extends BSDBBase {
 							where += " and (" + whereEx + ")";
 						}
 					}
+					if (key.equals("hasgeo")) {
+						// 关键字
+						where += " and (t.geo_id <> '' and t.geo_id is not null)";
+					}
 					if (key.equals("geoarea")) {
 						// 关键字
 						if (v.startsWith(",")) {

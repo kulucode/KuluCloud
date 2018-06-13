@@ -287,11 +287,21 @@ public class BIStats extends BSDBBase {
 					truckWhere += " and t.TRUCK_ID=?";
 					vUserList.add(v);
 				}
-				if (key.equals("truck")) {
-					// 车辆ID
-					truckWhere += " and t.TRUCK_STATE=?";
-					vUserList.add(Integer.parseInt(v));
+				if (key.equals("state")) {
+					// 状态
+					truckWhere += " and t.TRUCK_STATE in(";
+					String[] vs = v.split(",");
+					String whereEx = "";
+					for (String oneV : vs) {
+						if (!oneV.equals("")) {
+							whereEx += ",?";
+							vUserList.add(Integer.parseInt(oneV));
+						}
+					}
+					truckWhere += ((whereEx.equals("") ? "" : whereEx
+							.substring(1)) + ")");
 				}
+
 			}
 		}
 		where.put("work", workWhere);
@@ -448,6 +458,21 @@ public class BIStats extends BSDBBase {
 						}
 					}
 					userWhere += inW.substring(1) + "))";
+				}
+				if (key.equals("state")) {
+					//
+					// 状态
+					userWhere += " and t.user_state in(";
+					String[] vs = v.split(",");
+					String whereEx = "";
+					for (String oneV : vs) {
+						if (!oneV.equals("")) {
+							whereEx += ",?";
+							vUserList.add(Integer.parseInt(oneV));
+						}
+					}
+					userWhere += ((whereEx.equals("") ? "" : whereEx
+							.substring(1)) + ")");
 				}
 			}
 		}

@@ -602,7 +602,7 @@
         }
 
         function doTestIF() {
-            $("#t_url").val(getRefreshURL(null, $("#t_bsid").val(), $("#t_opfun").val(), $("#t_paras").val()));
+            $("#t_url").val(getRefreshURL(null, $("#t_bsid").val(), $("#t_opfun").val()) + $("#t_paras").val());
             doRefresh("faultbase-form", $("#t_bsid").val(), $("#t_opfun").val(), "&bs_checklogin=f", function (_data) {
                 $("#t_result").val(do_js_beautify(_data));
             });

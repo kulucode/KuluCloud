@@ -609,7 +609,7 @@
             if ($("#t_opfun").val() == "clearUser") {
                 TTClear();
             }
-            $("#t_url").val(getRefreshURL(null, $("#t_bsid").val(), $("#t_opfun").val(), $("#t_paras").val()));
+            $("#t_url").val(getRefreshURL(null, $("#t_bsid").val(), $("#t_opfun").val()) + $("#t_paras").val());
             doRefresh(null, $("#t_bsid").val(), $("#t_opfun").val(), $("#t_paras").val(), function (_data) {
                 $("#t_result").val(do_js_beautify(_data));
                 if ($("#t_opfun").val() == "clearUser") {
