@@ -873,7 +873,7 @@ public class BIFance extends BSDBBase {
 			TruckWorkStatsPojo oneStats = new TruckWorkStatsPojo();
 			oneStats.getTruck()
 					.setId(oneEqpGeo.getEqpInst().getTruck().getId());
-			oneStats.setEndDate(oneEqpGeo.getCreateDate());
+			oneStats.setEndDate(oneEqpGeo.getSysDate());
 			oneStats.setOil(oneUWDL.getOil());
 			oneStats.setOilDiff(String.valueOf(onePojo.getOilDeff()));
 			oneStats.setDistance(oneUWDL.getDistance());

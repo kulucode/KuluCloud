@@ -985,7 +985,7 @@ public class BITruck extends BSDBBase {
 		SqlExecute sqlHelper = new SqlExecute();
 		try {
 			sqlHelper.setAutoCommit(false);
-			oneEqpGeo.setSysDate(this.bsDate.getThisDate(0, 0));
+			// oneEqpGeo.setSysDate(this.bsDate.getThisDate(0, 0));
 			count = this.insertVehicleData(sqlHelper, onePojo, oneEqpGeo);
 			sqlHelper.commit();
 		} catch (Exception ep) {

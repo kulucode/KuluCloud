@@ -821,11 +821,12 @@ public class TruckDBMang extends BSDBBase {
 						&& !onePojo.getWorkEDate().equals("")) {
 					if (!(onePojo.getWorkSDate().substring(0, 10))
 							.equals(onePojo.getDate().substring(0, 10))) {
-						// 开始时间不在当天，当天工作时长为结束时间减去0点
-						todayT = String
-								.valueOf((this.bsDate.getDateMillCount(onePojo
-										.getDate().substring(0, 10)
-										+ " 00:00:00", onePojo.getWorkEDate())) / 1000);
+						// 开始时间不在当天，当天工作时长为结束时间减去当日开机时间点
+						if (!onePojo.getInDate().equals("")) {
+							todayT = String.valueOf((this.bsDate
+									.getDateMillCount(onePojo.getInDate(),
+											onePojo.getWorkEDate())) / 1000);
+						}
 						onePojo.setWorkTime(todayT);
 						// 昨天时长补全。
 					} else {

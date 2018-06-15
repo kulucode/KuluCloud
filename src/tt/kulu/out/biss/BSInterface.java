@@ -58,6 +58,7 @@ import com.tt4j2ee.db.SqlExecute;
 import com.tt4j2ee.m.BSLogUserPojo;
 import com.tt4j2ee.m.BSObject;
 import com.tt4j2ee.md5.MD5Imp;
+import tt.kulu.util.VirtualTruck;
 
 /**
  * <p>
@@ -1059,6 +1060,8 @@ public class BSInterface {
 			oneObj.put("date", m_bs.getDateEx().getThisDate(0, 0));
 			userlist.add(oneObj);
 		}
+
+        //VirtualTruck.virtualTruck(userlist);
 		retJSON.put("data", userlist);
 		retJSON.put("count", paras.getLong("max"));
 		retJSON.put("code", 0);

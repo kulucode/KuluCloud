@@ -11,6 +11,7 @@ import tt.kulu.out.call.BICompany;
 import tt.kulu.out.call.BILogin;
 import tt.kulu.out.call.BIRedis;
 import tt.kulu.out.call.BIUser;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import com.tt4j2ee.BSCommon;
@@ -203,22 +204,27 @@ public class BSLogin {
 		// 菜单
 		// 得到应用
 		BILogin loginBI = new BILogin(null, m_bs);
-		retJSON.put("menus", loginBI.getUserMenu(m_bs, user, 0));
-		// 当前运营商
-		BICompany compBI = new BICompany(m_bs);
-		CompanyPojo onePojo = compBI.getOneCompanyByType(1);
-		JSONObject compJ = new JSONObject();
-		if (onePojo != null) {
-			compJ.put("id", onePojo.getId());
-			compJ.put("name", onePojo.getName());
-			compJ.put("link", onePojo.getLinkMan());
-			compJ.put("linkphone", onePojo.getLinkPhone());
-			compJ.put("lat", onePojo.getLatitude());
-			compJ.put("lon", onePojo.getLongitude());
-		}
-		retJSON.put("company", compJ);
+		JSONArray ms = loginBI.getUserMenu(m_bs, user, 0);
+		if (ms.size() > 0) {
+			retJSON.put("menus", ms);
+			// 当前运营商
+			BICompany compBI = new BICompany(m_bs);
+			CompanyPojo onePojo = compBI.getOneCompanyByType(1);
+			JSONObject compJ = new JSONObject();
+			if (onePojo != null) {
+				compJ.put("id", onePojo.getId());
+				compJ.put("name", onePojo.getName());
+				compJ.put("link", onePojo.getLinkMan());
+				compJ.put("linkphone", onePojo.getLinkPhone());
+				compJ.put("lat", onePojo.getLatitude());
+				compJ.put("lon", onePojo.getLongitude());
+			}
+			retJSON.put("company", compJ);
 
-		retJSON.put("r", 0);
+			retJSON.put("r", 0);
+		} else {
+			retJSON.put("r", 8);
+		}
 		retJSON.put("error", URLlImplBase.ErrorMap.get(retJSON.getInt("r")));
 		m_bs.setRetrunObj(retJSON);
 		return m_bs;

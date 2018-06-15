@@ -73,6 +73,7 @@ public class BIKuluMQAdapter {
 		JSONObject _oldData = JSONObject.fromObject(URLlImplBase
 				.decodeUnicode(msg));
 		JSONObject bodyData = _oldData.getJSONObject("databody");
+		_oldData.put("sysdate", this.bsDate.getThisDate(0, 0));
 		if (_oldData.getString("tag").equals("data")) {
 			EquipmentInstPojo oneEqp = new BIEquipment(null, null)
 					.getOneEquipmentInstByToken(_oldData.getString("eqpid"));
@@ -114,13 +115,13 @@ public class BIKuluMQAdapter {
 					}
 				} else {
 					BIKuluMQAdapter doMsg = new BIKuluMQAdapter();
-					doMsg.doTRUCKSERV_TO_CLOUD_MQ(msg);
+					doMsg.doTRUCKSERV_TO_CLOUD_MQ(_oldData.toString());
 				}
 			}
 
 		} else {
 			BIKuluMQAdapter doMsg = new BIKuluMQAdapter();
-			doMsg.doTRUCKSERV_TO_CLOUD_MQ(msg);
+			doMsg.doTRUCKSERV_TO_CLOUD_MQ(_oldData.toString());
 		}
 		return;
 	}
@@ -715,6 +716,12 @@ public class BIKuluMQAdapter {
 						oneEqpGeo.setEqpInst(eqpBI
 								.getOneEquipmentInstByToken(_oldData
 										.getString("eqpid")));
+						if (_oldData.containsKey("sysdate")
+								&& !_oldData.getString("sysdate").equals("")) {
+							oneEqpGeo.setSysDate(_oldData.getString("sysdate"));
+						} else {
+							oneEqpGeo.setSysDate(this.bsDate.getThisDate(0, 0));
+						}
 						if (oneEqpGeo.getEqpInst() != null) {
 							// oneEqpGeo.getEqpInst().getEqpDef().setId("WATCH_01");
 							// Calendar calendar = Calendar.getInstance();
