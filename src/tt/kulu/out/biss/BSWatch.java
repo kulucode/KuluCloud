@@ -404,4 +404,34 @@ public class BSWatch {
 		return m_bs;
 	}
 
+	/**
+	 * <p>
+	 * 方法名：do_updateAllWatch
+	 * </p>
+	 * <p>
+	 * 方法描述：得到一个用户初始化信息
+	 * </p>
+	 * <p>
+	 * 输入参数：BSObject m_bs：BS框架业务对象
+	 * </p>
+	 * <p>
+	 * 作者:曹祺
+	 * </p>
+	 * <p>
+	 * 输出参数：BSObject：BS框架业务对象
+	 * </p>
+	 */
+	public BSObject do_updateAllWatch(BSObject m_bs) throws Exception {
+		JSONObject retObj = new JSONObject();
+		retObj.put("r", 0);
+		String state = m_bs.getPrivateMap().get("pg_allstate");
+		BIWatch watchBI = new BIWatch(null, m_bs);
+		if (watchBI.updateAllWatch(Integer.parseInt(state)) > 0) {
+			retObj.put("r", 0);
+		}
+		retObj.put("error", URLlImplBase.ErrorMap.get(retObj.getInt("r")));
+		m_bs.setRetrunObj(retObj);
+		return m_bs;
+	}
+
 }

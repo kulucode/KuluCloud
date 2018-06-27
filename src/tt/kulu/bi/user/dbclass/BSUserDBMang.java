@@ -644,7 +644,9 @@ public class BSUserDBMang extends BSDBBase {
 		ArrayList<UserPojo> list = new ArrayList<UserPojo>();
 		StringBuffer strSQL = new StringBuffer(this._getUserSelectSQL(where,
 				orderBy));
-		strSQL.append(" LIMIT " + (t - f + 1) + " OFFSET " + f);
+		if (f >= 0 && t > 0) {
+			strSQL.append(" LIMIT " + (t - f + 1) + " OFFSET " + f);
+		}
 		ResultSet rs = this.sqlHelper.queryBySql(strSQL.toString(), vList);
 		if (rs != null) {
 			while (rs.next()) {
@@ -776,6 +778,39 @@ public class BSUserDBMang extends BSDBBase {
 				._getUserSelectSQL(
 						" and (t.USER_ID=? OR t.USER_IDCARD=? OR t.MPHONE=?) and t.USER_STATE=1",
 						"");
+		ResultSet rs = this.sqlHelper.queryBySql(strSQL.toString(), vList);
+		if (rs != null && rs.next()) {
+			onePojo = this._setOneUserPojo(rs);
+			rs.close();
+		}
+		return onePojo;
+	}
+
+	/**
+	 * <p>
+	 * 方法名称: getOneUserById
+	 * </p>
+	 * <p>
+	 * 方法功能描述: 得到单个用户。
+	 * </p>
+	 * <p>
+	 * 输入参数描述:
+	 * </p>
+	 * <p>
+	 * 输出参数描述:
+	 * </p>
+	 * 
+	 * @throws Exception
+	 * 
+	 */
+	public UserPojo getOneUserByIdNotState(String id) throws Exception {
+		UserPojo onePojo = null;
+		List<Object> vList = new ArrayList<Object>();
+		vList.add(id);
+		vList.add(id);
+		vList.add(id);
+		StringBuffer strSQL = this._getUserSelectSQL(
+				" and (t.USER_ID=? OR t.USER_IDCARD=? OR t.MPHONE=?)", "");
 		ResultSet rs = this.sqlHelper.queryBySql(strSQL.toString(), vList);
 		if (rs != null && rs.next()) {
 			onePojo = this._setOneUserPojo(rs);

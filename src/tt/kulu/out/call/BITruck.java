@@ -209,6 +209,59 @@ public class BITruck extends BSDBBase {
 
 	/**
 	 * <p>
+	 * 方法名称: setTruckDefToRedis
+	 * </p>
+	 * <p>
+	 * 方法功能描述: 从redis得到车辆类型
+	 * </p>
+	 * <p>
+	 * 创建人: 梁浩
+	 * </p>
+	 * <p>
+	 * 输入参数描述: BSObject m_bs:BinaryStar框架参数集。
+	 * </p>
+	 * <p>
+	 * 输出参数描述: BSObject：BinaryStar框架参数集。
+	 * </p>
+	 * 
+	 * @throws Exception
+	 */
+	public void deleteVehicleNewestToRedis(String instid) throws Exception {
+		// 得到最新的一条记录
+		BIRedis redisBI = new BIRedis();
+		if (instid != null && !instid.equals("")) {
+			redisBI.delMapData("VEHICLE_NEWEST", instid,
+					URLlImplBase.REDIS_KULUDATA);
+		}
+	}
+
+	/**
+	 * <p>
+	 * 方法名称: setTruckDefToRedis
+	 * </p>
+	 * <p>
+	 * 方法功能描述: 从redis得到车辆类型
+	 * </p>
+	 * <p>
+	 * 创建人: 梁浩
+	 * </p>
+	 * <p>
+	 * 输入参数描述: BSObject m_bs:BinaryStar框架参数集。
+	 * </p>
+	 * <p>
+	 * 输出参数描述: BSObject：BinaryStar框架参数集。
+	 * </p>
+	 * 
+	 * @throws Exception
+	 */
+	public void deleteAllVehicleNewestToRedis() throws Exception {
+		// 得到最新的一条记录
+		BIRedis redisBI = new BIRedis();
+		redisBI.delData("VEHICLE_NEWEST", URLlImplBase.REDIS_KULUDATA);
+	}
+
+	/**
+	 * <p>
 	 * 方法名称: getDriverSchedulingRedis
 	 * </p>
 	 * <p>
@@ -2947,6 +3000,61 @@ public class BITruck extends BSDBBase {
 			throws Exception {
 		TruckDBMang truckDB = new TruckDBMang(sqlHelper, m_bs);
 		return truckDB.deleteOneVehicle(instId);
+	}
+
+	/**
+	 * <p>
+	 * 方法名称: deleteOneVehicle
+	 * </p>
+	 * <p>
+	 * 方法功能描述: 编辑单个机构数据。
+	 * </p>
+	 * <p>
+	 * 输入参数描述:数据库操作类对象sqlHelper、菜单实体对象oneMenu
+	 * </p>
+	 * <p>
+	 * 输出参数描述:java.lang.Integer整型
+	 * </p>
+	 * 
+	 * @throws Exception
+	 * 
+	 */
+	public int updateAllVehicle(int state) throws Exception {
+		int count = 0;
+		SqlExecute sqlHelper = new SqlExecute();
+		try {
+			sqlHelper.setAutoCommit(false);
+			count = this.updateAllVehicle(sqlHelper, state);
+			sqlHelper.commit();
+		} catch (Exception ep) {
+			sqlHelper.rollback();
+			ep.printStackTrace();
+			throw ep;
+		}
+		return count;
+	}
+
+	/**
+	 * <p>
+	 * 方法名称: updateAllVehicle
+	 * </p>
+	 * <p>
+	 * 方法功能描述: 编辑单个机构数据。
+	 * </p>
+	 * <p>
+	 * 输入参数描述:数据库操作类对象sqlHelper、菜单实体对象oneMenu
+	 * </p>
+	 * <p>
+	 * 输出参数描述:java.lang.Integer整型
+	 * </p>
+	 * 
+	 * @throws Exception
+	 * 
+	 */
+	public int updateAllVehicle(SqlExecute sqlHelper, int state)
+			throws Exception {
+		TruckDBMang truckDB = new TruckDBMang(sqlHelper, m_bs);
+		return truckDB.updateAllVehicle(state);
 	}
 
 	/**

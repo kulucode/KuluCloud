@@ -1045,6 +1045,59 @@ public class BIUser extends BSDBBase {
 
 	/**
 	 * <p>
+	 * 方法名：getOneUserById
+	 * </p>
+	 * <p>
+	 * 方法描述：得到一个用户
+	 * </p>
+	 * <p>
+	 * 输入参数：BSObject m_bs：BS框架业务对象
+	 * </p>
+	 * <p>
+	 * 作者:曹祺
+	 * </p>
+	 * <p>
+	 * 输出参数：BSObject：BS框架业务对象
+	 * </p>
+	 */
+	public UserPojo getOneUserByIdNotState(String id) throws Exception {
+		UserPojo onePojo = new UserPojo();
+		SqlExecute sqlHelper = new SqlExecute();
+		try {
+			onePojo = this.getOneUserByIdNotState(sqlHelper, id);
+		} catch (Exception ep) {
+			ep.printStackTrace();
+		} finally {
+			sqlHelper.close();
+		}
+		return onePojo;
+	}
+
+	/**
+	 * <p>
+	 * 方法名：getOneUserById
+	 * </p>
+	 * <p>
+	 * 方法描述：得到一个用户
+	 * </p>
+	 * <p>
+	 * 输入参数：BSObject m_bs：BS框架业务对象
+	 * </p>
+	 * <p>
+	 * 作者:曹祺
+	 * </p>
+	 * <p>
+	 * 输出参数：BSObject：BS框架业务对象
+	 * </p>
+	 */
+	public UserPojo getOneUserByIdNotState(SqlExecute sqlHelper, String id)
+			throws Exception {
+		BSUserDBMang userDB = new BSUserDBMang(sqlHelper, m_bs);
+		return userDB.getOneUserByIdNotState(id);
+	}
+
+	/**
+	 * <p>
 	 * 方法名：getOneUserByPhone
 	 * </p>
 	 * <p>
@@ -1278,7 +1331,6 @@ public class BIUser extends BSDBBase {
 		SqlExecute sqlHelper = new SqlExecute();
 		try {
 			sqlHelper.setAutoCommit(false);
-			BIRedis redisBI = new BIRedis();
 			BSUserDBMang userDB = new BSUserDBMang(sqlHelper, m_bs);
 			count = userDB.updateUser(onePojo);
 			// 增加角色

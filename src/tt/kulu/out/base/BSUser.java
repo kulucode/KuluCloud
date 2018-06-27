@@ -1,7 +1,18 @@
 package tt.kulu.out.base;
 
+import java.io.File;
 import java.util.ArrayList;
 
+import jxl.Workbook;
+import jxl.format.Alignment;
+import jxl.format.Border;
+import jxl.format.BorderLineStyle;
+import jxl.format.VerticalAlignment;
+import jxl.write.Label;
+import jxl.write.WritableCellFormat;
+import jxl.write.WritableFont;
+import jxl.write.WritableSheet;
+import jxl.write.WritableWorkbook;
 import tt.kulu.bi.base.URLlImplBase;
 import tt.kulu.bi.company.pojo.CompanyPojo;
 import tt.kulu.bi.power.pojo.RolePojo;
@@ -9,13 +20,14 @@ import tt.kulu.bi.user.pojo.LoginUserPojo;
 import tt.kulu.bi.user.pojo.OrgPojo;
 import tt.kulu.bi.user.pojo.UserOrgRPojo;
 import tt.kulu.bi.user.pojo.UserPojo;
-import tt.kulu.bi.user.pojo.UserWorkParasPojo;
 import tt.kulu.out.call.BICompany;
 import tt.kulu.out.call.BILogin;
 import tt.kulu.out.call.BIUser;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import com.tt4j2ee.BSCommon;
+import com.tt4j2ee.Const;
 import com.tt4j2ee.m.BSObject;
 import com.tt4j2ee.md5.MD5Imp;
 
@@ -27,7 +39,7 @@ import com.tt4j2ee.md5.MD5Imp;
  * 功能描述: 用户Web接口类
  * </p>
  * <p>
- * 作者: 马维
+ * 作者: 梁浩
  * </p>
  * <p>
  * 版本: 0.1
@@ -898,6 +910,219 @@ public class BSUser {
 		retJSON.put("error", URLlImplBase.ErrorMap.get(retJSON.getInt("r")));
 		m_bs.setRetrunObj(retJSON);
 		return m_bs;
+	}
+
+	/**
+	 * <p>
+	 * 方法名称: do_exportUserList
+	 * </p>
+	 * <p>
+	 * 方法功能描述:导出用户报表统计。
+	 * </p>
+	 * 
+	 * @throws Exception
+	 */
+	public BSObject do_exportUserList(BSObject m_bs) throws Exception {
+		JSONObject retJSON = new JSONObject();
+		String filepath = BSCommon.getConfigValue("upload_path") + "/report/";
+		String fileName = "user_" + m_bs.getDateEx().getSeqDate() + ".xls";
+		JSONObject paras = new JSONObject();
+		paras.put("state", 1);
+		WritableWorkbook workbook = null;
+		try {
+			(new File(filepath)).mkdirs();
+			workbook = Workbook.createWorkbook(new File(filepath + "/"
+					+ fileName));
+			// 定义xls式样
+			WritableFont NormalFont = new WritableFont(WritableFont.ARIAL, 12);
+			WritableFont BoldFont = new WritableFont(WritableFont.ARIAL, 14,
+					WritableFont.BOLD);
+			WritableFont BoldFont2 = new WritableFont(WritableFont.ARIAL, 13,
+					WritableFont.BOLD);
+			WritableCellFormat wcf_title = new WritableCellFormat(BoldFont);
+			wcf_title.setBorder(Border.ALL, BorderLineStyle.THIN);
+			wcf_title.setVerticalAlignment(VerticalAlignment.CENTRE);
+			wcf_title.setAlignment(Alignment.CENTRE);
+			wcf_title.setWrap(true);
+
+			WritableCellFormat wcf_center = new WritableCellFormat(NormalFont);
+			wcf_center.setBorder(Border.ALL, BorderLineStyle.THIN);
+			wcf_center.setVerticalAlignment(VerticalAlignment.CENTRE);
+			wcf_center.setAlignment(Alignment.CENTRE);
+			wcf_center.setWrap(true);
+
+			WritableCellFormat wcf_left = new WritableCellFormat(NormalFont);
+			wcf_left.setBorder(Border.ALL, BorderLineStyle.THIN);
+			wcf_left.setVerticalAlignment(VerticalAlignment.CENTRE);
+			wcf_left.setAlignment(Alignment.LEFT);
+			wcf_left.setWrap(true);
+
+			WritableCellFormat wcf_boldFont = new WritableCellFormat(BoldFont2);
+			wcf_boldFont.setBorder(Border.ALL, BorderLineStyle.THIN);
+			wcf_boldFont.setVerticalAlignment(VerticalAlignment.CENTRE);
+			wcf_boldFont.setAlignment(Alignment.CENTRE);
+			wcf_boldFont.setWrap(true);
+			//
+			WritableSheet sheet = null;
+			sheet = workbook.createSheet("员工列表", 0);
+			// 列行合并
+			sheet.mergeCells(0, 0, 10, 0);// x,y
+			// 设置表头
+			sheet.setRowView(0, 700);
+			sheet.setRowView(1, 600);
+			sheet.setRowView(2, 600);
+			sheet.addCell(new Label(0, 0, "员工列表", wcf_boldFont));
+			sheet.setColumnView(0, 10);
+			sheet.setColumnView(1, 40);
+			sheet.setColumnView(2, 18);
+			sheet.setColumnView(3, 18);
+			sheet.setColumnView(4, 15);
+			sheet.setColumnView(5, 30);
+			sheet.setColumnView(6, 30);
+			sheet.setColumnView(7, 20);
+			sheet.setColumnView(8, 30);
+			sheet.setColumnView(9, 30);
+			sheet.setColumnView(10, 60);
+			sheet.addCell(new Label(0, 1, "ID", wcf_title));
+			sheet.addCell(new Label(1, 1, "机构", wcf_title));
+			sheet.addCell(new Label(2, 1, "员工编号", wcf_title));
+			sheet.addCell(new Label(3, 1, "姓名", wcf_title));
+			sheet.addCell(new Label(4, 1, "年龄", wcf_title));
+			sheet.addCell(new Label(5, 1, "联系方式", wcf_title));
+			sheet.addCell(new Label(6, 1, "身份证", wcf_title));
+			sheet.addCell(new Label(7, 1, "角色", wcf_title));
+			sheet.addCell(new Label(8, 1, "前端功能", wcf_title));
+			sheet.addCell(new Label(9, 1, "后端功能", wcf_title));
+			sheet.addCell(new Label(10, 1, "监管机构", wcf_title));
+			// 调用BI
+			BIUser userBI = new BIUser(null, m_bs);
+			BILogin loginBI = new BILogin(null, m_bs);
+			// 返回数据
+			JSONArray retlist = new JSONArray();
+			ArrayList<UserPojo> list = userBI.getUserList(paras, 0, -1);
+			int i = 2;
+			for (UserPojo onePojo : list) {
+				onePojo = loginBI.getLoginUser(onePojo);
+				if (onePojo != null) {
+					int rowH = 2;
+					int age = 0;
+					if (!onePojo.getBirthday().equals("")) {
+						age = URLlImplBase.getAge(onePojo.getBirthday());
+					}
+					String org = "";
+					if (onePojo.getOrg() != null) {
+						org = onePojo.getOrg().getAllName()
+								.replaceAll(",", "-");
+					}
+					// 角色
+					String roles = "";
+					if (onePojo.getRoleList() != null) {
+						if (onePojo.getRoleList().size() > rowH) {
+							rowH = onePojo.getRoleList().size();
+						}
+						for (RolePojo oneRole : onePojo.getRoleList()) {
+							roles += ((!roles.equals("") ? "\r\n" : "") + oneRole
+									.getName());
+						}
+					}
+					sheet.addCell(new Label(0, i,
+							String.valueOf(retlist.size() + 1), wcf_center));
+					sheet.addCell(new Label(1, i, org, wcf_center));
+					sheet.addCell(new Label(2, i, onePojo.getId(), wcf_center));
+					sheet.addCell(new Label(3, i, onePojo.getName(), wcf_center));
+					sheet.addCell(new Label(4, i, String.valueOf(age),
+							wcf_center));
+					sheet.addCell(new Label(5, i, onePojo.getmPhone(),
+							wcf_center));
+					sheet.addCell(new Label(6, i, onePojo.getIdCard(),
+							wcf_center));
+					sheet.addCell(new Label(7, i, roles, wcf_center));
+					// 前端功能
+					String funName = "";
+					JSONArray ms = loginBI.getUserMenu(m_bs,
+							onePojo.getInstId(), 1);
+					int rowF = 0;
+					for (int r = 0, rsize = ms.size(); r < rsize; r++, rowF++) {
+						JSONObject oneF = ms.getJSONObject(r);
+						funName += ((!funName.equals("") ? "\r\n" : "") + oneF
+								.getString("name"));
+						if (oneF.containsKey("sub")) {
+							JSONArray oneFSList = oneF.getJSONArray("sub");
+							for (int s = 0, ssize = oneFSList.size(); s < ssize; s++, rowF++) {
+								JSONObject oneFS = oneFSList.getJSONObject(s);
+								funName += ("\r\n  --" + oneFS
+										.getString("name"));
+							}
+						}
+					}
+					if (rowF > rowH) {
+						rowH = rowF;
+					}
+					sheet.addCell(new Label(8, i, funName, wcf_left));
+					// 后端功能
+					rowF = 0;
+					funName = "";
+					ms = loginBI.getUserMenu(m_bs, onePojo.getInstId(), 0);
+					for (int r = 0, rsize = ms.size(); r < rsize; r++, rowF++) {
+						JSONObject oneF = ms.getJSONObject(r);
+						funName += ((!funName.equals("") ? "\r\n" : "") + oneF
+								.getString("name"));
+						if (oneF.containsKey("sub")) {
+							JSONArray oneFSList = oneF.getJSONArray("sub");
+							for (int s = 0, ssize = oneFSList.size(); s < ssize; s++, rowF++) {
+								JSONObject oneFS = oneFSList.getJSONObject(s);
+								funName += ("\r\n  --" + oneFS
+										.getString("name"));
+							}
+						}
+					}
+					if (rowF > rowH) {
+						rowH = rowF;
+					}
+					sheet.addCell(new Label(9, i, funName, wcf_left));
+					// 监管机构
+					String orgs = "";
+					String[] orgList = onePojo.getGroupAllName().split(",");
+					for (String oneO : orgList) {
+						if (!oneO.equals("")) {
+							orgs += ((!orgs.equals("") ? "\r\n" : "") + oneO);
+						}
+					}
+					if (orgList.length - 1 > rowH) {
+						rowH = orgList.length - 1;
+					}
+					sheet.addCell(new Label(10, i, orgs, wcf_left));
+					if (rowH < 2) {
+						rowH = 2;
+					}
+					sheet.setRowView(i, rowH * 300);
+					i++;
+				}
+			}
+		} catch (Exception ep) {
+			ep.printStackTrace();
+			throw ep;
+		} finally {
+			if (workbook != null) {
+				workbook.write();
+				workbook.close();
+			}
+			if (!filepath.equals("")) {
+				retJSON.put("path", "/files/report/" + fileName);
+				m_bs.setPrivateValue(Const.BS_DOWNLOAD_DELETE_FLAG, "true");
+				m_bs.setPrivateValue(Const.BS_DOWNLOAD_FILE, filepath + "/"
+						+ fileName);
+				File file = new File(filepath + fileName);
+				file.setExecutable(true, false);// 设置可执行权限
+				file.setReadable(true, false);// 设置可读权限
+				file.setWritable(true, false);// 设置可写权限
+			}
+		}
+		retJSON.put("code", 0);
+		retJSON.put("msg", URLlImplBase.ErrorMap.get(retJSON.getInt("code")));
+		m_bs.setRetrunObj(retJSON);
+		return m_bs;
+
 	}
 
 	// 设置编辑页面

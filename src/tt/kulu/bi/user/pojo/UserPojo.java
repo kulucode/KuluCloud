@@ -47,6 +47,9 @@ public class UserPojo {
 	// 机构
 	private OrgPojo org = null;
 	private int ugType = 0;
+	private String groupId = "";
+	private String groupAllId = "";
+	private String groupAllName = "";
 
 	public String getInstId() {
 		return instId;
@@ -198,6 +201,30 @@ public class UserPojo {
 
 	public void setInName(String inName) {
 		this.inName = inName;
+	}
+
+	public String getGroupAllId() {
+		return groupAllId;
+	}
+
+	public void setGroupAllId(String groupAllId) {
+		this.groupAllId = groupAllId;
+	}
+
+	public String getGroupAllName() {
+		return groupAllName;
+	}
+
+	public void setGroupAllName(String groupAllName) {
+		this.groupAllName = groupAllName;
+	}
+
+	public String getGroupId() {
+		return groupId;
+	}
+
+	public void setGroupId(String groupId) {
+		this.groupId = groupId;
 	}
 
 }

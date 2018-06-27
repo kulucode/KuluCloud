@@ -67,6 +67,10 @@ $(function () {
     $('.dropdown-toggle').click(function () {
         $(this).closest('.button-group, .drop').addClass("open");
     });
+    $(".dropdown-hover").hover(function () {
+        $(".button-group, .drop").removeClass("open");
+        $(this).closest(".button-group, .drop").addClass("open")
+    });
     $(document).bind("click", function (e) {
         if ($(e.target).closest(".button-group.open, .drop.open").length == 0) {
             $(".button-group, .drop").removeClass("open");

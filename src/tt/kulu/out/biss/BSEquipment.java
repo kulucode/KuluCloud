@@ -128,6 +128,19 @@ public class BSEquipment {
 			retObj.add(oneObj);
 		}
 		fretObj.put("list", retObj);
+		// 运营商信息
+		BICompany compBI = new BICompany(m_bs);
+		CompanyPojo oneComp = compBI.getThisCompanyByRedis();
+		JSONObject compJ = new JSONObject();
+		if (oneComp != null) {
+			compJ.put("id", oneComp.getId());
+			compJ.put("name", oneComp.getName());
+			compJ.put("link", oneComp.getLinkMan());
+			compJ.put("linkphone", oneComp.getLinkPhone());
+			compJ.put("lat", oneComp.getLatitude());
+			compJ.put("lon", oneComp.getLongitude());
+		}
+		fretObj.put("company", compJ);
 		fretObj.put("r", 0);
 		fretObj.put("error", URLlImplBase.ErrorMap.get(fretObj.getInt("r")));
 		m_bs.setRetrunObj(fretObj);
@@ -406,6 +419,11 @@ public class BSEquipment {
 		retObj.put("qr", onePojo.getQrCode());
 		retObj.put("phone", onePojo.getPhone());
 		retObj.put("para1", onePojo.getPara1());
+		retObj.put("para2", onePojo.getPara2());
+		retObj.put("tonnage", onePojo.getTonnage());
+		retObj.put("install", onePojo.getInstall());
+		retObj.put("deflon", onePojo.getDefLongitude());
+		retObj.put("deflat", onePojo.getDefLatitude());
 		retObj.put("pdate", onePojo.getProDate());
 		retObj.put("muser", onePojo.getMangUser().getInstId());
 		retObj.put("muserid", onePojo.getMangUser().getId());
@@ -630,6 +648,21 @@ public class BSEquipment {
 		}
 		if (m_bs.getPrivateMap().get("t_eqppara1") != null) {
 			onePojo.setPara1(m_bs.getPrivateMap().get("t_eqppara1"));
+		}
+		if (m_bs.getPrivateMap().get("t_eqppara2") != null) {
+			onePojo.setPara2(m_bs.getPrivateMap().get("t_eqppara2"));
+		}
+		if (m_bs.getPrivateMap().get("t_eqptonnage") != null) {
+			onePojo.setTonnage(m_bs.getPrivateMap().get("t_eqptonnage"));
+		}
+		if (m_bs.getPrivateMap().get("t_eqpinstall") != null) {
+			onePojo.setInstall(m_bs.getPrivateMap().get("t_eqpinstall"));
+		}
+		if (m_bs.getPrivateMap().get("t_eqplon") != null) {
+			onePojo.setDefLongitude(m_bs.getPrivateMap().get("t_eqplon"));
+		}
+		if (m_bs.getPrivateMap().get("t_eqplat") != null) {
+			onePojo.setDefLatitude(m_bs.getPrivateMap().get("t_eqplat"));
 		}
 
 		return onePojo;

@@ -13,27 +13,11 @@ var FanceTrucks = {};
 var COMPCenter = null;
 jQuery(function ($) {
     getLoginUser("div_user", "FANCE_INST", "FANCE_MANG", function () {
-        getPlateMsg();
+        FanceIni();
+        searchFance();
     });
 
 });
-
-function getPlateMsg() {
-    doRefresh(
-        null,
-        "STATS",
-        "searchSysBaseStats",
-        "",
-        function (_data) {
-            if (_data.r == 0) {
-                if (_data.company.lat != "" && _data.company.lon != "") {
-                    COMPCenter = [parseFloat(_data.company.lon), parseFloat(_data.company.lat)];
-                }
-                FanceIni();
-                searchFance();
-            }
-        });
-}
 
 function FanceIni() {
     doRefresh(
@@ -48,6 +32,9 @@ function FanceIni() {
                 }
                 $("#s_fancetype").html(_html);
                 $("#s_fancetype").val("");
+                if (_data.company.lat != "" && _data.company.lon != "") {
+                    COMPCenter = [parseFloat(_data.company.lon), parseFloat(_data.company.lat)];
+                }
             }
         });
 }

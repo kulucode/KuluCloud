@@ -284,7 +284,7 @@ public class WatchDBMang extends BSDBBase {
 		strSQL.append(",(select twb.bre_high || ',' || twb.bre_low || ',' || twb.s_cdate from t_watch_bro twb where twb.eqp_inst = t.eqp_inst order by twb.s_cdate desc limit 1) as bro");
 		strSQL.append(",(select twh.bbe_value || ',' || twh.bbe_ele || ',' || twh.s_cdate from t_watch_hr twh where twh.eqp_inst = t.eqp_inst order by twh.s_cdate desc limit 1) as hr");
 		strSQL.append(",(select twh.bbe_value || ',' || twh.bbe_ele || ',' || twh.s_cdate from t_watch_hr twh where twh.eqp_inst = t.eqp_inst order by twh.s_cdate desc limit 1) as hr");
-		strSQL.append(" from t_equipment_def def,t_equipment_inst t left outer join t_eqp_inst_geometry tg on tg.eqp_inst = t.EQP_GEO_ID");
+		strSQL.append(" from t_equipment_def def,t_equipment_inst t left outer join t_eqp_inst_geometry tg on tg.log_id = t.EQP_GEO_ID");
 		strSQL.append(" where t.eqp_def = def.eqp_code");
 		strSQL.append(" and def.eqp_type = 'EQUIPMENT_DEFTYPE_1'");
 		strSQL.append(" and t.eqp_inst=?");
@@ -405,6 +405,50 @@ public class WatchDBMang extends BSDBBase {
 	 * 输出参数描述: ArrayList
 	 * </p>
 	 */
+	public int updateAllWatch(int state) throws Exception {
+		int count = 0;
+		if (state >= 0) {
+			// 修改状态
+			List<Object> vList = new ArrayList<Object>();
+			vList.add(state);
+			count += sqlHelper
+					.updateBySql(
+							"update T_EQUIPMENT_INST set EQP_STATE=? where EQP_INST in (select t.EQP_INST  from T_EQUIPMENT_INST t1,V_WATCH_WORK_PARAS t left outer join T_USER tu on tu.USER_INSTID = t.eqp_muser where t.eqp_inst=t1.eqp_inst)",
+							vList);
+			if (state > 0) {
+				(new BIWatch(null)).deleteAllWatchLastDataToRedis();
+			}
+		} else {
+			// 物理删除
+			List<Object> vList = new ArrayList<Object>();
+			vList.add(4);
+			StringBuffer strSQL = new StringBuffer(
+					this._getWatchWordParasSelectSQL(" and t.EQP_STATE=?", ""));
+			ResultSet rs = this.sqlHelper.queryBySql(strSQL.toString(), vList);
+			if (rs != null) {
+				while (rs.next()) {
+					count += this.deleteOneWatch(rs.getString("eqp_inst"));
+				}
+				rs.close();
+			}
+		}
+		return count;
+	}
+
+	/**
+	 * <p>
+	 * 方法名称: deleteOneWatch
+	 * </p>
+	 * <p>
+	 * 方法功能描述: 修改用户联系信息。
+	 * </p>
+	 * <p>
+	 * 输入参数描述: String where：输入的查询条件。
+	 * </p>
+	 * <p>
+	 * 输出参数描述: ArrayList
+	 * </p>
+	 */
 	public int deleteOneWatch(String instId) throws Exception {
 		int count = 0;
 		if (instId != null && !instId.trim().equals("")) {
@@ -419,6 +463,8 @@ public class WatchDBMang extends BSDBBase {
 			count += sqlHelper.updateBySql(
 					"delete from T_WATCH_HR where EQP_INST=?", vList);
 			count += sqlHelper.updateBySql(
+					"delete from T_WATCH_BRO where EQP_INST=?", vList);
+			count += sqlHelper.updateBySql(
 					"delete from T_EQP_INST_GEOMETRY where EQP_INST=?", vList);
 			count += sqlHelper.updateBySql(
 					"delete from T_EQP_INST_GEOMETRY_HOUR where EQP_INST=?",
@@ -432,7 +478,7 @@ public class WatchDBMang extends BSDBBase {
 
 			count += sqlHelper.updateBySql(
 					"delete from T_EQUIPMENT_INST where EQP_INST=?", vList);
-
+			(new BIWatch(null)).deleteWatchLastDataToRedis(instId);
 		}
 		return count;
 	}

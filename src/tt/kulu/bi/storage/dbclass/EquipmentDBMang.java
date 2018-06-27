@@ -602,7 +602,11 @@ public class EquipmentDBMang extends BSDBBase {
 		strSQL.append(",EQP_TRUCK");
 		strSQL.append(",EQP_TOKEN");
 		strSQL.append(",EQP_PARA1");
-		strSQL.append(") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+		strSQL.append(",EQP_PARA2");
+		strSQL.append(",EQP_DEFGEO");
+		strSQL.append(",EQP_INSTALL");
+		strSQL.append(",EQP_TONNAGE");
+		strSQL.append(") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
 		List<Object> vList = new ArrayList<Object>();
 		vList.add(onePojo.getInstId());
 		vList.add(onePojo.getWyCode());
@@ -631,6 +635,16 @@ public class EquipmentDBMang extends BSDBBase {
 		}
 		vList.add(onePojo.getToken());
 		vList.add(onePojo.getPara1());
+		vList.add(onePojo.getPara2());
+		if (!onePojo.getDefLongitude().equals("")
+				&& !onePojo.getDefLatitude().equals("")) {
+			vList.add(onePojo.getDefLongitude() + ","
+					+ onePojo.getDefLatitude());
+		} else {
+			vList.add("");
+		}
+		vList.add(onePojo.getInstall());
+		vList.add(onePojo.getTonnage());
 		count = this.sqlHelper.updateBySql(strSQL.toString(), vList);
 
 		return count;
@@ -669,6 +683,10 @@ public class EquipmentDBMang extends BSDBBase {
 		strSQL.append(",EQP_WYCODE=?");
 		strSQL.append(",EQP_TOKEN=?");
 		strSQL.append(",EQP_PARA1=?");
+		strSQL.append(",EQP_PARA2=?");
+		strSQL.append(",EQP_DEFGEO=?");
+		strSQL.append(",EQP_INSTALL=?");
+		strSQL.append(",EQP_TONNAGE=?");
 		strSQL.append(" where EQP_INST=?");
 		List<Object> vList = new ArrayList<Object>();
 		vList.add(onePojo.getEqpDef().getId());
@@ -689,6 +707,16 @@ public class EquipmentDBMang extends BSDBBase {
 		vList.add(onePojo.getWyCode());
 		vList.add(onePojo.getToken());
 		vList.add(onePojo.getPara1());
+		vList.add(onePojo.getPara2());
+		if (!onePojo.getDefLongitude().equals("")
+				&& !onePojo.getDefLatitude().equals("")) {
+			vList.add(onePojo.getDefLongitude() + ","
+					+ onePojo.getDefLatitude());
+		} else {
+			vList.add("");
+		}
+		vList.add(onePojo.getInstall());
+		vList.add(onePojo.getTonnage());
 		vList.add(onePojo.getInstId());
 		count = this.sqlHelper.updateBySql(strSQL.toString(), vList);
 		// 关联设备更换车辆
@@ -1406,6 +1434,10 @@ public class EquipmentDBMang extends BSDBBase {
 				+ " as EQP_LDATE");
 		strSQL.append(",t.EQP_PHONE");
 		strSQL.append(",t.EQP_PARA1");
+		strSQL.append(",t.EQP_PARA2");
+		strSQL.append(",t.EQP_DEFGEO");
+		strSQL.append(",t.EQP_INSTALL");
+		strSQL.append(",t.EQP_TONNAGE");
 		// 定义
 		strSQL.append(",t.EQP_DEF");
 		// 管理用户
@@ -1468,6 +1500,23 @@ public class EquipmentDBMang extends BSDBBase {
 		}
 		if (rs.getString("EQP_PHONE") != null) {
 			onePojo.setPhone(rs.getString("EQP_PHONE"));
+		}
+		if (rs.getString("EQP_PARA2") != null) {
+			onePojo.setPara2(rs.getString("EQP_PARA2"));
+		}
+		if (rs.getString("EQP_INSTALL") != null) {
+			onePojo.setInstall(rs.getString("EQP_INSTALL"));
+		}
+		if (rs.getString("EQP_TONNAGE") != null) {
+			onePojo.setTonnage(rs.getString("EQP_TONNAGE"));
+		}
+		if (rs.getString("EQP_DEFGEO") != null
+				&& !rs.getString("EQP_DEFGEO").equals("")) {
+			String[] defG = rs.getString("EQP_DEFGEO").split(",");
+			if (defG.length == 2) {
+				onePojo.setDefLongitude(defG[0]);
+				onePojo.setDefLatitude(defG[1]);
+			}
 		}
 
 		// 定义

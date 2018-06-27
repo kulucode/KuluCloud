@@ -232,6 +232,40 @@ public class BSLogin {
 
 	/**
 	 * <p>
+	 * 方法名称: do_getLoginUserFun
+	 * </p>
+	 * <p>
+	 * 方法功能描述: 得到用户功能权限
+	 * </p>
+	 * <p>
+	 * 输入参数描述: BSObject m_bs:BinaryStar框架参数集。
+	 * </p>
+	 * <p>
+	 * 输出参数描述: BSObject：BinaryStar框架参数集。
+	 * </p>
+	 */
+	public BSObject do_getLoginUserFun(BSObject m_bs) throws Exception {
+		String userInstId = m_bs.getPrivateMap().get("pg_user");
+		JSONObject retJSON = new JSONObject();
+		// 菜单
+		// 得到应用
+		BILogin loginBI = new BILogin(null, m_bs);
+		JSONArray ms = loginBI.getUserMenu(m_bs, userInstId, 1);
+		if (ms.size() > 0) {
+			retJSON.put("webfun", ms);
+		}
+		ms = loginBI.getUserMenu(m_bs, userInstId, 0);
+		if (ms.size() > 0) {
+			retJSON.put("ptfun", ms);
+		}
+		retJSON.put("r", 0);
+		retJSON.put("error", URLlImplBase.ErrorMap.get(retJSON.getInt("r")));
+		m_bs.setRetrunObj(retJSON);
+		return m_bs;
+	}
+
+	/**
+	 * <p>
 	 * 方法名称: do_SysBaseIni
 	 * </p>
 	 * <p>

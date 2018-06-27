@@ -71,14 +71,14 @@ public class BIEquipment extends BSDBBase {
 	public EquipmentDefPojo getEqpDefByRedis(String defId) throws Exception {
 		EquipmentDefPojo onePojo = new EquipmentDefPojo();
 		BIRedis redisBI = new BIRedis();
-		String redisS = redisBI.getStringData("KEQPDEF_" + defId,
+		String redisS = redisBI.getMapData("KEQPDEF_MAP", defId,
 				URLlImplBase.REDIS_KULUDATA);
 		if (redisS == null || redisS.trim().equals("")) {
 			// 从数据库的到
 			onePojo = this.getOneEquipmentDefById(defId);
 			if (onePojo != null) {
-				redisBI.setStringData("KEQPDEF_" + defId, JSONObject
-						.fromObject(onePojo).toString(),
+				redisBI.setMapData("KEQPDEF_MAP", defId,
+						JSONObject.fromObject(onePojo).toString(),
 						URLlImplBase.REDIS_KULUDATA);
 			}
 		} else {
@@ -115,7 +115,7 @@ public class BIEquipment extends BSDBBase {
 		EquipmentDefPojo onePojo = this.getOneEquipmentDefById(defId);
 		BIRedis redisBI = new BIRedis();
 		if (onePojo != null) {
-			redisBI.setStringData("KEQPDEF_" + defId,
+			redisBI.setMapData("KEQPDEF_MAP", defId,
 					JSONObject.fromObject(onePojo).toString(),
 					URLlImplBase.REDIS_KULUDATA);
 		}
@@ -143,12 +143,15 @@ public class BIEquipment extends BSDBBase {
 	public String getEqpInstFDIdByRedis(String eqpId) throws Exception {
 		String fdId = "";
 		BIRedis redisBI = new BIRedis();
-		fdId = redisBI.getStringData("KEQPINSTFDID_" + eqpId,
+		fdId = redisBI.getMapData("KEQPINSTFDID_MAP", eqpId,
 				URLlImplBase.REDIS_KULUDATA);
 		if (fdId == null || fdId.trim().equals("")) {
 			// 从数据库的到
 			fdId = this.getOneEquipmentGeoFDId(eqpId);
-			redisBI.setStringData("KEQPINSTFDID_" + eqpId, fdId,
+			if (fdId == null || fdId.trim().equals("")) {
+				fdId = BSGuid.getRandomGUID();
+			}
+			redisBI.setMapData("KEQPINSTFDID_MAP", eqpId, fdId,
 					URLlImplBase.REDIS_KULUDATA);
 		}
 		return fdId;
@@ -176,7 +179,7 @@ public class BIEquipment extends BSDBBase {
 	public String setEqpInstFDIdToRedis(String eqpId) throws Exception {
 		String fdId = BSGuid.getRandomGUID();
 		BIRedis redisBI = new BIRedis();
-		redisBI.setStringData("KEQPINSTFDID_" + eqpId, fdId,
+		redisBI.setMapData("KEQPINSTFDID_MAP", eqpId, fdId,
 				URLlImplBase.REDIS_KULUDATA);
 		return fdId;
 	}
@@ -994,7 +997,7 @@ public class BIEquipment extends BSDBBase {
 			throw ep;
 		}
 		if (count > 0 && onePojo != null && !onePojo.getInstId().equals("")) {
-			this.setEqpInstFDIdToRedis(onePojo.getInstId());
+			// this.setEqpInstFDIdToRedis(onePojo.getInstId());
 			this.setEqpInstLastWorkTimeByRedis(onePojo.getInstId(),
 					this.bsDate.getThisDate(0, 0));
 		}

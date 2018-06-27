@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import tt.kulu.bi.base.URLlImplBase;
+import tt.kulu.bi.company.pojo.CompanyPojo;
 import tt.kulu.bi.fance.pojo.FancePojo;
+import tt.kulu.out.call.BICompany;
 import tt.kulu.out.call.BIFance;
 
 import com.tt4j2ee.BSGuid;
@@ -47,6 +49,19 @@ public class BSFance {
 		// 数据准备
 		JSONObject fretObj = new JSONObject();
 		fretObj.put("type", FancePojo.TYPE_NAME);
+		// 运营商信息
+		BICompany compBI = new BICompany(m_bs);
+		CompanyPojo oneComp = compBI.getThisCompanyByRedis();
+		JSONObject compJ = new JSONObject();
+		if (oneComp != null) {
+			compJ.put("id", oneComp.getId());
+			compJ.put("name", oneComp.getName());
+			compJ.put("link", oneComp.getLinkMan());
+			compJ.put("linkphone", oneComp.getLinkPhone());
+			compJ.put("lat", oneComp.getLatitude());
+			compJ.put("lon", oneComp.getLongitude());
+		}
+		fretObj.put("company", compJ);
 		fretObj.put("r", 0);
 		fretObj.put("error", URLlImplBase.ErrorMap.get(fretObj.getInt("r")));
 		m_bs.setRetrunObj(fretObj);

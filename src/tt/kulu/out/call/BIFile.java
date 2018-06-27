@@ -942,8 +942,8 @@ public class BIFile extends BSDBBase {
 					}
 					boolean isNew = false;
 					boolean isNewEqp = false;
-					onePojo = userBI.getOneUserById((sheet.getCell(2, r)
-							.getContents()).trim());
+					onePojo = userBI.getOneUserByIdNotState((sheet
+							.getCell(2, r).getContents()).trim());
 					if (onePojo == null) {
 						isNew = true;
 						onePojo = new UserPojo();
@@ -952,6 +952,7 @@ public class BIFile extends BSDBBase {
 						onePojo.setCreateDate(bsDate.getThisDate(0, 0));
 					}
 					onePojo.setUpdateDate(onePojo.getCreateDate());
+					onePojo.setState(1);
 					// 名称
 					onePojo.setName((sheet.getCell(3, r).getContents()).trim());
 					// 内部名称
@@ -1102,6 +1103,7 @@ public class BIFile extends BSDBBase {
 								oneEqp.setToken(oneEqp.getWyCode());
 								isNewEqp = true;
 							}
+							oneEqp.setState(0);
 							oneEqp.setQrCode(sheet.getCell(11, r).getContents()
 									.trim());
 							oneEqp.setProDate(this.bsDate.getThisDate(0, 0));

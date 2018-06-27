@@ -4,8 +4,9 @@ var thisComp = null;
 var thisGroupId = "";
 var thisGroupName = "全部员工";
 var userOrgTree = null;
+var userPowerTree = null;
 var thisUserId = "";
-
+var ptFun, webFun;
 jQuery(function ($) {
     $("#t_uorg").lookup({bsid: "DCUSER", opname: "searchOrgLookUp", paras: "", lname: "pg_text"});
     $("#t_birthday").datetimepicker({
@@ -139,8 +140,10 @@ function searchUser(_page) {
                         "<a type=\"button\" class=\"button button-small bg-main\" href=\"javascript:showPower('"
                         + oneD.name + "[" + oneD.id + "]" + "','" + oneD.instid + "');\">角色</a>");
                     addTableCell("user_tab", _oneTr, "money",
-                        "<div><button type=\"button\" class=\"button bg-main button-small margin-little-top\" onclick=\"doUserOrg('"
-                        + oneD.instid + "')\">监管</button></div>");
+                        "<div><button type=\"button\" class=\"button bg-main button-small\" onclick=\"doUserOrg('"
+                        + oneD.instid + "')\">监管权限</button></div>" +
+                        "<div><button type=\"button\" class=\"button bg-main button-small margin-little-top\" onclick=\"showFunPower('"
+                        + oneD.instid + "','" + oneD.name + "[" + oneD.id + "]')\">功能权限</button></div>");
                     addTableCell("user_tab", _oneTr, "key",
                         "<a type=\"button\" class=\"button bg-main button-small\" href=\"javascript:changeUserKey('"
                         + oneD.instid + "')\">修改密码</a>");
@@ -455,6 +458,78 @@ function deleteOneUser(_id, _type) {
         }
     );
 
+}
+
+//得到功能权限树
+function showFunPower(_userid, _userName) {
+    openDialogs({
+        id: "power-dlg",
+        title: "用户 " + _userName + " 功能权限",
+        width: "40%",
+        father: "",
+    });
+    iniPowerTree();
+    doRefresh(
+        "",
+        "DCLOGIN",
+        "getLoginUserFun",
+        "&pg_user=" + _userid,
+        function (_data) {
+            if (_data.r == 0) {
+                if (_data.ptfun != null) {
+                    _getPowerTreeNodes(ptFun, _data.ptfun);
+                }
+                if (_data.webfun != null) {
+                    _getPowerTreeNodes(webFun, _data.webfun);
+                }
+            }
+            else {
+                alert(_data.error);
+            }
+        });
+}
+
+//权限
+function iniPowerTree() {
+    userPowerTree = null;
+    $("#div_dpowertree").html("");
+    userPowerTree = new BSTreeView("userPowerTree", "", false, "", "div_dpowertree");
+    userPowerTree.imagePath = webHome + "/common/images/tree/";
+    var root = userPowerTree
+        .addRootNode(
+            "root",
+            "平台功能",
+            "", "", "", true);
+    webFun = root.addNode(
+        "webroot",
+        "前端管理功能",
+        "", "", "",
+        true);
+    ptFun = root.addNode(
+        "plateroot",
+        "后台管理功能",
+        "", "", "",
+        true);
+    userPowerTree.DrawTree(true);
+}
+
+//递归展示下级
+function _getPowerTreeNodes(_pNode, _list) {
+    for (var i = 0; i < _list.length; i++) {
+        var oneD = _list[i];
+        var sub = _pNode
+            .addNode(
+                oneD.id,
+                oneD.name, "", "",
+                true);
+        if (oneD.sub != null && oneD.sub.length > 0) {
+            _getPowerTreeNodes(sub, oneD.sub);
+        }
+    }
+}
+
+function exportUser() {
+    doRefreshDownLoad("frmBusiness", "DCUSER", "exportUserList", "");
 }
 
 

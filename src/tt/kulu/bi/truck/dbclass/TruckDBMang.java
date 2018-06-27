@@ -30,6 +30,7 @@ import tt.kulu.out.call.BIEquipment;
 import tt.kulu.out.call.BIFile;
 import tt.kulu.out.call.BITruck;
 import tt.kulu.out.call.BIUser;
+import tt.kulu.out.call.BIWatch;
 
 import com.tt4j2ee.BSGuid;
 import com.tt4j2ee.db.SqlExecute;
@@ -1643,6 +1644,50 @@ public class TruckDBMang extends BSDBBase {
 
 	/**
 	 * <p>
+	 * 方法名称: updateAllVehicle
+	 * </p>
+	 * <p>
+	 * 方法功能描述: 修改用户联系信息。
+	 * </p>
+	 * <p>
+	 * 输入参数描述: String where：输入的查询条件。
+	 * </p>
+	 * <p>
+	 * 输出参数描述: ArrayList
+	 * </p>
+	 */
+	public int updateAllVehicle(int state) throws Exception {
+		int count = 0;
+		if (state >= 0) {
+			// 修改状态
+			List<Object> vList = new ArrayList<Object>();
+			vList.add(state);
+			count += sqlHelper
+					.updateBySql(
+							"update T_EQUIPMENT_INST set EQP_STATE=? where EQP_DEF in (select v.EQP_CODE from T_EQUIPMENT_DEF v where v.EQP_TYPE='EQUIPMENT_DEFTYPE_0')",
+							vList);
+			if (state > 0) {
+				(new BITruck(null)).deleteAllVehicleNewestToRedis();
+			}
+		} else {
+			// 物理删除
+			List<Object> vList = new ArrayList<Object>();
+			vList.add(4);
+			StringBuffer strSQL = new StringBuffer(
+					"select t.eqp_inst from T_EQUIPMENT_INST t where t.EQP_STATE=? and t.EQP_DEF in (select v.EQP_CODE from T_EQUIPMENT_DEF v where v.EQP_TYPE='EQUIPMENT_DEFTYPE_0')");
+			ResultSet rs = this.sqlHelper.queryBySql(strSQL.toString(), vList);
+			if (rs != null) {
+				while (rs.next()) {
+					count += this.deleteOneVehicle(rs.getString("eqp_inst"));
+				}
+				rs.close();
+			}
+		}
+		return count;
+	}
+
+	/**
+	 * <p>
 	 * 方法名称: deleteOneVehicle
 	 * </p>
 	 * <p>
@@ -1676,6 +1721,7 @@ public class TruckDBMang extends BSDBBase {
 
 			count += sqlHelper.updateBySql(
 					"delete from T_EQUIPMENT_INST where EQP_INST=?", vList);
+			(new BITruck(null)).deleteVehicleNewestToRedis(instId);
 		}
 		return count;
 	}

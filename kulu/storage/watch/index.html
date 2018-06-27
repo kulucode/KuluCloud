@@ -15,6 +15,7 @@
     <link rel="stylesheet" type="text/css" href="../../common/css/uc.css"/>
     <link rel="stylesheet" type="text/css" href="../../common/css/jquery.datetimepicker.css"/>
     <link rel="stylesheet" type="text/css" href="../../common/css/bstree.css"/>
+    <link rel="stylesheet" href="https://openlayers.org/en/v4.5.0/css/ol.css" type="text/css">
     <script language="javascript" src="../../common/script/jquery.js" type="text/javascript"></script>
     <script language="javascript" src="../../common/script/jquery.bs.js" type="text/javascript"></script>
     <script language="javascript" src="../../common/script/pintuer.js" type="text/javascript"></script>
@@ -99,10 +100,43 @@
                                 </div>
                             </div>
                             <div style="float: right;">
-                                <button type="button" class="button bg-sub icon-file-excel-o"
-                                        onclick="doImport('WATCH','',{temppath:'yunhuan_templet.xls',tempimg:'yunhuan_templet.png'});"
-                                        style="vertical-align: top;" title="xls导入"> xls导入
-                                </button>
+                                <div class="button-group">
+                                    <button type="button" class="button dropdown-hover bg-sub ">
+                                        批量处理 <span class="downward"></span>
+                                    </button>
+                                    <ul class="drop-menu">
+                                        <li>
+                                            <a class="icon-file-excel-o"
+                                               href="javascript:doImport('WATCH','',{temppath:'yunhuan_templet.xls',tempimg:'yunhuan_templet.png'},function(){window.location.reload()});"
+                                               style="vertical-align: top;" title="xls导入"> xls导入
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <hr/>
+                                        </li>
+                                        <li>
+                                            <a class="icon-trash-o text-yellow"
+                                               href="javascript:updateAllWatch(4,'是否将所有云环设备设置为无效？');"
+                                               style="vertical-align: top;" title="所有云环设置为无效"> 所有云环无效
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="icon-undo"
+                                               href="javascript:updateAllWatch(0,'是否还原所有无效的云环设备？');"
+                                               style="vertical-align: top;" title="还原所有无效云环"> 还原所有云环
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <hr/>
+                                        </li>
+                                        <li>
+                                            <a class="icon-times text-dot"
+                                               href="javascript:updateAllWatch(-1,'删除所有无效的云环设备，该操作不可逆，是否继续？');"
+                                               style="vertical-align: top;" title="清除所有无效云环"> 清除无效云环
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
                                 <button class="button bg-sub icon-list-alt" type="button"
                                         onclick="getWatchParas('WATCH_PARAS','云环');"
                                         style="vertical-align: top;" title="参数设置"> 参数设置
@@ -257,6 +291,28 @@
                                data-validate="required:必填"/>
                     </div>
                 </div>
+                <div class="form-group">
+                    <div class="label">
+                        <strong>安装进度</strong>
+                    </div>
+                    <div class="field">
+                        <input class="input" type="text" id="t_eqpinstall" name="t_eqpinstall"
+                               placeholder="输入安装进度"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="label">
+                        <strong>缺省位置</strong>
+                    </div>
+                    <div class="field">
+                        <button onclick="setEqpDefGeo()" type="button"
+                                class="button button-small bg-sub icon-globe"> 地图选择
+                        </button>
+                        <div id="l_compgeo" class="input-note">坐标（国际坐标系）：</div>
+                        <input type="hidden" id="t_eqplon" name="t_eqplon"/>
+                        <input type="hidden" id="t_eqplat" name="t_eqplat"/>
+                    </div>
+                </div>
             </form>
         </div>
         <div class="dialog-foot">
@@ -381,5 +437,30 @@
         </div>
     </div>
 </div>
+
+<!--用户关联机构 -->
+<div id="center-dlg">
+    <div class="dialog">
+        <div class="dialog-head">
+            <span class="close rotate-hover"></span> <strong></strong>
+        </div>
+        <div class="dialog-body" defheight="0" style="overflow-y:hidden;padding:1px;" id="p_form">
+            <div id="container" style="height:100%;width: 100%;">
+
+            </div>
+            <div class="x12" style="position:absolute;top: 40px;left: 55px;z-index: 2100;width: 100%;" id="div_mapcond">
+                <div class="navbar" style="padding: 2px 0px;">
+                    <div class="navbar-form navbar-right" style="padding: 5px 0px;">
+                        <div class="navbar-form navbar-right" id="mouse-position"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="dialog-foot">
+            <button class="button bg-main text-white icon-check" onclick="getCenterPoint();"> 选定</button>
+        </div>
+    </div>
+</div>
+<script src="https://openlayers.org/en/v4.6.4/build/ol.js"></script>
 </body>
 </html>

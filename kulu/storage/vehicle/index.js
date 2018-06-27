@@ -4,6 +4,8 @@ var thisInst = "";
 var thisComp = null;
 var thisGroupId = "";
 var thisGroupName = "全部云盒";
+var COMPCenter = null;
+var FancePoints = null;
 jQuery(function ($) {
     $("#t_eqpmuser").lookup({bsid: "DCUSER", opname: "searchUserLookUp", lname: "pg_text", exfun: "setUserOrg"});
     $("#t_eqpmorg").lookup({bsid: "DCUSER", opname: "searchOrgLookUp", lname: "pg_text"});
@@ -52,6 +54,9 @@ function EqpInstIni() {
                 }
                 $("#s_eqpdef").html(_html);
                 $("#s_eqpdef").val(_defId);
+                if (_data.company.lat != "" && _data.company.lon != "") {
+                    COMPCenter = [parseFloat(_data.company.lon), parseFloat(_data.company.lat)];
+                }
             }
         });
     searchVehicle();
@@ -208,6 +213,13 @@ function showEqpInstBase(_data, _type) {
     $("#t_truck").val(_data.mtruck == "" ? "" : _data.mtruckname + "[" + _data.mtruckpnum + "]");
     $("#t_eqpmorg_v").val(_data.morg);
     $("#t_eqpmorg").val(_data.morgallname);
+
+    $("#t_eqppara2").val(_data.para2);
+    $("#t_eqptonnage").val(_data.tonnage);
+    $("#t_eqpinstall").val(_data.install);
+    $("#t_eqplon").val(_data.deflon);
+    $("#t_eqplat").val(_data.deflat);
+    $("#l_compgeo").html("经度:" + _data.deflon + ";纬度:" + _data.deflat);
 }
 
 //保存云盒
@@ -377,4 +389,152 @@ function deleteOneVehicle(_id, _type) {
             }
         );
     }
+}
+
+function updateAllVehicle(_state, _text) {
+    $(".dropdown-hover, .button-group, .drop").removeClass("open");
+    var isOk = confirm(_text);
+    if (isOk) {
+        doRefresh(
+            "",
+            "VEHICLE",
+            "updateAllVehicle",
+            "&pg_allstate=" + _state,
+            function (_data) {
+                if (_data.r == 0) {
+                    searchVehicle();
+                }
+                else {
+                    alert(_data.error);
+                }
+            }
+        );
+    }
+}
+
+function setEqpDefGeo() {
+    openDialogs({
+        id: "center-dlg",
+        title: "选择中心位置",
+        width: "90%",
+        father: ""
+    }, function () {
+        return true;
+    });
+    var _center = [112.9380, 28.1711];
+    if (COMPCenter != null) {
+        _center = COMPCenter;
+    }
+    var _eqpDef = null;
+    if ($("#t_eqplat").val() != "" && $("#t_eqplon").val() != "") {
+        _eqpDef = [parseFloat($("#t_eqplon").val()), parseFloat($("#t_eqplat").val())]
+    }
+    mapIni(_eqpDef, _center);
+}
+
+function getCenterPoint() {
+    $("#t_eqplat").val(FancePoints.lat);
+    $("#t_eqplon").val(FancePoints.lon);
+    $("#l_compgeo").html("经度:" + FancePoints.lon + ";纬度:" + FancePoints.lat);
+    closeDialog("center-dlg");
+}
+
+function mapIni(_points, _center) {
+    $("#container").html("");
+    $("#container").height($("#center-dlg-body").height());
+    $("#div_mapcond").width($("#p_form").width() - 54);
+    var onePF = null;
+    if (_points != null) {
+        FancePoints = _points;
+        _center = _points;
+        onePF = new ol.Feature({
+            geometry: new ol.geom.Point(_points)
+        });
+    }
+    else {
+        FancePoints = null;
+    }
+    if (onePF != null) {
+        drawSource = new ol.source.Vector({
+                features: [onePF]
+            }
+        );
+    }
+    else {
+        drawSource = new ol.source.Vector();
+    }
+
+    drawVector = new ol.layer.Vector({
+        source: drawSource,
+        style: new ol.style.Style({
+            fill: new ol.style.Fill({
+                color: 'rgba(0, 255, 0, 0.3)'
+            }),
+            stroke: new ol.style.Stroke({
+                color: '#ff0000',
+                width: 2
+            }),
+            image: new ol.style.Circle({
+                radius: 7,
+                fill: new ol.style.Fill({
+                    color: '#ff0000'
+                })
+            })
+        })
+    });
+
+    defaultLayer = [
+        new ol.layer.Tile({
+            source: new ol.source.OSM()
+        }), drawVector];
+    $("#mouse-position").html("");
+    map = new ol.Map({
+        controls: ol.control.defaults({
+            attributionOptions: {
+                collapsible: false
+            }
+        }).extend([
+            new ol.control.ScaleLine({
+                units: 'degrees'
+            })
+            , new ol.control.MousePosition({
+                coordinateFormat: ol.coordinate.createStringXY(4),
+                projection: 'EPSG:4326',
+                // comment the following two lines to have the mouse position
+                // be placed within the map.
+                className: 'custom-mouse-position',
+                target: document.getElementById("mouse-position"),
+                undefinedHTML: '鼠标移动显示经纬度'
+            })]),
+        layers: defaultLayer,
+        target: 'container',
+        view: new ol.View({
+            projection: 'EPSG:4326',
+            center: _center,
+            zoom: 13
+        })
+    });
+
+    function addInteractions() {
+        draw = new ol.interaction.Draw({
+            source: drawSource,
+            type: "Point"
+        });
+        map.addInteraction(draw);
+        snap = new ol.interaction.Snap({source: drawSource});
+        map.addInteraction(snap);
+    }
+
+    addInteractions();
+    draw.on('drawstart',
+        function (evt) {
+            drawSource.clear();
+            FancePoints = {};
+        }, this);
+    draw.on('drawend',
+        function (evt) {
+            // set sketch
+            var geom = evt.feature.getGeometry().getCoordinates();
+            FancePoints = {lon: geom[0], lat: geom[1]};
+        }, this);
 }

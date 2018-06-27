@@ -236,6 +236,45 @@ public class BILogin extends BSDBBase {
 	}
 
 	// 得到应用
+	public JSONArray getUserMenu(BSObject m_bs, String userInst, int style)
+			throws Exception {
+		JSONArray menuList = new JSONArray();
+		// 更新应用列表
+		SqlExecute sqlHelper = new SqlExecute();
+		try {
+			// 添加应用
+			LoginUserPojo user = new LoginUserPojo();
+			user.setUserInst(userInst);
+			// 得到角色信息
+			BSPowerDBMang roleDB = new BSPowerDBMang(sqlHelper, m_bs);
+			ArrayList<RolePojo> list = new ArrayList<RolePojo>();
+			List<Object> vList = new ArrayList<Object>();
+			vList.add(user.getUserInst());
+			user.setRoleWhere(roleDB
+					.getRoles(
+							list,
+							" and t.ROLE_ID in (select ROLE_ID from T_ROLE_USER_R where USER_INSTID=?)",
+							vList));
+			// 设置roleWhere
+			String roleWhere = "";
+			for (int i = 0, size = list.size(); i < size; i++) {
+				roleWhere += (",'" + list.get(i).getId() + "'");
+			}
+			if (list.size() > 0) {
+				roleWhere = roleWhere.substring(1);
+			}
+			user.setRoleWhere(roleWhere);
+			menuList = this._getWinApps(m_bs, user, 1, style, sqlHelper);
+			sqlHelper.close();
+		} catch (Exception ex) {
+			sqlHelper.close();
+			ex.printStackTrace();
+		}
+
+		return menuList;
+	}
+
+	// 得到应用
 	public JSONArray getUserMenuQD(BSObject m_bs, LoginUserPojo user, int style)
 			throws Exception {
 		JSONArray menuList = new JSONArray();
@@ -304,6 +343,72 @@ public class BILogin extends BSDBBase {
 		return onePojo;
 	}
 
+	/**
+	 * <p>
+	 * 方法名称: do_checkUser
+	 * </p>
+	 * <p>
+	 * 方法功能描述: 用户密码和验证码效验
+	 * </p>
+	 * <p>
+	 * 输入参数描述: BSObject m_bs:BinaryStar框架参数集。
+	 * </p>
+	 * <p>
+	 * 输出参数描述: BSObject：BinaryStar框架参数集。
+	 * </p>
+	 */
+	public UserPojo getLoginUser(UserPojo inUser) throws Exception {
+		UserPojo outUser = null;
+		SqlExecute sqlHelper = new SqlExecute();
+		try {
+			// 员工登录
+			BSUserDBMang userDB = new BSUserDBMang(sqlHelper, m_bs);
+			outUser = userDB.getOneUserByInstId(inUser.getInstId());
+			if (outUser != null) {
+				// 得到角色信息
+				BSPowerDBMang roleDB = new BSPowerDBMang(sqlHelper, m_bs);
+				List<Object> vList = new ArrayList<Object>();
+				vList.add(outUser.getInstId());
+				outUser.setRoleList(roleDB
+						.getRoles(
+								" and t.ROLE_ID in (select ROLE_ID from T_ROLE_USER_R where USER_INSTID=?)",
+								"", vList));
+				// 设置roleWhere
+				String roleWhere = "";
+				for (RolePojo oneR : outUser.getRoleList()) {
+					roleWhere += ("," + oneR.getId());
+				}
+				if (outUser.getRoleList().size() > 0) {
+					roleWhere = roleWhere.substring(1);
+				}
+				outUser.setRoleWhere(roleWhere);
+				// 得到所有orgId
+				ArrayList<UserOrgRPojo> ugList = userDB.getUserOrgList(
+						" and t.USER_INSTID=?", vList, "");
+				for (UserOrgRPojo oneR : ugList) {
+					String[] aos = oneR.getOrg().getAllOrgId().split(",");
+					outUser.setGroupAllName(outUser.getGroupAllName() + ","
+							+ oneR.getOrg().getAllName().replaceAll(",", "-"));
+					for (String oneAO : aos) {
+						if (!oneAO.equals("")) {
+							if (outUser.getGroupAllId().indexOf("," + oneAO) < 0) {
+								outUser.setGroupAllId(outUser.getGroupAllId()
+										+ "," + oneAO);
+
+							}
+						}
+					}
+				}
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			throw ex;
+		} finally {
+			sqlHelper.close();
+		}
+		return outUser;
+	}
+
 	private LoginUserPojo _getUserById(BSUserDBMang userDB, String id)
 			throws Exception {
 		LoginUserPojo oneUser = null;
@@ -356,6 +461,7 @@ public class BILogin extends BSDBBase {
 			oneComp.getArea().setId("110000");
 			oneComp.setType(1);
 			(new BICompany(null, null)).insertCompany(oneComp);
+
 		}
 
 		return count;

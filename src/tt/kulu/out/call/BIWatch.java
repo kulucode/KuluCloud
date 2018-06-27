@@ -91,7 +91,7 @@ public class BIWatch extends BSDBBase {
 
 	/**
 	 * <p>
-	 * 方法名称: getTruckDefByRedis
+	 * 方法名称: setWatchLastDataToRedis
 	 * </p>
 	 * <p>
 	 * 方法功能描述: 从redis得到车辆类型
@@ -113,6 +113,57 @@ public class BIWatch extends BSDBBase {
 		BIRedis redisBI = new BIRedis();
 		redisBI.setMapData("WATCHLASTDATA_MAP", onePojo.getEqpInst(),
 				JSON.toJSONString(onePojo), URLlImplBase.REDIS_KULUDATA);
+		return;
+	}
+
+	/**
+	 * <p>
+	 * 方法名称: setWatchLastDataToRedis
+	 * </p>
+	 * <p>
+	 * 方法功能描述: 从redis得到车辆类型
+	 * </p>
+	 * <p>
+	 * 创建人: 梁浩
+	 * </p>
+	 * <p>
+	 * 输入参数描述: BSObject m_bs:BinaryStar框架参数集。
+	 * </p>
+	 * <p>
+	 * 输出参数描述: BSObject：BinaryStar框架参数集。
+	 * </p>
+	 * 
+	 * @throws Exception
+	 */
+	public void deleteWatchLastDataToRedis(String instId) throws Exception {
+		BIRedis redisBI = new BIRedis();
+		redisBI.delMapData("WATCHLASTDATA_MAP", instId,
+				URLlImplBase.REDIS_KULUDATA);
+		return;
+	}
+
+	/**
+	 * <p>
+	 * 方法名称: deleteAllWatchLastDataToRedis
+	 * </p>
+	 * <p>
+	 * 方法功能描述: 从redis得到车辆类型
+	 * </p>
+	 * <p>
+	 * 创建人: 梁浩
+	 * </p>
+	 * <p>
+	 * 输入参数描述: BSObject m_bs:BinaryStar框架参数集。
+	 * </p>
+	 * <p>
+	 * 输出参数描述: BSObject：BinaryStar框架参数集。
+	 * </p>
+	 * 
+	 * @throws Exception
+	 */
+	public void deleteAllWatchLastDataToRedis() throws Exception {
+		BIRedis redisBI = new BIRedis();
+		redisBI.delData("WATCHLASTDATA_MAP", URLlImplBase.REDIS_KULUDATA);
 		return;
 	}
 
@@ -766,5 +817,59 @@ public class BIWatch extends BSDBBase {
 			throws Exception {
 		WatchDBMang watchDB = new WatchDBMang(sqlHelper, m_bs);
 		return watchDB.deleteOneWatch(instId);
+	}
+
+	/**
+	 * <p>
+	 * 方法名称: updateAllWatch
+	 * </p>
+	 * <p>
+	 * 方法功能描述: 编辑单个机构数据。
+	 * </p>
+	 * <p>
+	 * 输入参数描述:数据库操作类对象sqlHelper、菜单实体对象oneMenu
+	 * </p>
+	 * <p>
+	 * 输出参数描述:java.lang.Integer整型
+	 * </p>
+	 * 
+	 * @throws Exception
+	 * 
+	 */
+	public int updateAllWatch(int state) throws Exception {
+		int count = 0;
+		SqlExecute sqlHelper = new SqlExecute();
+		try {
+			sqlHelper.setAutoCommit(false);
+			count = this.updateAllWatch(sqlHelper, state);
+			sqlHelper.commit();
+		} catch (Exception ep) {
+			sqlHelper.rollback();
+			ep.printStackTrace();
+			throw ep;
+		}
+		return count;
+	}
+
+	/**
+	 * <p>
+	 * 方法名称: updateAllWatch
+	 * </p>
+	 * <p>
+	 * 方法功能描述: 编辑单个机构数据。
+	 * </p>
+	 * <p>
+	 * 输入参数描述:数据库操作类对象sqlHelper、菜单实体对象oneMenu
+	 * </p>
+	 * <p>
+	 * 输出参数描述:java.lang.Integer整型
+	 * </p>
+	 * 
+	 * @throws Exception
+	 * 
+	 */
+	public int updateAllWatch(SqlExecute sqlHelper, int state) throws Exception {
+		WatchDBMang watchDB = new WatchDBMang(sqlHelper, m_bs);
+		return watchDB.updateAllWatch(state);
 	}
 }

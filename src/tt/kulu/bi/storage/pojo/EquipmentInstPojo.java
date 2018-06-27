@@ -42,7 +42,12 @@ public class EquipmentInstPojo {
 	private String lastLoginDate = "";
 	private String phone = "";// 关联号码
 	private String thisDate = "";
-	private String para1 = "";//
+	private String para1 = "";// 车载时为ICCID
+	private String para2 = "";// 车载为车号
+	private String defLongitude = "";// 缺省经度
+	private String defLatitude = "";// 缺省纬度
+	private String install = "";// 安装进度
+	private String tonnage = "";// 设备吨位
 
 	public EquipmentDefPojo getEqpDef() {
 		return eqpDef;
@@ -186,6 +191,46 @@ public class EquipmentInstPojo {
 
 	public void setPara1(String para1) {
 		this.para1 = para1;
+	}
+
+	public String getPara2() {
+		return para2;
+	}
+
+	public void setPara2(String para2) {
+		this.para2 = para2;
+	}
+
+	public String getDefLongitude() {
+		return defLongitude;
+	}
+
+	public void setDefLongitude(String defLongitude) {
+		this.defLongitude = defLongitude;
+	}
+
+	public String getDefLatitude() {
+		return defLatitude;
+	}
+
+	public void setDefLatitude(String defLatitude) {
+		this.defLatitude = defLatitude;
+	}
+
+	public String getInstall() {
+		return install;
+	}
+
+	public void setInstall(String install) {
+		this.install = install;
+	}
+
+	public String getTonnage() {
+		return tonnage;
+	}
+
+	public void setTonnage(String tonnage) {
+		this.tonnage = tonnage;
 	}
 
 }
