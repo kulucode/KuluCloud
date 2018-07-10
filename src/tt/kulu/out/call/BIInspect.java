@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
+import com.tt4j2ee.BIRedis;
 
 import net.sf.json.JSONObject;
 import tt.kulu.bi.base.BSDBBase;

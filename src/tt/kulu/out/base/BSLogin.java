@@ -4,23 +4,20 @@ import java.util.HashMap;
 
 import tt.kulu.bi.base.URLlImplBase;
 import tt.kulu.bi.company.pojo.CompanyPojo;
-import tt.kulu.bi.message.biclass.MQSender;
 import tt.kulu.bi.user.pojo.LoginUserPojo;
 import tt.kulu.bi.user.pojo.UserPojo;
 import tt.kulu.out.call.BICompany;
 import tt.kulu.out.call.BILogin;
-import tt.kulu.out.call.BIRedis;
+import com.tt4j2ee.BIRedis;
 import tt.kulu.out.call.BIUser;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import com.tt4j2ee.BSCommon;
-import com.tt4j2ee.BSGuid;
 import com.tt4j2ee.db.SqlExecute;
 import com.tt4j2ee.m.BSLogUserPojo;
 import com.tt4j2ee.m.BSObject;
 import com.tt4j2ee.md5.MD5Imp;
-import com.tt4j2ee.security.BSDes;
 
 /**
  * <p>

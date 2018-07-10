@@ -2,6 +2,7 @@ package tt.kulu.bi.message.biclass;
 
 import java.util.ArrayList;
 
+import com.tt4j2ee.BIRedis;
 import com.tt4j2ee.BSDateEx;
 
 import net.sf.json.JSONArray;
@@ -24,7 +25,6 @@ import tt.kulu.out.call.BIDic;
 import tt.kulu.out.call.BIEquipment;
 import tt.kulu.out.call.BIFance;
 import tt.kulu.out.call.BIFault;
-import tt.kulu.out.call.BIRedis;
 import tt.kulu.out.call.BITruck;
 import tt.kulu.out.call.BIUser;
 import tt.kulu.out.call.BIWatch;

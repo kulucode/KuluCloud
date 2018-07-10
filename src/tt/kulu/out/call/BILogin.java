@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import com.tt4j2ee.BIRedis;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;

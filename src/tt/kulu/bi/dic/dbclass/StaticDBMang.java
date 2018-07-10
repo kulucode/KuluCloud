@@ -1,10 +1,9 @@
 package tt.kulu.bi.dic.dbclass;
 
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import javax.sql.rowset.CachedRowSet;
 
 import org.dom4j.tree.*;
 
@@ -67,8 +66,8 @@ public class StaticDBMang {
 			List<Object> vList) throws Exception {
 		ArrayList<DicPojo> list = new ArrayList<DicPojo>();
 		StringBuffer strSQL = this._getDicSelectSQL(where, orderBy);
-		CachedRowSet rs = this.sqlHelper.queryCachedBySql(strSQL.toString(),
-				vList);
+		ResultSet rs = this.sqlHelper
+				.queryCachedBySql(strSQL.toString(), vList);
 		if (rs != null) {
 			while (rs.next()) {
 				list.add(this._setOneDicPojo(rs));
@@ -96,8 +95,7 @@ public class StaticDBMang {
 		List<Object> vList = new ArrayList<Object>();
 		vList.add(id);
 		StringBuffer strSQL = this._getDicSelectSQL(" and t.DIC_ID=?", "");
-		CachedRowSet rs = this.sqlHelper.queryCachedBySql(strSQL.toString(),
-				vList);
+		ResultSet rs = this.sqlHelper.queryBySql(strSQL.toString(), vList);
 		if (rs != null && rs.next()) {
 			onePojo = (this._setOneDicPojo(rs));
 
@@ -193,8 +191,7 @@ public class StaticDBMang {
 			List<Object> vList) throws Exception {
 		ArrayList<DicItemPojo> list = new ArrayList<DicItemPojo>();
 		StringBuffer strSQL = this._getDicItemSelectSQL(where, orderBy);
-		CachedRowSet rs = this.sqlHelper.queryCachedBySql(strSQL.toString(),
-				vList);
+		ResultSet rs = this.sqlHelper.queryBySql(strSQL.toString(), vList);
 		if (rs != null) {
 			while (rs.next()) {
 				list.add(this._setOneDicItemPojo(rs));
@@ -221,8 +218,7 @@ public class StaticDBMang {
 			String orderBy, List<Object> vList) throws Exception {
 		HashMap<String, DicItemPojo> map = new HashMap<String, DicItemPojo>();
 		StringBuffer strSQL = this._getDicItemSelectSQL(where, orderBy);
-		CachedRowSet rs = this.sqlHelper.queryCachedBySql(strSQL.toString(),
-				vList);
+		ResultSet rs = this.sqlHelper.queryBySql(strSQL.toString(), vList);
 		if (rs != null) {
 			while (rs.next()) {
 				map.put(rs.getString("ITEM_ID").trim(),
@@ -252,8 +248,7 @@ public class StaticDBMang {
 		vList.add(id);
 		StringBuffer strSQL = this
 				._getDicItemSelectSQL(" and t1.ITEM_ID=?", "");
-		CachedRowSet rs = this.sqlHelper.queryCachedBySql(strSQL.toString(),
-				vList);
+		ResultSet rs = this.sqlHelper.queryBySql(strSQL.toString(), vList);
 		if (rs != null && rs.next()) {
 			onePojo = (this._setOneDicItemPojo(rs));
 
@@ -281,8 +276,7 @@ public class StaticDBMang {
 		vList.add(name);
 		StringBuffer strSQL = this._getDicItemSelectSQL(" and t1.ITEM_NAME=?",
 				"");
-		CachedRowSet rs = this.sqlHelper.queryCachedBySql(strSQL.toString(),
-				vList);
+		ResultSet rs = this.sqlHelper.queryBySql(strSQL.toString(), vList);
 		if (rs != null && rs.next()) {
 			onePojo = (this._setOneDicItemPojo(rs));
 
@@ -312,8 +306,7 @@ public class StaticDBMang {
 		vList.add(name);
 		StringBuffer strSQL = this._getDicItemSelectSQL(
 				" and t.DIC_ID=? and t1.ITEM_NAME=?", "");
-		CachedRowSet rs = this.sqlHelper.queryCachedBySql(strSQL.toString(),
-				vList);
+		ResultSet rs = this.sqlHelper.queryBySql(strSQL.toString(), vList);
 		if (rs != null && rs.next()) {
 			onePojo = (this._setOneDicItemPojo(rs));
 
@@ -622,7 +615,7 @@ public class StaticDBMang {
 			strBufSql.append(" order by " + order);
 		}
 
-		CachedRowSet rs = this.sqlHelper.queryCachedBySql(strBufSql.toString());
+		ResultSet rs = this.sqlHelper.queryBySql(strBufSql.toString());
 		if (rs != null) {
 			staticList = new ArrayList<StaticPojo>();
 			while (rs.next()) {
@@ -689,8 +682,7 @@ public class StaticDBMang {
 		strBufSql.append("t.TABLE_NAME='" + table + "' ");
 		strBufSql.append("and t.COL_NAME='" + col + "' ");
 		strBufSql.append(" and t.COL_VALUE='" + value + "'");
-		CachedRowSet rs = this.sqlHelper.queryCachedBySql(dbName,
-				strBufSql.toString());
+		ResultSet rs = this.sqlHelper.queryBySql(dbName, strBufSql.toString());
 		if (rs != null && rs.next()) {
 			oneStatic.setStaticId(rs.getString("STATIC_ID"));
 			oneStatic.setTable(rs.getString("TABLE_NAME"));
@@ -746,8 +738,7 @@ public class StaticDBMang {
 		strBufSql.append("from PUB_STATIC t ");
 		strBufSql.append("where ");
 		strBufSql.append("t.STATIC_ID='" + staticId + "'");
-		CachedRowSet rs = this.sqlHelper.queryCachedBySql(dbName,
-				strBufSql.toString());
+		ResultSet rs = this.sqlHelper.queryBySql(dbName, strBufSql.toString());
 		if (rs != null && rs.next()) {
 			oneStatic.setStaticId(rs.getString("STATIC_ID"));
 			oneStatic.setTable(rs.getString("TABLE_NAME"));
@@ -802,8 +793,7 @@ public class StaticDBMang {
 		strBufSql.append("from PUB_STATIC t ");
 		strBufSql.append("where ");
 		strBufSql.append("t.STATIC_ID is not null " + where);
-		CachedRowSet rs = this.sqlHelper.queryCachedBySql(dbName,
-				strBufSql.toString());
+		ResultSet rs = this.sqlHelper.queryBySql(dbName, strBufSql.toString());
 		if (rs != null && rs.next()) {
 			oneStatic.setStaticId(rs.getString("STATIC_ID"));
 			oneStatic.setTable(rs.getString("TABLE_NAME"));
@@ -929,7 +919,7 @@ public class StaticDBMang {
 	}
 
 	// 填充字典信息
-	private DicPojo _setOneDicPojo(CachedRowSet rs) throws Exception {
+	private DicPojo _setOneDicPojo(ResultSet rs) throws Exception {
 		DicPojo onePojo = new DicPojo();
 		// ID
 		if (rs.getString("DIC_ID") != null) {
@@ -982,7 +972,7 @@ public class StaticDBMang {
 	}
 
 	// 填充字典信息
-	private DicItemPojo _setOneDicItemPojo(CachedRowSet rs) throws Exception {
+	private DicItemPojo _setOneDicItemPojo(ResultSet rs) throws Exception {
 		DicItemPojo onePojo = new DicItemPojo();
 		onePojo.setDic(this._setOneDicPojo(rs));
 		// ID

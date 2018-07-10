@@ -1,16 +1,5 @@
 package tt.kulu.bi.base;
 
-import java.util.List;
-
-import net.sf.json.JSONObject;
-import redis.clients.jedis.Jedis;
-import tt.kulu.bi.redis.biclass.JedisPoolUtils;
-import tt.kulu.bi.user.pojo.LoginUserPojo;
-import tt.kulu.bi.user.pojo.UserPojo;
-import tt.kulu.out.call.BIRedis;
-
-import com.tt4j2ee.BSCommon;
-import com.tt4j2ee.m.BSLogUserPojo;
 import com.tt4j2ee.m.BSObject;
 
 /**

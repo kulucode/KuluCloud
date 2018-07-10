@@ -47,7 +47,7 @@ import tt.kulu.out.call.BIFault;
 import tt.kulu.out.call.BIFile;
 import tt.kulu.out.call.BIInspect;
 import tt.kulu.out.call.BILogin;
-import tt.kulu.out.call.BIRedis;
+import com.tt4j2ee.BIRedis;
 import tt.kulu.out.call.BIStats;
 import tt.kulu.out.call.BITruck;
 import tt.kulu.out.call.BIUser;

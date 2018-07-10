@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import com.tt4j2ee.BIRedis;
 
 import tt.kulu.bi.base.BSDBBase;
 import tt.kulu.bi.base.URLlImplBase;

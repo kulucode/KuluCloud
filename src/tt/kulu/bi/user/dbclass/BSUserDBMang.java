@@ -90,7 +90,7 @@ public class BSUserDBMang extends BSDBBase {
 		id = BSCommon.getConfigValue("userconfig_loginobj_pre")
 				+ "-"
 				+ (((date.getThisDate(0, 0)).substring(0, 10)).replaceAll("-",
-						"") + id);
+				"") + id);
 		return id;
 	}
 
@@ -107,11 +107,11 @@ public class BSUserDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述:
 	 * </p>
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	public ArrayList<OrgPojo> getOrgList(String where, List<Object> vList,
-			String orderBy, long f, long t) throws Exception {
+										 String orderBy, long f, long t) throws Exception {
 		ArrayList<OrgPojo> list = new ArrayList<OrgPojo>();
 		StringBuffer strSQL = _getOrgSelectSQL(where, orderBy);
 		strSQL.append(" LIMIT " + (t - f + 1) + " OFFSET " + f);
@@ -139,11 +139,11 @@ public class BSUserDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述:
 	 * </p>
-	 * 
+	 *
 	 * @throws Exception
-	 * 
+	 *
 	 * @throws Exception
-	 * 
+	 *
 	 */
 	public OrgPojo getOneOrgById(String orgId) throws Exception {
 		OrgPojo onePojo = null;
@@ -170,11 +170,11 @@ public class BSUserDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述:
 	 * </p>
-	 * 
+	 *
 	 * @throws Exception
-	 * 
+	 *
 	 * @throws Exception
-	 * 
+	 *
 	 */
 	public OrgPojo getOneOrgByName(String name) throws Exception {
 		OrgPojo onePojo = null;
@@ -202,11 +202,11 @@ public class BSUserDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述:
 	 * </p>
-	 * 
+	 *
 	 * @throws Exception
-	 * 
+	 *
 	 * @throws Exception
-	 * 
+	 *
 	 */
 	public OrgPojo getOneOrgByName(String name, int type) throws Exception {
 		OrgPojo onePojo = null;
@@ -235,11 +235,11 @@ public class BSUserDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述:
 	 * </p>
-	 * 
+	 *
 	 * @throws Exception
-	 * 
+	 *
 	 * @throws Exception
-	 * 
+	 *
 	 */
 	public OrgPojo getOneOrgByName(String pid, String name, int type)
 			throws Exception {
@@ -271,11 +271,11 @@ public class BSUserDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述:
 	 * </p>
-	 * 
+	 *
 	 * @throws Exception
-	 * 
+	 *
 	 * @throws Exception
-	 * 
+	 *
 	 */
 	public OrgPojo getOneOrgByUser(String user) throws Exception {
 		OrgPojo onePojo = null;
@@ -305,11 +305,11 @@ public class BSUserDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述:
 	 * </p>
-	 * 
+	 *
 	 * @throws Exception
-	 * 
+	 *
 	 * @throws Exception
-	 * 
+	 *
 	 */
 	public OrgPojo getOneOrgByName(String pid, String name) throws Exception {
 		OrgPojo onePojo = null;
@@ -347,9 +347,9 @@ public class BSUserDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述:
 	 * </p>
-	 * 
+	 *
 	 * @throws Exception
-	 * 
+	 *
 	 */
 	public long getOrgCount(String where, List<Object> vList) throws Exception {
 		long count = 0;
@@ -635,11 +635,11 @@ public class BSUserDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述:
 	 * </p>
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	public ArrayList<UserPojo> getUserList(String where, String orderBy,
-			List<Object> vList, long f, long t) throws Exception {
+										   List<Object> vList, long f, long t) throws Exception {
 		// 翻页代码
 		ArrayList<UserPojo> list = new ArrayList<UserPojo>();
 		StringBuffer strSQL = new StringBuffer(this._getUserSelectSQL(where,
@@ -670,9 +670,9 @@ public class BSUserDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述:
 	 * </p>
-	 * 
+	 *
 	 * @throws Exception
-	 * 
+	 *
 	 */
 	public long getUserCount(String where, List<Object> vList) throws Exception {
 		long count = 0;
@@ -704,9 +704,9 @@ public class BSUserDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述:
 	 * </p>
-	 * 
+	 *
 	 * @throws Exception
-	 * 
+	 *
 	 */
 	public UserPojo getOneUser(String where, List<Object> vList)
 			throws Exception {
@@ -733,9 +733,9 @@ public class BSUserDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述:
 	 * </p>
-	 * 
+	 *
 	 * @throws Exception
-	 * 
+	 *
 	 */
 	public UserPojo getOneUserByInstId(String instId) throws Exception {
 		UserPojo onePojo = null;
@@ -764,24 +764,26 @@ public class BSUserDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述:
 	 * </p>
-	 * 
+	 *
 	 * @throws Exception
-	 * 
+	 *
 	 */
 	public UserPojo getOneUserById(String id) throws Exception {
 		UserPojo onePojo = null;
 		List<Object> vList = new ArrayList<Object>();
-		vList.add(id);
-		vList.add(id);
-		vList.add(id);
-		StringBuffer strSQL = this
-				._getUserSelectSQL(
-						" and (t.USER_ID=? OR t.USER_IDCARD=? OR t.MPHONE=?) and t.USER_STATE=1",
-						"");
-		ResultSet rs = this.sqlHelper.queryBySql(strSQL.toString(), vList);
-		if (rs != null && rs.next()) {
-			onePojo = this._setOneUserPojo(rs);
-			rs.close();
+		if (id != null && !id.equals("")) {
+			vList.add(id);
+			vList.add(id);
+			vList.add(id);
+			StringBuffer strSQL = this
+					._getUserSelectSQL(
+							" and (t.USER_ID=? OR t.USER_IDCARD=? OR t.MPHONE=?) and t.USER_STATE=1",
+							"");
+			ResultSet rs = this.sqlHelper.queryBySql(strSQL.toString(), vList);
+			if (rs != null && rs.next()) {
+				onePojo = this._setOneUserPojo(rs);
+				rs.close();
+			}
 		}
 		return onePojo;
 	}
@@ -799,9 +801,9 @@ public class BSUserDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述:
 	 * </p>
-	 * 
+	 *
 	 * @throws Exception
-	 * 
+	 *
 	 */
 	public UserPojo getOneUserByIdNotState(String id) throws Exception {
 		UserPojo onePojo = null;
@@ -832,9 +834,9 @@ public class BSUserDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述:
 	 * </p>
-	 * 
+	 *
 	 * @throws Exception
-	 * 
+	 *
 	 */
 	public JSONArray getOneOrgMang(String orgId) throws Exception {
 		JSONArray list = new JSONArray();
@@ -879,7 +881,7 @@ public class BSUserDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述: int count：影响行数
 	 * </p>
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	public int insertUser(UserPojo onePojo) throws Exception {
@@ -962,7 +964,7 @@ public class BSUserDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述: int count：影响行数
 	 * </p>
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	public int updateUser(UserPojo onePojo) throws Exception {
@@ -1188,11 +1190,11 @@ public class BSUserDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述:
 	 * </p>
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	public ArrayList<UserWorkParasPojo> getUserWordParasList(String where,
-			String orderBy, List<Object> vList, long f, long t)
+															 String orderBy, List<Object> vList, long f, long t)
 			throws Exception {
 		// 翻页代码
 		ArrayList<UserWorkParasPojo> list = new ArrayList<UserWorkParasPojo>();
@@ -1224,9 +1226,9 @@ public class BSUserDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述:
 	 * </p>
-	 * 
+	 *
 	 * @throws Exception
-	 * 
+	 *
 	 */
 	public long getUserWordParasCount(String where, List<Object> vList)
 			throws Exception {
@@ -1259,11 +1261,11 @@ public class BSUserDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述:
 	 * </p>
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	public ArrayList<UserOrgRPojo> getUserOrgList(String where,
-			List<Object> vList, String orderBy) throws Exception {
+												  List<Object> vList, String orderBy) throws Exception {
 		ArrayList<UserOrgRPojo> list = new ArrayList<UserOrgRPojo>();
 		StringBuffer strSQL = _getUserOrgSelectSQL(where, orderBy);
 		ResultSet rs = this.sqlHelper.queryBySql(strSQL.toString(), vList);
@@ -1289,7 +1291,7 @@ public class BSUserDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述:
 	 * </p>
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	public ArrayList<UserWorkDayLogsPojo> getUserWorkDayLogsList(
@@ -1323,9 +1325,9 @@ public class BSUserDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述:
 	 * </p>
-	 * 
+	 *
 	 * @throws Exception
-	 * 
+	 *
 	 */
 	public long getUserWorkDayLogsCount(JSONObject where, List<Object> vList)
 			throws Exception {
@@ -1362,11 +1364,11 @@ public class BSUserDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述:
 	 * </p>
-	 * 
+	 *
 	 * @throws Exception
-	 * 
+	 *
 	 * @throws Exception
-	 * 
+	 *
 	 */
 	public UserWorkDayLogsPojo getOneUserWorkDayLogsId(String id)
 			throws Exception {
@@ -1498,11 +1500,11 @@ public class BSUserDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述:
 	 * </p>
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	public ArrayList<UserSchedulingPojo> getUserSchedulingList(String where,
-			List<Object> vList) throws Exception {
+															   List<Object> vList) throws Exception {
 		ArrayList<UserSchedulingPojo> list = new ArrayList<UserSchedulingPojo>();
 		CachedRowSet rs = this.sqlHelper.queryCachedBySql(
 				_getUserSchedulingSelectSQL(where).toString(), vList);
@@ -1791,7 +1793,7 @@ public class BSUserDBMang extends BSDBBase {
 
 	// 得到资源实例查询的SQL语句
 	private StringBuffer _getUserWorkDayLogsSelectSQL(JSONObject where,
-			String orderBy) throws Exception {
+													  String orderBy) throws Exception {
 		StringBuffer strSQL = new StringBuffer();
 		strSQL.append("select ");
 		strSQL.append("t.LOG_ID");

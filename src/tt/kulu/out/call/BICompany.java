@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import com.tt4j2ee.BIRedis;
 
 import net.sf.json.JSONObject;
 import tt.kulu.bi.area.pojo.AreaPojo;

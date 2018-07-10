@@ -13,6 +13,7 @@ import tt.kulu.bi.base.BSDBBase;
 import tt.kulu.bi.base.URLlImplBase;
 import tt.kulu.bi.dic.pojo.DicItemPojo;
 
+import com.tt4j2ee.BIRedis;
 import com.tt4j2ee.db.SqlExecute;
 import com.tt4j2ee.m.BSObject;
 

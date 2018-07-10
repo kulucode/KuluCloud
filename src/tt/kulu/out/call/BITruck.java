@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import com.tt4j2ee.BIRedis;
 
 import javax.sql.rowset.CachedRowSet;
 

@@ -5,7 +5,7 @@
 <%@ page import="java.util.*"%>
 <%@ page import="javax.imageio.*"%>
 <%@ page import="com.tt4j2ee.BSCommon"%>
-<%@ page import="tt.kulu.out.call.BIRedis"%>
+<%@ page import="com.tt4j2ee.BIRedis"%>
 <%
 	response.setHeader("Cache-Control", "no-store"); //HTTP   1.1   
 	response.setHeader("Pragma", "no-cache"); //HTTP   1.0   

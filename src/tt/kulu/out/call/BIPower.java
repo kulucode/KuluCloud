@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import com.tt4j2ee.BIRedis;
 
 import tt.kulu.bi.base.BSDBBase;
 import tt.kulu.bi.power.dbclass.BSPowerDBMang;

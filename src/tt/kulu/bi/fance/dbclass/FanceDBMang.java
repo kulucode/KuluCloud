@@ -4,8 +4,6 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.sql.rowset.CachedRowSet;
-
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import tt.kulu.bi.base.BSDBBase;
@@ -160,8 +158,8 @@ public class FanceDBMang extends BSDBBase {
 		FancePojo onePojo = null;
 		List<Object> vList = new ArrayList<Object>();
 		vList.add(id);
-		CachedRowSet rs = this.sqlHelper.queryCachedBySql(this
-				._getFanceSelectSQL(" and t.F_ID=?", "").toString(), vList);
+		ResultSet rs = this.sqlHelper.queryBySql(
+				this._getFanceSelectSQL(" and t.F_ID=?", "").toString(), vList);
 		if (rs != null) {
 			if (rs.next()) {
 				onePojo = (this._setOneFancePojo(rs));
@@ -341,8 +339,8 @@ public class FanceDBMang extends BSDBBase {
 	public ArrayList<UserPojo> getFanceUserRList(String where,
 			List<Object> vList) throws Exception {
 		ArrayList<UserPojo> list = new ArrayList<UserPojo>();
-		CachedRowSet rs = this.sqlHelper.queryCachedBySql(
-				_getFanceUserRSelectSQL(where).toString(), vList);
+		ResultSet rs = this.sqlHelper.queryBySql(_getFanceUserRSelectSQL(where)
+				.toString(), vList);
 		if (rs != null) {
 			while (rs.next()) {
 				list.add(this._setOneFanceUserRPojo(rs));
@@ -371,7 +369,7 @@ public class FanceDBMang extends BSDBBase {
 	public ArrayList<TruckPojo> getFanceTruckRList(String where,
 			List<Object> vList) throws Exception {
 		ArrayList<TruckPojo> list = new ArrayList<TruckPojo>();
-		CachedRowSet rs = this.sqlHelper.queryCachedBySql(
+		ResultSet rs = this.sqlHelper.queryBySql(
 				_getFanceTruckRSelectSQL(where).toString(), vList);
 		if (rs != null) {
 			while (rs.next()) {
@@ -584,7 +582,7 @@ public class FanceDBMang extends BSDBBase {
 	}
 
 	// 物品定义对象
-	private UserPojo _setOneFanceUserRPojo(CachedRowSet rs) throws Exception {
+	private UserPojo _setOneFanceUserRPojo(ResultSet rs) throws Exception {
 		UserPojo onePojo = new UserPojo();
 		onePojo.setInstId(rs.getString("USER_INSTID"));
 		onePojo.setId(rs.getString("USER_ID"));
@@ -615,7 +613,7 @@ public class FanceDBMang extends BSDBBase {
 	}
 
 	// 物品定义对象
-	private TruckPojo _setOneFanceTruckRPojo(CachedRowSet rs) throws Exception {
+	private TruckPojo _setOneFanceTruckRPojo(ResultSet rs) throws Exception {
 		TruckPojo onePojo = new TruckPojo();
 		onePojo.setId(rs.getString("TRUCK_ID"));
 		onePojo.setName(rs.getString("TRUCK_NAME"));
