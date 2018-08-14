@@ -4,8 +4,11 @@ import net.sf.json.JSONObject;
 import tt.kulu.bi.base.URLlImplBase;
 import tt.kulu.bi.company.pojo.CompanyPojo;
 import tt.kulu.bi.dic.pojo.DicPojo;
+import tt.kulu.bi.logs.biclass.SysLogsBIMang;
+import tt.kulu.bi.logs.pojo.SysLogsPojo;
 import tt.kulu.out.call.BICompany;
 import tt.kulu.out.call.BIDic;
+import tt.kulu.out.call.BILogin;
 
 import com.tt4j2ee.BSGuid;
 import com.tt4j2ee.m.BSObject;
@@ -88,6 +91,8 @@ public class BSCompany {
 	 */
 	public BSObject do_updateThisCompany(BSObject m_bs) throws Exception {
 		JSONObject fretObj = new JSONObject();
+		SysLogsPojo oneLogs = new SysLogsPojo();
+		oneLogs.setCreateUser(BILogin.getLoginUser(m_bs));
 		fretObj.put("r", 990);
 		BICompany compBI = new BICompany(m_bs);
 		CompanyPojo onePojo = compBI.getOneCompanyById(m_bs.getPrivateMap()
@@ -109,11 +114,20 @@ public class BSCompany {
 		int count = 0;
 		if (isNew) {
 			count += compBI.insertCompany(onePojo);
+			oneLogs.setName("新增当前运营商");
 		} else {
 			count += compBI.updateCompany(onePojo);
+			oneLogs.setName("编辑当前运营商");
 		}
 		if (count > 0) {
 			fretObj.put("r", 0);
+			// 写日志
+			oneLogs.setType(1);
+			oneLogs.setContent("操作:" + oneLogs.getName() + "；影响运营商："
+					+ onePojo.getName());
+
+			SysLogsBIMang slbi = new SysLogsBIMang(oneLogs, m_bs);
+			slbi.start();
 		}
 		fretObj.put("error", URLlImplBase.ErrorMap.get(fretObj.getInt("r")));
 		m_bs.setRetrunObj(fretObj);

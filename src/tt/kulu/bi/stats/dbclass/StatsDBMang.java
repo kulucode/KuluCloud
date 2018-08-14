@@ -391,7 +391,7 @@ public class StatsDBMang extends BSDBBase {
 		JSONObject retObj = new JSONObject();
 		StringBuffer strSQL = new StringBuffer("select ");
 		strSQL.append("to_timestamp(to_char(t.s_cdate,'YYYY-MM-DD'),'YYYY-MM-DD') as oil_date");
-		strSQL.append(",sum(to_number(t.OIL_VALUME, '99999D99' )) as OIL_VALUME");
+		strSQL.append(",sum(to_number(t.OIL_VALUME, '99999999999999999D99' )) as OIL_VALUME");
 		strSQL.append(" from T_VEHICLE_DATA t,T_EQUIPMENT_INST t1,T_EQUIPMENT_DEF t3");
 		strSQL.append(" where t.eqp_inst=t1.eqp_inst");
 		strSQL.append(" and t1.eqp_def = t3.EQP_CODE");

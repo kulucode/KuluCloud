@@ -208,6 +208,7 @@ function showTruckBase(_data, _type) {
     $("#t_truckmuser").val(_data.muserid == "" ? "" : _data.musername + "[" + _data.muserid + "]");
     $("#t_truckorg_v").val(_data.morg);
     $("#t_truckorg").val(_data.morgname);
+    $("#t_truckoildef").val(JSON.stringify(_data.oildef));
     $("#t_area").val("430000");
 }
 

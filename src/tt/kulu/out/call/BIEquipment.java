@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import com.alibaba.fastjson.JSON;
 import com.tt4j2ee.BIRedis;
 
 import tt.kulu.bi.base.BSDBBase;
@@ -71,24 +73,22 @@ public class BIEquipment extends BSDBBase {
 	 */
 	public EquipmentDefPojo getEqpDefByRedis(String defId) throws Exception {
 		EquipmentDefPojo onePojo = new EquipmentDefPojo();
-		BIRedis redisBI = new BIRedis();
-		String redisS = redisBI.getMapData("KEQPDEF_MAP", defId,
-				URLlImplBase.REDIS_KULUDATA);
-		if (redisS == null || redisS.trim().equals("")) {
-			// 从数据库的到
-			onePojo = this.getOneEquipmentDefById(defId);
-			if (onePojo != null) {
-				redisBI.setMapData("KEQPDEF_MAP", defId,
-						JSONObject.fromObject(onePojo).toString(),
-						URLlImplBase.REDIS_KULUDATA);
+		if (defId != null && !defId.equals("")) {
+			BIRedis redisBI = new BIRedis();
+			String redisS = redisBI.getMapData("KEQPDEF_MAP", defId,
+					URLlImplBase.REDIS_KULUDATA);
+			if (redisS == null || redisS.trim().equals("")) {
+				// 从数据库的到
+				onePojo = this.getOneEquipmentDefById(defId);
+				if (onePojo != null) {
+					redisBI.setMapData("KEQPDEF_MAP", defId,
+							JSON.toJSONString(onePojo),
+							URLlImplBase.REDIS_KULUDATA);
+				}
+			} else {
+				onePojo = (EquipmentDefPojo) JSON.parseObject(redisS,
+						EquipmentDefPojo.class);
 			}
-		} else {
-			Map config = new HashMap();
-			config.put("eqpType", DicItemPojo.class);
-			config.put("dic", DicPojo.class);
-			onePojo = (EquipmentDefPojo) JSONObject.toBean(
-					JSONObject.fromObject(redisS), EquipmentDefPojo.class,
-					config);
 		}
 		return onePojo;
 	}
@@ -117,8 +117,7 @@ public class BIEquipment extends BSDBBase {
 		BIRedis redisBI = new BIRedis();
 		if (onePojo != null) {
 			redisBI.setMapData("KEQPDEF_MAP", defId,
-					JSONObject.fromObject(onePojo).toString(),
-					URLlImplBase.REDIS_KULUDATA);
+					JSON.toJSONString(onePojo), URLlImplBase.REDIS_KULUDATA);
 		}
 	}
 

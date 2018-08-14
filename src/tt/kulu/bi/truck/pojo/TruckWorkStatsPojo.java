@@ -25,6 +25,7 @@ public class TruckWorkStatsPojo {
 	private String workTime = "0";
 	private String oil = "0";
 	private String oilDiff = "0";
+	private String oilDiffV = "0";
 	private String distance = "0";// 路程
 
 	public TruckPojo getTruck() {
@@ -81,5 +82,13 @@ public class TruckWorkStatsPojo {
 
 	public void setDistance(String distance) {
 		this.distance = distance;
+	}
+
+	public String getOilDiffV() {
+		return oilDiffV;
+	}
+
+	public void setOilDiffV(String oilDiffV) {
+		this.oilDiffV = oilDiffV;
 	}
 }

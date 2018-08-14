@@ -726,8 +726,7 @@ public class BSInterface {
 		BIUser userBI = new BIUser(null, m_bs);
 		// 返回数据
 		JSONArray userlist = new JSONArray();
-		ArrayList<UserWorkParasPojo> list = userBI.getUserWordParasList(paras,
-				startNum, startNum + pageSize - 1);
+		ArrayList<UserWorkParasPojo> list = userBI.getUserWordParasList(paras, startNum, startNum + pageSize - 1);
 		for (UserWorkParasPojo onePojo : list) {
 			if (!onePojo.getLatitude().equals("")
 					&& !onePojo.getLongitude().equals("")) {
@@ -987,15 +986,13 @@ public class BSInterface {
 			oneObj.put("tbindex", startNum + userlist.size() + 1);
 			oneObj.put("eqpid", onePojo.getEqpInst().getInstId());
 			oneObj.put("onlinev", onePojo.getEqpInst().getOnlineState());
-			oneObj.put("online", EquipmentInstPojo.ONLINE_STATE_NAME[onePojo
-					.getEqpInst().getOnlineState()]);
+			oneObj.put("online", EquipmentInstPojo.ONLINE_STATE_NAME[onePojo.getEqpInst().getOnlineState()]);
 			oneObj.put("truckid", onePojo.getEqpInst().getTruck().getId());
 			oneObj.put("trucknno", onePojo.getEqpInst().getTruck().getNo());
 			oneObj.put("truckname", onePojo.getEqpInst().getTruck().getName());
-			oneObj.put("trucktype", onePojo.getEqpInst().getTruck().getDefine()
-					.getName());
-			oneObj.put("truckbrand", onePojo.getEqpInst().getTruck()
-					.getDefine().getBrand());
+			oneObj.put("truckinname", onePojo.getEqpInst().getTruck().getInName());
+			oneObj.put("trucktype", onePojo.getEqpInst().getTruck().getDefine().getName());
+			oneObj.put("truckbrand", onePojo.getEqpInst().getTruck().getDefine().getBrand());
 			if (onePojo.getEqpInst().getTruck().getOrg() != null) {
 				oneObj.put("truckorg", onePojo.getEqpInst().getTruck().getOrg()
 						.getAllName().replaceAll(",", "-"));
@@ -1024,14 +1021,22 @@ public class BSInterface {
 				oneObj.put("usermphone", "");
 			}
 
-			oneObj.put(
-					"oil",
-					!onePojo.getSpeed().equals("") ? URLlImplBase.AllPrinceDiv(
-							onePojo.getOil(), 10000) : "0");
+			if (onePojo.getThisOilV().equals("")) {
+				oneObj.put(
+						"oil",
+						(!onePojo.getOil().equals("") ? URLlImplBase
+								.AllPrinceDiv(onePojo.getOil(), 100) : "0")
+								+ "毫米");
+			} else {
+				oneObj.put(
+						"oil",
+						(URLlImplBase.AllPrinceDiv(onePojo.getThisOilV(), 1000))
+								+ "升");
+			}
 			oneObj.put(
 					"oildiff",
 					!onePojo.getSpeed().equals("") ? URLlImplBase.AllPrinceDiv(
-							onePojo.getOilDiff(), 10000) : "0");
+							onePojo.getOilDiff(), 1000) : "0");
 			oneObj.put(
 					"speed",
 					!onePojo.getSpeed().equals("") ? URLlImplBase.AllPrinceDiv(
@@ -1182,14 +1187,22 @@ public class BSInterface {
 				oneObj.put("usermphone", "");
 			}
 
-			oneObj.put(
-					"oil",
-					!onePojo.getSpeed().equals("") ? URLlImplBase.AllPrinceDiv(
-							onePojo.getOil(), 10000) : "0");
+			if (onePojo.getThisOilV().equals("")) {
+				oneObj.put(
+						"oil",
+						(!onePojo.getOil().equals("") ? URLlImplBase
+								.AllPrinceDiv(onePojo.getOil(), 100) : "0")
+								+ "毫米");
+			} else {
+				oneObj.put(
+						"oil",
+						(URLlImplBase.AllPrinceDiv(onePojo.getThisOilV(), 1000))
+								+ "升");
+			}
 			oneObj.put(
 					"oildiff",
 					!onePojo.getSpeed().equals("") ? URLlImplBase.AllPrinceDiv(
-							onePojo.getOilDiff(), 10000) : "0");
+							onePojo.getOilDiff(), 1000) : "0");
 			oneObj.put(
 					"speed",
 					!onePojo.getSpeed().equals("") ? URLlImplBase.AllPrinceDiv(

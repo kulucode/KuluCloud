@@ -11,6 +11,8 @@ jQuery(function ($) {
 });
 
 function iniTree(_name, _div) {
+    $("#" + _div).html("");
+    funTree = null;
     funTree = new BSTreeView(_name, "", false, "", _div);
     funTree.imagePath = webHome + "/common/images/tree/";
     var root = funTree
@@ -44,6 +46,11 @@ function getMenuTree(_style) {
                 var oneD = _data.data[i];
                 // 添加菜单
                 var rootN = _style == 0 ? ptFun : webFun
+                var _delbt = "&nbsp;<a class=\"badge bg-red icon-times\" href=\"javascript:deleteMenu('"
+                    + oneD.id + "')\">删除</a>";
+                if (oneD.topflagv == 1 || (oneD.sub != null && oneD.sub.length) > 0) {
+                    _delbt = "";
+                }
                 var sub = rootN
                     .addNode(
                         oneD.id,
@@ -53,19 +60,22 @@ function getMenuTree(_style) {
                         + "','"
                         + oneD.name
                         + "'," + _style + ")\"> 新增</a>"
-                        + "&nbsp;<a class=\"badge bg-red icon-times\" href=\"javascript:delete('"
-                        + oneD.id + "')\">删除</a>",
+                        + _delbt,
                         "editFuc(\"" + oneD.id + "\"," + _style + ")", "", "",
                         true);
                 if (oneD.sub != null && oneD.sub.length > 0) {
                     for (var j = 0; j < oneD.sub.length; j++) {
                         var oneSubD = oneD.sub[j];
+                        var _delsubbt = "&nbsp;<a class=\"badge bg-red icon-times\" href=\"javascript:deleteMenu('"
+                            + oneSubD.id + "')\">删除</a>";
+                        if (oneSubD.topflagv == 1) {
+                            _delsubbt = "";
+                        }
                         sub
                             .addNode(
                                 oneSubD.id,
-                                oneSubD.name
-                                + "&nbsp;<a class=\"badge bg-red icon-times\" href=\"javascript:delete('"
-                                + oneD.id + "')\">删除</a>",
+                                oneSubD.name +
+                                _delsubbt,
                                 "editFuc(\"" + oneSubD.id + "\")",
                                 "", "", true);
                     }
@@ -89,12 +99,12 @@ function editFuc(_funid, _pObj, _style) {
     if (_funid != null && _funid != "") {
         type = "edit";
         $("#div_head").html(
-            "应用详情&nbsp;<span class=\"badge bg-green icon-pencil-square-o\"> 编辑</span>");
+            "功能详情&nbsp;<span class=\"badge bg-green icon-pencil-square-o\"> 编辑</span>");
         editType = "edit";
     } else {
         _funid = "";
         editType = "new";
-        $("#div_head").html("应用详情&nbsp;<span class=\"badge bg-red icon-plus\"> 新增</span>");
+        $("#div_head").html("功能详情&nbsp;<span class=\"badge bg-red icon-plus\"> 新增</span>");
     }
     doRefresh(null, "DCFUNC", "getOneFun", "&in_type=" + type + "&funid="
         + _funid, function (_data) {
@@ -151,7 +161,7 @@ function setFunBase(_data, _style) {
 }
 
 function commitFun() {
-    if (checkForm("funbase-form") && confirm("是否保存应用")) {
+    if (checkForm("funbase-form") && confirm("是否保存功能")) {
         doRefresh(
             "funbase-form",
             "DCFUNC",
@@ -170,7 +180,7 @@ function commitFun() {
                                 + oneD.name
                                 + "')\"> 新增</a>";
                         }
-                        fun += "&nbsp;<a class=\"badge bg-red icon-times\" href=\"javascript:delete('"
+                        fun += "&nbsp;<a class=\"badge bg-red icon-times\" href=\"javascript:deleteMenu('"
                             + oneD.id + "')\">删除</a>";
                         funTree.getNodeByName($("#t_pfunid").val())
                             .addNode(oneD.id, oneD.name + fun,
@@ -186,4 +196,30 @@ function commitFun() {
             });
     }
 
+}
+
+function deleteMenu(_id) {
+    if (confirm("是否删除功能菜单？该操作无法恢复，是否继续？")) {
+        doRefresh(
+            "",
+            "DCFUNC",
+            "deleteOneFunc",
+            "&pg_funid=" + _id,
+            function (_data) {
+                if (_data.r == 0) {
+                    iniTree("funTree", "div_functree");
+                    $("#t_funid").val("");
+                    $("#t_pfunid").val("");
+                    $("#l_pfun").html("");
+                    $("#t_funname").val("");
+                    $("#t_funseq").val("0");
+                    $("#t_funjs").val("");
+                    $("#t_funicon").val("");
+                    $("#t_funpage").val("");
+                    $("#t_fundesc").val("");
+                } else {
+                    alert(_data.error);
+                }
+            });
+    }
 }

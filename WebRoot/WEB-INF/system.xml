@@ -15,5 +15,7 @@
 			BS_PAGE_BEAN="tt.kulu.out.base.BSDic" BS_DETAIL="数据字典" />
 		<DCAREA CREATER="lianghao" BSID="DCAREA" BS_URL="index.jsp"
 			BS_PAGE_BEAN="tt.kulu.out.base.BSArea" BS_DETAIL="行政区域" />
+		<DCLOGS CREATER="lianghao" BSID="DCLOGS" BS_URL="index.jsp"
+			BS_PAGE_BEAN="tt.kulu.out.base.BSLogs" BS_DETAIL="日志管理" />
 	</BS_PAGE>
 </BS>

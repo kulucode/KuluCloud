@@ -211,7 +211,7 @@
                 </div>
                 <div class="form-group">
                     <div class="label">
-                        <strong>车牌号</strong>
+                        <strong>*车牌号</strong>
                     </div>
                     <div class="field">
                         <input class="input" type="text" id="t_truckpnum" name="t_truckpnum"
@@ -225,6 +225,16 @@
                     </div>
                     <div class="field">
                         <select id="s_truckpcolor" name="s_truckpcolor" class="input"></select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="label">
+                        <strong>邮箱参数</strong>
+                    </div>
+                    <div class="field">
+                        <input class="input" type="text" id="t_truckoildef" name="t_truckoildef"
+                               placeholder="输入邮箱参数"/>
+                        <div class="input-note">如：{"L":"1000","W":"600","H":"600","R":"20"}</div>
                     </div>
                 </div>
                 <div class="form-group">
@@ -249,7 +259,7 @@
                 </div>
                 <div class="form-group">
                     <div class="label">
-                        <strong>上装出厂编号</strong>
+                        <strong>*上装出厂编号</strong>
                     </div>
                     <div class="field">
                         <input class="input" type="text" id="t_truckupno" name="t_truckupno"
@@ -326,22 +336,22 @@
                 <input type="hidden" id="t_struckid" name="t_truckid"/>
                 <div class="form-group">
                     <div class="label" for="t_usign">
-                        <strong>服务器</strong>
+                        <strong>*服务器</strong>
                     </div>
                     <div class="field">
                         <div class="input-group">
                             <input class="input" type="text" id="t_videoip" name="t_videoip"
-                                   placeholder="输入IP地址" data-validate="ip:必须是IP地址"/>
+                                   placeholder="输入IP地址" data-validate="required:必填;ip:必须是IP地址"/>
                             <span class="addon"> : </span>
                             <input class="input" type="text" id="t_videoport" name="t_videoport"
                                    placeholder="输入端口"
-                                   data-validate="plusinteger:必须是正整数"/>
+                                   data-validate="required:必填;plusinteger:必须是正整数"/>
                         </div>
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="label" for="t_usign">
-                        <strong>用户名</strong>
+                        <strong>*用户名</strong>
                     </div>
                     <div class="field">
                         <input class="input" type="text" id="t_videouser" name="t_videouser"

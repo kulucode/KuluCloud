@@ -8,12 +8,15 @@ import net.sf.json.JSONObject;
 import tt.kulu.bi.base.URLlImplBase;
 import tt.kulu.bi.company.pojo.CompanyPojo;
 import tt.kulu.bi.dic.pojo.DicItemPojo;
+import tt.kulu.bi.logs.biclass.SysLogsBIMang;
+import tt.kulu.bi.logs.pojo.SysLogsPojo;
 import tt.kulu.bi.storage.pojo.EquipmentDefPojo;
 import tt.kulu.bi.storage.pojo.EquipmentGeometryPojo;
 import tt.kulu.bi.storage.pojo.EquipmentInstPojo;
 import tt.kulu.out.call.BICompany;
 import tt.kulu.out.call.BIDic;
 import tt.kulu.out.call.BIEquipment;
+import tt.kulu.out.call.BILogin;
 
 import com.tt4j2ee.BSGuid;
 import com.tt4j2ee.m.BSObject;
@@ -205,6 +208,8 @@ public class BSEquipment {
 	 */
 	public BSObject do_updateEqpDefine(BSObject m_bs) throws Exception {
 		String type = m_bs.getPrivateMap().get("in_type");
+		SysLogsPojo oneLogs = new SysLogsPojo();
+		oneLogs.setCreateUser(BILogin.getLoginUser(m_bs));
 		EquipmentDefPojo onePojo = new EquipmentDefPojo();
 		onePojo.setId(m_bs.getPrivateMap().get("t_defid"));
 		onePojo.setName(m_bs.getPrivateMap().get("t_defname"));
@@ -228,13 +233,21 @@ public class BSEquipment {
 		int count = 0;
 		if (type.equals("new")) {
 			count = eqpBI.insertEquipmentDef(onePojo);
+			oneLogs.setName("新增设备类型定义");
 		} else if (type.equals("edit")) {
 			count = eqpBI.updateEquipmentDef(onePojo);
+			oneLogs.setName("编辑设备类型定义");
 		}
 		JSONObject fretObj = new JSONObject();
 		fretObj.put("id", onePojo.getId());
 		if (count > 0) {
 			fretObj.put("r", 0);
+			// 写日志
+			oneLogs.setType(1);
+			oneLogs.setContent("操作:" + oneLogs.getName() + "；影响设备类型定义："
+					+ onePojo.getName() + "[" + onePojo.getNo() + "]");
+			SysLogsBIMang slbi = new SysLogsBIMang(oneLogs, m_bs);
+			slbi.start();
 		} else {
 			fretObj.put("r", 990);
 		}
@@ -466,6 +479,8 @@ public class BSEquipment {
 	public BSObject do_updateEqpInst(BSObject m_bs) throws Exception {
 		JSONObject fretObj = new JSONObject();
 		fretObj.put("r", 990);
+		SysLogsPojo oneLogs = new SysLogsPojo();
+		oneLogs.setCreateUser(BILogin.getLoginUser(m_bs));
 		String type = m_bs.getPrivateMap().get("in_type");
 
 		EquipmentInstPojo onePojo = this._getEqpInstFromWeb(m_bs);
@@ -474,11 +489,22 @@ public class BSEquipment {
 		onePojo.setUpdateDate(m_bs.getDateEx().getThisDate(0, 0));
 		if ("new".equals(type)) {
 			count = eqpBI.insertEquipmentInst(onePojo);
+			oneLogs.setName("新增设备");
 		} else if ("edit".equals(type)) {
 			count = eqpBI.updateEquipmentInst(onePojo);
+			oneLogs.setName("编辑设备");
 		}
 		if (count >= 0) {
 			fretObj.put("r", 0);
+			// 写日志
+			oneLogs.setType(1);
+			oneLogs.setContent("操作:" + oneLogs.getName() + "；影响设备："
+					+ onePojo.getName() + "；Token:" + onePojo.getToken()
+					+ "；唯一标识:" + onePojo.getWyCode() + "；物联网号码:"
+					+ onePojo.getPhone() + "；其他(ICCID):" + onePojo.getPara1()
+					+ "；关联用户:" + onePojo.getMangUser().getName());
+			SysLogsBIMang slbi = new SysLogsBIMang(oneLogs, m_bs);
+			slbi.start();
 		}
 		fretObj.put("r", 0);
 		fretObj.put("error", URLlImplBase.ErrorMap.get(fretObj.getInt("r")));
@@ -642,6 +668,7 @@ public class BSEquipment {
 		onePojo.setProDate(m_bs.getPrivateMap().get("t_eqppdate"));
 		onePojo.getMangUser().setInstId(
 				m_bs.getPrivateMap().get("t_eqpmuser_v"));
+		onePojo.getMangUser().setName(m_bs.getPrivateMap().get("t_eqpmuser"));
 		onePojo.getOrg().setId(m_bs.getPrivateMap().get("t_eqpmorg_v"));
 		if (m_bs.getPrivateMap().get("t_truck_v") != null) {
 			onePojo.getTruck().setId(m_bs.getPrivateMap().get("t_truck_v"));

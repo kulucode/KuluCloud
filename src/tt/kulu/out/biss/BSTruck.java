@@ -7,6 +7,8 @@ import net.sf.json.JSONObject;
 import tt.kulu.bi.base.URLlImplBase;
 import tt.kulu.bi.company.pojo.CompanyPojo;
 import tt.kulu.bi.file.pojo.BFSFilePojo;
+import tt.kulu.bi.logs.biclass.SysLogsBIMang;
+import tt.kulu.bi.logs.pojo.SysLogsPojo;
 import tt.kulu.bi.truck.pojo.TruckDefinePojo;
 import tt.kulu.bi.truck.pojo.TruckDriverRPojo;
 import tt.kulu.bi.truck.pojo.TruckFixLogsPojo;
@@ -16,6 +18,7 @@ import tt.kulu.bi.user.pojo.OrgPojo;
 import tt.kulu.out.call.BICompany;
 import tt.kulu.out.call.BIDic;
 import tt.kulu.out.call.BIFile;
+import tt.kulu.out.call.BILogin;
 import tt.kulu.out.call.BITruck;
 import tt.kulu.out.call.BIUser;
 
@@ -139,6 +142,8 @@ public class BSTruck {
 	 */
 	public BSObject do_updateTruckDefine(BSObject m_bs) throws Exception {
 		String type = m_bs.getPrivateMap().get("in_type");
+		SysLogsPojo oneLogs = new SysLogsPojo();
+		oneLogs.setCreateUser(BILogin.getLoginUser(m_bs));
 		TruckDefinePojo onePojo = new TruckDefinePojo();
 		onePojo.setId(m_bs.getPrivateMap().get("t_defid"));
 		onePojo.setName(m_bs.getPrivateMap().get("t_defname"));
@@ -160,13 +165,21 @@ public class BSTruck {
 		int count = 0;
 		if (type.equals("new")) {
 			count = truckBI.insertTruckDef(onePojo);
+			oneLogs.setName("新增车型");
 		} else if (type.equals("edit")) {
 			count = truckBI.updateTruckDef(onePojo);
+			oneLogs.setName("编辑车型");
 		}
 		JSONObject fretObj = new JSONObject();
 		fretObj.put("id", onePojo.getId());
 		if (count > 0) {
 			fretObj.put("r", 0);
+			// 写日志
+			oneLogs.setType(1);
+			oneLogs.setContent("操作:" + oneLogs.getName() + "；影响车型："
+					+ onePojo.getName() + "[" + onePojo.getNo() + "]");
+			SysLogsBIMang slbi = new SysLogsBIMang(oneLogs, m_bs);
+			slbi.start();
 		} else {
 			fretObj.put("r", 990);
 		}
@@ -344,6 +357,7 @@ public class BSTruck {
 			oneObj.put("upno", onePojo.getUpNo());
 			oneObj.put("uodate", onePojo.getUpDate());
 			oneObj.put("area", onePojo.getArea());
+			oneObj.put("oildef", onePojo.getOilDef().toString());
 			oneObj.put("muser", onePojo.getMangUser().getInstId());
 			oneObj.put("muserid", onePojo.getMangUser().getId());
 			oneObj.put("musername", onePojo.getMangUser().getName());
@@ -475,6 +489,7 @@ public class BSTruck {
 		fretObj.put("upno", onePojo.getUpNo());
 		fretObj.put("uodate", onePojo.getUpDate());
 		fretObj.put("area", onePojo.getArea());
+		fretObj.put("oildef", onePojo.getOilDef().toString());
 		fretObj.put("muser", onePojo.getMangUser().getInstId());
 		fretObj.put("muserid", onePojo.getMangUser().getId());
 		fretObj.put("musername", onePojo.getMangUser().getName());
@@ -504,6 +519,9 @@ public class BSTruck {
 	 */
 	public BSObject do_updateTruck(BSObject m_bs) throws Exception {
 		String type = m_bs.getPrivateMap().get("in_type");
+		SysLogsPojo oneLogs = new SysLogsPojo();
+		oneLogs.setCreateUser(BILogin.getLoginUser(m_bs));
+
 		TruckPojo onePojo = new TruckPojo();
 		onePojo.setId(m_bs.getPrivateMap().get("t_truckid"));
 		onePojo.setName(m_bs.getPrivateMap().get("t_truckname"));
@@ -525,18 +543,33 @@ public class BSTruck {
 		if (m_bs.getPrivateMap().get("t_truckupdate") != null) {
 			onePojo.setUpDate(m_bs.getPrivateMap().get("t_truckupdate"));
 		}
+		if (m_bs.getPrivateMap().get("t_truckoildef") != null) {
+			if (!m_bs.getPrivateMap().get("t_truckoildef").equals("")) {
+				onePojo.setOilDef(JSONObject.fromObject(m_bs.getPrivateMap()
+						.get("t_truckoildef")));
+			}
+		}
 		onePojo.getArea().setId(m_bs.getPrivateMap().get("t_truckarea"));
 		BITruck truckBI = new BITruck(m_bs);
 		int count = 0;
 		if (type.equals("new")) {
 			count = truckBI.insertTruck(onePojo);
+			oneLogs.setName("新增车辆");
 		} else if (type.equals("edit")) {
 			count = truckBI.updateTruck(onePojo);
+			oneLogs.setName("编辑车辆");
 		}
 		JSONObject fretObj = new JSONObject();
 		fretObj.put("id", onePojo.getId());
 		if (count > 0) {
 			fretObj.put("r", 0);
+			// 写日志
+			oneLogs.setType(1);
+			oneLogs.setContent("操作:" + oneLogs.getName() + "；影响车辆："
+					+ onePojo.getName() + "；车牌：" + onePojo.getPlateNum()
+					+ "；车架号：" + onePojo.getCjNo());
+			SysLogsBIMang slbi = new SysLogsBIMang(oneLogs, m_bs);
+			slbi.start();
 		} else {
 			fretObj.put("r", 990);
 		}
@@ -565,22 +598,37 @@ public class BSTruck {
 	public BSObject do_deleteOneTruck(BSObject m_bs) throws Exception {
 		JSONObject retObj = new JSONObject();
 		retObj.put("r", 0);
+		SysLogsPojo oneLogs = new SysLogsPojo();
+		oneLogs.setCreateUser(BILogin.getLoginUser(m_bs));
 		String instid = m_bs.getPrivateMap().get("pg_inst");
 		String type = m_bs.getPrivateMap().get("pg_type");
 		int count = 0;
 		BITruck truckBI = new BITruck(null, m_bs);
-		if (type.equals("delete")) {
-			// 物理删除
-			count = truckBI.deleteOneTruck(instid);
-		} else if (type.equals("state")) {
-			// 逻辑删除
-			count = truckBI.updateOneTruckState(instid, 4);
-		} else if (type.equals("reset")) {
-			// 还原
-			count = truckBI.updateOneTruckState(instid, 0);
-		}
-		if (count > 0) {
-			retObj.put("r", 0);
+		TruckPojo onePojo = truckBI.getOneTruckById(instid);
+		if (onePojo != null) {
+			if (type.equals("delete")) {
+				// 物理删除
+				count = truckBI.deleteOneTruck(instid);
+				oneLogs.setName("删除车辆");
+			} else if (type.equals("state")) {
+				// 逻辑删除
+				count = truckBI.updateOneTruckState(instid, 4);
+				oneLogs.setName("设置车辆无效");
+			} else if (type.equals("reset")) {
+				// 还原
+				count = truckBI.updateOneTruckState(instid, 0);
+				oneLogs.setName("还原无效车辆");
+			}
+			if (count > 0) {
+				retObj.put("r", 0);
+				// 写日志
+				oneLogs.setType(1);
+				oneLogs.setContent("操作:" + oneLogs.getName() + "；影响车辆："
+						+ onePojo.getName() + "；车牌：" + onePojo.getPlateNum()
+						+ "；车架号：" + onePojo.getCjNo());
+				SysLogsBIMang slbi = new SysLogsBIMang(oneLogs, m_bs);
+				slbi.start();
+			}
 		}
 		retObj.put("error", URLlImplBase.ErrorMap.get(retObj.getInt("r")));
 		m_bs.setRetrunObj(retObj);
@@ -849,6 +897,14 @@ public class BSTruck {
 		}
 		if (count > 0) {
 			fretObj.put("r", 0);
+			SysLogsPojo oneLogs = new SysLogsPojo();
+			oneLogs.setCreateUser(BILogin.getLoginUser(m_bs));
+			oneLogs.setName("批量配置车载视频");
+			// 写日志
+			oneLogs.setType(1);
+			oneLogs.setContent("操作:" + oneLogs.getName());
+			SysLogsBIMang slbi = new SysLogsBIMang(oneLogs, m_bs);
+			slbi.start();
 		}
 		fretObj.put("error", URLlImplBase.ErrorMap.get(fretObj.getInt("r")));
 		m_bs.setRetrunObj(fretObj);

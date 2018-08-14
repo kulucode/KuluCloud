@@ -120,8 +120,8 @@ function searchUser(_page) {
                     var _oneTr = addTableRow("user_tab");
                     var _bt = "";
                     if (oneD.state == 0) {
-                        // _bt = "<button type=\"button\" class=\"button margin-left bg-dot button-little\" onclick=\"deleteOneUser('"
-                        //     + oneD.instid + "','delete')\">删除</button>";
+                        _bt = "<button type=\"button\" class=\"button margin-left bg-dot button-little\" onclick=\"deleteOneUser('"
+                            + oneD.instid + "','delete')\">删除</button>";
                         _bt += "<button type=\"button\" class=\"button margin-left bg-main button-little\" onclick=\"deleteOneUser('"
                             + oneD.instid + "','reset')\">还原</button>";
                     }
@@ -440,9 +440,7 @@ function deleteUserOrg(_userInst, _orgId) {
 function deleteOneUser(_id, _type) {
     var isOk = true;
     if (_type == "delete") {
-        //alert("");
-        // if (confirm("彻底删除后无法还原，是否继续？")) {
-        // }
+        isOk = confirm("彻底删除后无法还原，是否继续？");
     }
     doRefresh(
         "",

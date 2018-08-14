@@ -28,6 +28,7 @@ public class TruckWorkParasPojo {
 	private String oilDiff = "";
 	private String speed = "";
 	private String oilDate = "";
+	private String thisOilV = "";
 
 	// 位置
 	private String longitude = "";// 经度
@@ -132,6 +133,14 @@ public class TruckWorkParasPojo {
 
 	public void setFanceFlg(int fanceFlg) {
 		this.fanceFlg = fanceFlg;
+	}
+
+	public String getThisOilV() {
+		return thisOilV;
+	}
+
+	public void setThisOilV(String thisOilV) {
+		this.thisOilV = thisOilV;
 	}
 
 }

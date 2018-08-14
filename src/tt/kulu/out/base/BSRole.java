@@ -5,6 +5,8 @@ import java.util.HashMap;
 
 import tt.kulu.bi.base.URLlImplBase;
 import tt.kulu.bi.function.pojo.MenuPojo;
+import tt.kulu.bi.logs.biclass.SysLogsBIMang;
+import tt.kulu.bi.logs.pojo.SysLogsPojo;
 import tt.kulu.bi.power.pojo.RoleMenuPojo;
 import tt.kulu.bi.power.pojo.RolePojo;
 import tt.kulu.bi.user.pojo.LoginUserPojo;
@@ -12,6 +14,7 @@ import tt.kulu.bi.user.pojo.UserPojo;
 import tt.kulu.out.call.BILogin;
 import tt.kulu.out.call.BIMenu;
 import tt.kulu.out.call.BIPower;
+import tt.kulu.out.call.BIUser;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -152,17 +155,49 @@ public class BSRole {
 	 * </p>
 	 */
 	public BSObject do_updateUserRole(BSObject m_bs) throws Exception {
-		LoginUserPojo user = BILogin.getLoginUser(m_bs);
 		JSONObject fretObj = new JSONObject();
 		fretObj.put("r", -999);
+		BSReturnPojo ret = new BSReturnPojo();
 		String inRolesStr = (String) m_bs.getPrivateMap().get("t_roleids");
 		String inUserStr = (String) m_bs.getPrivateMap().get("t_roleuserid");
+		if (inUserStr.equals("SUPER_ADMIN")) {
+			// 超级管理员
+			if (inRolesStr.indexOf("SUPER_ADMIN") < 0) {
+				inRolesStr += (",SUPER_ADMIN");
+			}
+		}
 		String roles[] = inRolesStr.split(",");
-		// 调用接口
-		BIPower powerBI = new BIPower(null, m_bs);
-		BSReturnPojo ret = powerBI.updateUserRoles(inUserStr, roles);
-		// 设置返回值
-		fretObj.put("r", ret.getErrorNo());
+		BIUser userBI = new BIUser(null, m_bs);
+		UserPojo oneUser = userBI.getOneUser(inUserStr);
+		if (oneUser != null) {
+			// 调用接口
+			BIPower powerBI = new BIPower(null, m_bs);
+			ret = powerBI.updateUserRoles(inUserStr, roles);
+			// 设置返回值
+			if (ret.getErrorNo() == 0) {
+				SysLogsPojo oneLogs = new SysLogsPojo();
+				oneLogs.setCreateUser(BILogin.getLoginUser(m_bs));
+				oneLogs.setName("设置用户角色");
+				oneLogs.setType(1);
+				String roleStr = "";
+				String rs[] = inRolesStr.split(",");
+				for (String oneR : rs) {
+					if (!oneR.equals("")) {
+						roleStr += ","
+								+ (powerBI.getRoleByRedis(oneR).getName());
+					}
+				}
+				if (roleStr.length() > 0) {
+					roleStr = roleStr.substring(1);
+				}
+				oneLogs.setContent("操作:" + oneLogs.getName() + "；影响用户："
+						+ oneUser.getName() + "[" + oneUser.getId() + "]"
+						+ "；角色内容：" + roleStr);
+				SysLogsBIMang slbi = new SysLogsBIMang(oneLogs, m_bs);
+				slbi.start();
+			}
+			fretObj.put("r", ret.getErrorNo());
+		}
 		fretObj.put("error", ret.getErrorString());
 		m_bs.setRetrunObj(fretObj);
 		return m_bs;
@@ -256,13 +291,26 @@ public class BSRole {
 	public BSObject do_updateRole(BSObject m_bs) throws Exception {
 		String type = (String) m_bs.getPrivateMap().get("in_type");
 		String retStr = "";
+		SysLogsPojo oneLogs = new SysLogsPojo();
+		oneLogs.setCreateUser(BILogin.getLoginUser(m_bs));
 		RolePojo oneRole = this._getRoleFromWeb(type, m_bs);
 		BIPower powerBI = new BIPower(null, m_bs);
 		BSReturnPojo retObj = new BSReturnPojo(-999, "");
 		if (type.equals("new")) {
 			retObj = powerBI.insertRole(oneRole);
+			oneLogs.setName("新增角色");
 		} else if (type.equals("edit")) {
 			retObj = powerBI.updateRole(oneRole);
+			oneLogs.setName("更新角色");
+		}
+		if (retObj.getErrorNo() == 0) {
+			// 写日志
+			oneLogs.setType(1);
+			oneLogs.setContent("操作:" + oneLogs.getName() + "；影响角色："
+					+ oneRole.getName());
+
+			SysLogsBIMang slbi = new SysLogsBIMang(oneLogs, m_bs);
+			slbi.start();
 		}
 		JSONObject fretObj = new JSONObject();
 		fretObj.put("data", retStr);
@@ -290,8 +338,21 @@ public class BSRole {
 		JSONObject fretObj = new JSONObject();
 		fretObj.put("r", 991);
 		String roleId = (String) m_bs.getPrivateMap().get("roleid");
-		if (new BIPower(null, m_bs).deleteRole(roleId) > 0) {
-			fretObj.put("r", 0);
+		BIPower powerBI = new BIPower(null, m_bs);
+		RolePojo onePojo = powerBI.getRoleById(roleId);
+		if (onePojo != null && !roleId.equals("SUPER_ADMIN")) {
+			if (new BIPower(null, m_bs).deleteRole(roleId) > 0) {
+				fretObj.put("r", 0);
+				//
+				SysLogsPojo oneLogs = new SysLogsPojo();
+				oneLogs.setCreateUser(BILogin.getLoginUser(m_bs));
+				oneLogs.setName("删除角色");
+				oneLogs.setType(1);
+				oneLogs.setContent("操作:" + oneLogs.getName() + "；删除角色："
+						+ onePojo.getName());
+				SysLogsBIMang slbi = new SysLogsBIMang(oneLogs, m_bs);
+				slbi.start();
+			}
 		}
 		fretObj.put("error", URLlImplBase.ErrorMap.get(fretObj.getInt("r")));
 		m_bs.setRetrunObj(fretObj);

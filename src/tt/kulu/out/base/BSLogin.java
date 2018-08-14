@@ -4,11 +4,16 @@ import java.util.HashMap;
 
 import tt.kulu.bi.base.URLlImplBase;
 import tt.kulu.bi.company.pojo.CompanyPojo;
+import tt.kulu.bi.logs.biclass.SysLogsBIMang;
+import tt.kulu.bi.logs.pojo.SysLogsPojo;
 import tt.kulu.bi.user.pojo.LoginUserPojo;
 import tt.kulu.bi.user.pojo.UserPojo;
 import tt.kulu.out.call.BICompany;
 import tt.kulu.out.call.BILogin;
+
+import com.alibaba.fastjson.JSON;
 import com.tt4j2ee.BIRedis;
+
 import tt.kulu.out.call.BIUser;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -154,6 +159,18 @@ public class BSLogin {
 								retJSON.getString("u"));
 						// m_bs.setSessionID(loginBI.setUserToSession(outUser));
 						retJSON.put("r", 0);
+						// 写登陆日志
+						SysLogsPojo oneLogs = new SysLogsPojo();
+						oneLogs.setName("登录日志");
+						oneLogs.setCreateUser(JSON.parseObject(
+								retJSON.getString("u"), LoginUserPojo.class));
+						oneLogs.setCreateDate(m_bs.getDateEx()
+								.getThisDate(0, 0));
+						oneLogs.setType(0);
+						oneLogs.setContent("帐号:" + inUser.getName() + "["
+								+ inUser.getId() + "] 登录系统");
+						SysLogsBIMang slbi = new SysLogsBIMang(oneLogs, m_bs);
+						slbi.start();
 					}
 				}
 			}

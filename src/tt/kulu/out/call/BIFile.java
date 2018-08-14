@@ -25,6 +25,8 @@ import tt.kulu.bi.file.biclass.ResizeImage;
 import tt.kulu.bi.file.biclass.SFTPThread;
 import tt.kulu.bi.file.dbclass.BSFileDBMang;
 import tt.kulu.bi.file.pojo.BFSFilePojo;
+import tt.kulu.bi.logs.biclass.SysLogsBIMang;
+import tt.kulu.bi.logs.pojo.SysLogsPojo;
 import tt.kulu.bi.power.dbclass.BSPowerDBMang;
 import tt.kulu.bi.power.pojo.RolePojo;
 import tt.kulu.bi.power.pojo.RoleUserPojo;
@@ -473,22 +475,27 @@ public class BIFile extends BSDBBase {
 			ServletFileUpload multi) throws Exception {
 		JSONObject ret = new JSONObject();
 		ret.put("r", 1002);
+		SysLogsPojo oneLogs = new SysLogsPojo();
+		oneLogs.setCreateUser(BILogin.getLoginUser(m_bs));
 		// 保存临时文件
 		BIFile fileBI = new BIFile();
 		switch (file.getOpType()) {
 		case "DICITEM":
 			for (FileItem fi : m_bs.getFileList()) {
 				ret = fileBI.importDitItemData(file, fi.getInputStream());
+				oneLogs.setName("导入数据字典");
 			}
 			break;
 		case "WATCH":
 			for (FileItem fi : m_bs.getFileList()) {
 				ret = fileBI.importWatchUser(file, fi.getInputStream());
+				oneLogs.setName("导入用户云环数据");
 			}
 			break;
 		case "USER":
 			for (FileItem fi : m_bs.getFileList()) {
 				ret = fileBI.importUser(file, fi.getInputStream());
+				oneLogs.setName("导入用户数据");
 			}
 			break;
 		case "TRUCKDEF":
@@ -499,11 +506,13 @@ public class BIFile extends BSDBBase {
 		case "TRUCK":
 			for (FileItem fi : m_bs.getFileList()) {
 				ret = fileBI.importTruck(file, fi.getInputStream());
+				oneLogs.setName("导入车辆云盒数据");
 			}
 			break;
 		case "AREA":
 			for (FileItem fi : m_bs.getFileList()) {
 				ret = fileBI.importArea(file, fi.getInputStream());
+				oneLogs.setName("导入地域数据");
 			}
 			break;
 		case "EQUIPMENTDEF":
@@ -514,11 +523,20 @@ public class BIFile extends BSDBBase {
 		case "EQUIPMENTINST":
 			for (FileItem fi : m_bs.getFileList()) {
 				ret = fileBI.importEquipmentInst(file, fi.getInputStream());
+				oneLogs.setName("导入设备数据");
 			}
 			break;
 		default:
 			break;
 		}
+
+		if (ret.getInt("r") == 0) {
+			oneLogs.setType(1);
+			oneLogs.setContent("操作:" + oneLogs.getName());
+			SysLogsBIMang slbi = new SysLogsBIMang(oneLogs, m_bs);
+			slbi.start();
+		}
+
 		return ret;
 	}
 
@@ -1369,9 +1387,9 @@ public class BIFile extends BSDBBase {
 								onePojo.getDefine().setSaleDate(
 										onePojo.getInDate());
 								// 邮箱
-								onePojo.getDefine().setOilMJ(
-										(sheet.getCell(9, r).getContents())
-												.trim());
+								// onePojo.getDefine().setOilMJ(
+								// (sheet.getCell(9, r).getContents())
+								// .trim());
 							} else {
 								onePojo.getDefine().setName(
 										sheet.getCell(5, r).getContents()
@@ -1386,9 +1404,22 @@ public class BIFile extends BSDBBase {
 								onePojo.getDefine().setSaleDate(
 										onePojo.getInDate());
 								// 邮箱
-								onePojo.getDefine().setOilMJ("");
+//								onePojo.getDefine().setOilMJ("");
 							}
 							truckBI.insertTruckDef(onePojo.getDefine());
+						}
+						// 邮箱
+						String oil = (sheet.getCell(9, r).getContents()).trim();
+						if (!oil.equals("")) {
+							String[] oils = oil.split(",");
+							for (String oneDef : oils) {
+								if (oneDef.indexOf("=") > 0) {
+									onePojo.getOilDef().put(
+											oneDef.split("=")[0],
+											oneDef.split("=")[1]);
+								}
+
+							}
 						}
 						onePojo.setName(onePojo.getInName() + "【"
 								+ onePojo.getPlateNum() + "】");

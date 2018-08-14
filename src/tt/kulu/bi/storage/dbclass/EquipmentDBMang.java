@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.json.JSONObject;
 import tt.kulu.bi.base.BSDBBase;
 import tt.kulu.bi.storage.pojo.EquipmentDefPojo;
 import tt.kulu.bi.storage.pojo.EquipmentGeometryPojo;
@@ -64,11 +65,11 @@ public class EquipmentDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述:
 	 * </p>
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public ArrayList<EquipmentDefPojo> getEquipmentDefList(String where,
-														   String orderBy, List<Object> vList) throws Exception {
+			String orderBy, List<Object> vList) throws Exception {
 		ArrayList<EquipmentDefPojo> list = new ArrayList<EquipmentDefPojo>();
 		ResultSet rs = this.sqlHelper.queryBySql(
 				_getEquipmentDefSelectSQL(where, orderBy).toString(), vList);
@@ -100,7 +101,7 @@ public class EquipmentDBMang extends BSDBBase {
 		List<Object> vList = new ArrayList<Object>();
 		vList.add(id);
 		ResultSet rs = this.sqlHelper.queryBySql(this
-						._getEquipmentDefSelectSQL(" and t.EQP_CODE=?", "").toString(),
+				._getEquipmentDefSelectSQL(" and t.EQP_CODE=?", "").toString(),
 				vList);
 		if (rs != null) {
 			if (rs.next()) {
@@ -159,7 +160,7 @@ public class EquipmentDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述: boolean
 	 * </p>
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public int insertEquipmentDef(EquipmentDefPojo onePojo) throws Exception {
@@ -213,7 +214,7 @@ public class EquipmentDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述: boolean
 	 * </p>
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public int updateEquipmentDef(EquipmentDefPojo onePojo) throws Exception {
@@ -222,9 +223,9 @@ public class EquipmentDBMang extends BSDBBase {
 		vList.add(onePojo.getId());
 		if ((onePojo.getId() == null || onePojo.getId().trim().equals(""))
 				|| this.sqlHelper
-				.queryIntBySql(
-						"select count(EQP_CODE) from T_EQUIPMENT_DEF where EQP_CODE=?",
-						vList) <= 0) {
+						.queryIntBySql(
+								"select count(EQP_CODE) from T_EQUIPMENT_DEF where EQP_CODE=?",
+								vList) <= 0) {
 			// 新增
 			count += this.insertEquipmentDef(onePojo);
 		} else {
@@ -269,11 +270,11 @@ public class EquipmentDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述:
 	 * </p>
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public ArrayList<EquipmentInstPojo> getEquipmentInstList(String where,
-															 String orderBy, long f, long t, List<Object> vList)
+			String orderBy, long f, long t, List<Object> vList)
 			throws Exception {
 		ArrayList<EquipmentInstPojo> list = new ArrayList<EquipmentInstPojo>();
 		StringBuffer strSQL = _getEquipmentInstSelectSQL(where, orderBy);
@@ -303,7 +304,7 @@ public class EquipmentDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述:
 	 * </p>
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public long getEquipmentInstCount(String where, List<Object> vList)
@@ -378,7 +379,7 @@ public class EquipmentDBMang extends BSDBBase {
 	 * </p>
 	 */
 	public EquipmentInstPojo getOneEquipmentInstByWhere(String where,
-														String orderBy, List<Object> vList) throws Exception {
+			String orderBy, List<Object> vList) throws Exception {
 		EquipmentInstPojo onePojo = null;
 		ResultSet rs = this.sqlHelper.queryBySql(this
 				._getEquipmentInstSelectSQL(where, orderBy).toString(), vList);
@@ -575,7 +576,7 @@ public class EquipmentDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述: boolean
 	 * </p>
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public int insertEquipmentInst(EquipmentInstPojo onePojo) throws Exception {
@@ -661,7 +662,7 @@ public class EquipmentDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述: boolean
 	 * </p>
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public int updateEquipmentInst(EquipmentInstPojo onePojo) throws Exception {
@@ -745,7 +746,7 @@ public class EquipmentDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述: boolean
 	 * </p>
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public int updateEquipmentInstMUser(EquipmentInstPojo onePojo)
@@ -776,7 +777,7 @@ public class EquipmentDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述: boolean
 	 * </p>
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public int updateEquipmentInstTruck(EquipmentInstPojo onePojo)
@@ -817,7 +818,7 @@ public class EquipmentDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述: boolean
 	 * </p>
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public int updateEquipmentInstLast(EquipmentInstPojo onePojo)
@@ -852,7 +853,7 @@ public class EquipmentDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述: boolean
 	 * </p>
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public int updateEquipmentInstRel(String pEqp, String relEqp)
@@ -903,7 +904,7 @@ public class EquipmentDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述: boolean
 	 * </p>
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public int deleteEquipmentInstRel(String pEqp, String relEqp)
@@ -933,7 +934,7 @@ public class EquipmentDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述: boolean
 	 * </p>
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public int checkEquipmentQRCode(String code) throws Exception {
@@ -959,7 +960,7 @@ public class EquipmentDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述: boolean
 	 * </p>
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public int checkEquipmentWYCode(String wyCode) throws Exception {
@@ -985,7 +986,7 @@ public class EquipmentDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述: boolean
 	 * </p>
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public int insertEquipmentGeometry(EquipmentGeometryPojo onePojo)
@@ -1041,7 +1042,7 @@ public class EquipmentDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述: boolean
 	 * </p>
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public int updateEquipmentGeometryFance(EquipmentGeometryPojo onePojo)
@@ -1068,11 +1069,11 @@ public class EquipmentDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述: boolean
 	 * </p>
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public String getGeometryLastDisdance(EquipmentGeometryPojo oneEqpGeo,
-										  int offset) throws Exception {
+			int offset) throws Exception {
 		String dis = "0";
 		// 得到最后一条记录
 		StringBuffer sql = new StringBuffer(
@@ -1111,11 +1112,11 @@ public class EquipmentDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述:
 	 * </p>
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public ArrayList<EquipmentGeometryPojo> getEqpGeometryList(String where,
-															   String orderBy, long f, long t, List<Object> vList)
+			String orderBy, long f, long t, List<Object> vList)
 			throws Exception {
 		ArrayList<EquipmentGeometryPojo> list = new ArrayList<EquipmentGeometryPojo>();
 		StringBuffer strSQL = _getEqpGeometrySelectSQL(where, orderBy);
@@ -1145,7 +1146,7 @@ public class EquipmentDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述:
 	 * </p>
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public long getEqpGeometryCount(String where, List<Object> vList)
@@ -1251,11 +1252,11 @@ public class EquipmentDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述: boolean
 	 * </p>
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public EquipmentInstWorkLogPojo getLastEquipmentInstWorkLog(String instId,
-																int state, int offset) throws Exception {
+			int state, int offset) throws Exception {
 		EquipmentInstWorkLogPojo onePojo = null;
 		List<Object> vList = new ArrayList<Object>();
 		if (state >= 0) {
@@ -1290,7 +1291,7 @@ public class EquipmentDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述: boolean
 	 * </p>
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public int insertEquipmentInstWorkLog(EquipmentInstWorkLogPojo onePojo)
@@ -1329,7 +1330,7 @@ public class EquipmentDBMang extends BSDBBase {
 	 * <p>
 	 * 输出参数描述: boolean
 	 * </p>
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public int updateEquipmentInstWorkLog(EquipmentInstWorkLogPojo onePojo)
@@ -1452,6 +1453,7 @@ public class EquipmentDBMang extends BSDBBase {
 		strSQL.append(",tru.TRUCK_NO");
 		strSQL.append(",tru.PLATE_NUM");
 		strSQL.append(",tru.PLATE_COLOR");
+		strSQL.append(",tru.TRUCK_OILDEF");
 		strSQL.append(",tru.ORG_ID as TRUCK_ORG");
 
 		strSQL.append(" from T_EQUIPMENT_INST t left outer join T_USER tu on t.EQP_MUSER = tu.USER_INSTID");
@@ -1559,6 +1561,12 @@ public class EquipmentDBMang extends BSDBBase {
 					&& !rs.getString("TRUCK_ORG").equals("")) {
 				onePojo.getTruck().setOrg(
 						this.userBI.getGroupByRedis(rs.getString("TRUCK_ORG")));
+			}
+			// 邮箱
+			if (rs.getString("TRUCK_OILDEF") != null
+					&& !rs.getString("TRUCK_OILDEF").equals("")) {
+				onePojo.getTruck().setOilDef(
+						JSONObject.fromObject(rs.getString("TRUCK_OILDEF")));
 			}
 		}
 
@@ -1718,7 +1726,7 @@ public class EquipmentDBMang extends BSDBBase {
 
 	// 得到物品定义查询的SQL语句
 	private StringBuffer _getEquipmentInstWorkLogSelectSQL(String where,
-														   String orderBy) throws Exception {
+			String orderBy) throws Exception {
 		StringBuffer strSQL = new StringBuffer();
 		strSQL.append("select ");
 		strSQL.append("t.LOG_ID");

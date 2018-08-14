@@ -10,6 +10,10 @@ import net.sf.json.JSONObject;
 import tt.kulu.bi.base.URLlImplBase;
 import tt.kulu.bi.dic.pojo.DicItemPojo;
 import tt.kulu.bi.fault.pojo.FaultReportPojo;
+import tt.kulu.bi.logs.biclass.MsgLogsBIMang;
+import tt.kulu.bi.logs.biclass.SysLogsBIMang;
+import tt.kulu.bi.logs.pojo.MsgLogsPojo;
+import tt.kulu.bi.logs.pojo.SysLogsPojo;
 import tt.kulu.bi.map.biclass.CoordTransformBI;
 import tt.kulu.bi.map.pojo.Gps;
 import tt.kulu.bi.storage.pojo.EquipmentGeometryPojo;
@@ -25,6 +29,7 @@ import tt.kulu.out.call.BIDic;
 import tt.kulu.out.call.BIEquipment;
 import tt.kulu.out.call.BIFance;
 import tt.kulu.out.call.BIFault;
+import tt.kulu.out.call.BILogs;
 import tt.kulu.out.call.BITruck;
 import tt.kulu.out.call.BIUser;
 import tt.kulu.out.call.BIWatch;
@@ -180,8 +185,12 @@ public class BIKuluMQAdapter {
 			BIFault faultBI = new BIFault(null, null);
 			BIFance fanceBI = new BIFance(null, null);
 			BIWatch watchBI = new BIWatch(null, null);
+			MsgLogsBIMang mlbi = new MsgLogsBIMang();
 			EquipmentInstPojo oneInst = new EquipmentInstPojo();
 			EquipmentGeometryPojo oneEqpGeo = new EquipmentGeometryPojo();
+			// 日志
+			MsgLogsPojo oneLogs = new MsgLogsPojo();
+			oneLogs.setEqpType(0);
 			switch (_oldData.getString("tag")) {
 			case "login":
 				// 判断是否存在，不存在则更新数据库
@@ -215,6 +224,16 @@ public class BIKuluMQAdapter {
 					MQSender mqSend = new MQSender(
 							URLlImplBase.MQTopicM.get(2), _sendMQ.toString());
 					mqSend.run();
+					// 日志
+					oneLogs.setType(1);
+					oneLogs.setName("云环上线");
+					oneLogs.setEqpName(oneInst.getWyCode());
+					oneLogs.setContent("云环【" + oneInst.getName() + "】上线");
+					oneLogs.setInMsg(_oldData.toString());
+					oneLogs.setOutMsg(_sendMQ.toString());
+					oneLogs.setCreateDate(this.bsDate.getThisDate(0, 0));
+					mlbi.setLogs(oneLogs);
+					mlbi.start();
 				}
 				break;
 			case "login_out":
@@ -234,11 +253,22 @@ public class BIKuluMQAdapter {
 						BITTWebSocketSend webSend = new BITTWebSocketSend(
 								bodyData.toString(), "02");
 						webSend.run();
+						// 日志
+						oneLogs.setType(2);
+						oneLogs.setName("云环下线");
+						oneLogs.setEqpName(oneInst.getWyCode());
+						oneLogs.setContent("云环【" + oneInst.getName() + "】下线");
+						oneLogs.setInMsg(_oldData.toString());
+						oneLogs.setOutMsg("{}");
+						oneLogs.setCreateDate(this.bsDate.getThisDate(0, 0));
+						mlbi.setLogs(oneLogs);
+						mlbi.start();
 					}
 				}
 				break;
 			case "data":
 				// 数据
+				oneLogs.setType(4);
 				switch (bodyData.getString("type")) {
 				case "6":// GPS
 					// 写入位置表
@@ -308,6 +338,18 @@ public class BIKuluMQAdapter {
 							BITTWebSocketSend webSend = new BITTWebSocketSend(
 									bodyData.toString(), "02");
 							webSend.run();
+							// 日志
+							oneLogs.setName("云环收到位置数据");
+							oneLogs.setEqpName(oneEqpGeo.getEqpInst().getName()
+									+ " [" + oneEqpGeo.getEqpInst().getWyCode()
+									+ "]");
+							oneLogs.setContent("纬度：" + oneEqpGeo.getLatitude()
+									+ "；经度：" + oneEqpGeo.getLongitude() + "]");
+							oneLogs.setInMsg(_oldData.toString());
+							oneLogs.setOutMsg("{}");
+							oneLogs.setCreateDate(this.bsDate.getThisDate(0, 0));
+							mlbi.setLogs(oneLogs);
+							mlbi.start();
 						}
 					}
 					break;
@@ -339,6 +381,16 @@ public class BIKuluMQAdapter {
 						BITTWebSocketSend webSend = new BITTWebSocketSend(
 								bodyData.toString(), "02");
 						webSend.run();
+						// 日志
+						oneLogs.setName("云环收到记步数据");
+						oneLogs.setEqpName(step.getEqpInst().getName() + " ["
+								+ step.getEqpInst().getWyCode() + "]");
+						oneLogs.setContent("步数：" + step.getStep());
+						oneLogs.setInMsg(_oldData.toString());
+						oneLogs.setOutMsg("{}");
+						oneLogs.setCreateDate(this.bsDate.getThisDate(0, 0));
+						mlbi.setLogs(oneLogs);
+						mlbi.start();
 					}
 					break;
 				case "110":// 血压正常
@@ -403,6 +455,17 @@ public class BIKuluMQAdapter {
 						BITTWebSocketSend webSend = new BITTWebSocketSend(
 								bodyData.toString(), "02");
 						webSend.run();
+						// 日志
+						oneLogs.setName("云环收到心率正常数据");
+						oneLogs.setEqpName(hr.getEqpInst().getName() + " ["
+								+ hr.getEqpInst().getWyCode() + "]");
+						oneLogs.setContent("心率：" + hr.getHeartRate() + "；剩余电量："
+								+ hr.getElectricity() + "]");
+						oneLogs.setInMsg(_oldData.toString());
+						oneLogs.setOutMsg("{}");
+						oneLogs.setCreateDate(this.bsDate.getThisDate(0, 0));
+						mlbi.setLogs(oneLogs);
+						mlbi.start();
 					}
 					break;
 				case "99":// 心率报警
@@ -448,6 +511,16 @@ public class BIKuluMQAdapter {
 						BITTWebSocketSend webSend = new BITTWebSocketSend(
 								bodyData.toString(), "02");
 						webSend.run();
+						// 日志
+						oneLogs.setName("云环收到心率异常数据");
+						oneLogs.setEqpName(hr.getEqpInst().getName() + " ["
+								+ hr.getEqpInst().getWyCode() + "]");
+						oneLogs.setContent("心率：" + hr.getHeartRate());
+						oneLogs.setInMsg(_oldData.toString());
+						oneLogs.setOutMsg("{}");
+						oneLogs.setCreateDate(this.bsDate.getThisDate(0, 0));
+						mlbi.setLogs(oneLogs);
+						mlbi.start();
 					}
 					break;
 				case "113":// 血压报警
@@ -506,6 +579,7 @@ public class BIKuluMQAdapter {
 			BIDic dicBI = new BIDic(null, null);
 			BIEquipment eqpBI = new BIEquipment(null, null);
 			BITruck truckBI = new BITruck(null, null);
+			MsgLogsBIMang mlbi = new MsgLogsBIMang();
 			JSONObject _oldData = JSONObject.fromObject(URLlImplBase
 					.decodeUnicode(inMessage));
 			JSONObject bodyData = _oldData.getJSONObject("databody");
@@ -520,6 +594,10 @@ public class BIKuluMQAdapter {
 			} else {
 				time = _oldData.getString("date");
 			}
+			// 日志
+			MsgLogsPojo oneLogs = new MsgLogsPojo();
+			oneLogs.setEqpType(1);
+			oneLogs.setMsgDate(time);
 			JSONObject _sendMQ = new JSONObject();
 			JSONObject _sendBodyMQ = new JSONObject();
 			switch (_oldData.getString("tag")) {
@@ -580,6 +658,17 @@ public class BIKuluMQAdapter {
 				MQSender mqSend = new MQSender(URLlImplBase.MQTopicM.get(0),
 						_sendMQ.toString());
 				mqSend.run();
+				// 日志
+				oneLogs.setType(0);
+				oneLogs.setName("云盒注册");
+				oneLogs.setEqpName(oneInst.getWyCode());
+				oneLogs.setContent("云盒【" + oneInst.getName() + "】注册");
+				oneLogs.setInMsg(_oldData.toString());
+				oneLogs.setOutMsg(_sendMQ.toString());
+				oneLogs.setCreateDate(this.bsDate.getThisDate(0, 0));
+				mlbi.setLogs(oneLogs);
+				mlbi.start();
+				// 日志
 				break;
 			case "login":
 				// 登录
@@ -588,9 +677,12 @@ public class BIKuluMQAdapter {
 				_sendMQ.put("eqpid", _oldData.getString("eqpid"));
 				_sendMQ.put("tag", "login_back");
 				_sendMQ.put("date", time);
+				oneLogs.setEqpName(bodyData.getString("token"));
 				oneInst = eqpBI.getOneEquipmentInstByToken(bodyData
 						.getString("token"));
 				if (oneInst != null) {
+					oneLogs.setEqpName(oneInst.getName() + " ["
+							+ oneInst.getWyCode() + "]");
 					_sendBodyMQ.put("r", 0);
 					// 得到手表设备参数
 					JSONArray wp = dicBI.getDicItemListByRedis("VEHICLE_PARAS");
@@ -619,6 +711,16 @@ public class BIKuluMQAdapter {
 				mqSend = new MQSender(URLlImplBase.MQTopicM.get(0),
 						_sendMQ.toString());
 				mqSend.run();
+				// 日志
+				oneLogs.setType(1);
+				oneLogs.setName("云盒登录");
+				oneLogs.setContent("token：" + bodyData.getString("token"));
+				oneLogs.setInMsg(_oldData.toString());
+				oneLogs.setOutMsg(_sendMQ.toString());
+				oneLogs.setCreateDate(this.bsDate.getThisDate(0, 0));
+				mlbi.setLogs(oneLogs);
+				mlbi.start();
+				// 日志
 				break;
 			case "authKeyLogin":
 				// 重连
@@ -627,9 +729,11 @@ public class BIKuluMQAdapter {
 				_sendMQ.put("eqpid", _oldData.getString("eqpid"));
 				_sendMQ.put("tag", "authKeyLogin_back");
 				_sendMQ.put("date", this.bsDate.getThisDate(0, 0));
+				oneLogs.setEqpName(bodyData.getString("token"));
 				oneInst = eqpBI.getOneEquipmentInstByToken(bodyData
 						.getString("token"));
 				if (oneInst != null) {
+					oneLogs.setEqpName(oneInst.getName());
 					clearVehicleGeoToFromRedis(oneInst.getInstId());
 					_sendBodyMQ.put("r", 0);
 					oneInst.setThisDate(this.bsDate.getThisDate(0, 0));
@@ -661,12 +765,23 @@ public class BIKuluMQAdapter {
 				mqSend = new MQSender(URLlImplBase.MQTopicM.get(0),
 						_sendMQ.toString());
 				mqSend.run();
+				// 日志
+				oneLogs.setType(3);
+				oneLogs.setName("云盒重连");
+				oneLogs.setContent("token：" + bodyData.getString("token"));
+				oneLogs.setInMsg(_oldData.toString());
+				oneLogs.setOutMsg(_sendMQ.toString());
+				oneLogs.setCreateDate(this.bsDate.getThisDate(0, 0));
+				mlbi.setLogs(oneLogs);
+				mlbi.start();
 				break;
 			case "login_out":
 				// 判断是否存在，不存在则更新数据库
+				oneLogs.setEqpName(bodyData.getString("token"));
 				oneInst = eqpBI.getOneEquipmentInstByToken(bodyData
 						.getString("token"));
 				if (oneInst != null) {
+					oneLogs.setEqpName(oneInst.getName());
 					clearVehicleGeoToFromRedis(oneInst.getInstId());
 					oneInst.setLastLoginDate(this.bsDate.getThisDate(0, 0));
 					oneInst.setThisDate(this.bsDate.getThisDate(0, 0));
@@ -696,6 +811,15 @@ public class BIKuluMQAdapter {
 						BITTWebSocketSend webSend = new BITTWebSocketSend(
 								bodyData.toString(), "01");
 						webSend.run();
+						// 日志
+						oneLogs.setType(2);
+						oneLogs.setName("云盒下线");
+						oneLogs.setContent("token：" + oneInst.getToken());
+						oneLogs.setInMsg(_oldData.toString());
+						oneLogs.setOutMsg(_sendMQ.toString());
+						oneLogs.setCreateDate(this.bsDate.getThisDate(0, 0));
+						mlbi.setLogs(oneLogs);
+						mlbi.start();
 					}
 				}
 				break;
@@ -713,6 +837,7 @@ public class BIKuluMQAdapter {
 								.getCalendarFromDateStr("20" + oneD.getTime(),
 										"yyyyMMddhhmmss"));
 						// 写入位置表
+						oneLogs.setEqpName(_oldData.getString("eqpid"));
 						oneEqpGeo.setEqpInst(eqpBI
 								.getOneEquipmentInstByToken(_oldData
 										.getString("eqpid")));
@@ -723,6 +848,7 @@ public class BIKuluMQAdapter {
 							oneEqpGeo.setSysDate(this.bsDate.getThisDate(0, 0));
 						}
 						if (oneEqpGeo.getEqpInst() != null) {
+							oneLogs.setEqpName(oneEqpGeo.getEqpInst().getName());
 							// oneEqpGeo.getEqpInst().getEqpDef().setId("WATCH_01");
 							// Calendar calendar = Calendar.getInstance();
 							// calendar.setTimeInMillis(Long.valueOf(oneD
@@ -771,7 +897,9 @@ public class BIKuluMQAdapter {
 										bodyData.put("bdlat", "");
 										bodyData.put("bdlon", "");
 									}
-									bodyData.put("oil", oneD.getOilLevel());
+									bodyData.put("oil", URLlImplBase
+											.AllPrinceDiv(String.valueOf(oneD
+													.getThisOilV()), 1000));
 									bodyData.put("oildiff", oneD.getOilDeff());
 									bodyData.put("speed", oneD.getSpeed());
 									bodyData.put("fanceflg",
@@ -780,6 +908,22 @@ public class BIKuluMQAdapter {
 									BITTWebSocketSend webSend = new BITTWebSocketSend(
 											bodyData.toString(), "01");
 									webSend.run();
+									// 日志
+									oneLogs.setType(4);
+									oneLogs.setName("云盒收到数据");
+									oneLogs.setContent("token："
+											+ oneEqpGeo.getEqpInst().getToken()
+											+ "；纬度：" + oneEqpGeo.getLatitude()
+											+ "；经度：" + oneEqpGeo.getLongitude()
+											+ "；速度：" + oneD.getSpeed()
+											+ "；油量水平：" + oneD.getOilLevel()
+											+ "");
+									oneLogs.setInMsg(_oldData.toString());
+									oneLogs.setOutMsg(_sendMQ.toString());
+									oneLogs.setCreateDate(oneEqpGeo
+											.getSysDate());
+									mlbi.setLogs(oneLogs);
+									mlbi.start();
 								}
 							}
 						} else {

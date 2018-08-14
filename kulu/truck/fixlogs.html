@@ -179,7 +179,7 @@
                                name="t_fluser_v"/>
                         <input class="input" autocomplete="off" type="text" id="t_fluser"
                                name="t_fluser"
-                               placeholder="输入操作用户"/>
+                               placeholder="输入操作用户" data-validate="required:必填"/>
                     </div>
                 </div>
                 <div class="form-group">
@@ -187,7 +187,7 @@
                         <strong>*维护类别</strong>
                     </div>
                     <div class="field">
-                        <select id="s_fltype" name="s_fltype" class="input"></select>
+                        <select id="s_fltype" name="s_fltype" class="input" data-validate="required:必填"></select>
                     </div>
                 </div>
                 <div class="form-group">
@@ -211,7 +211,7 @@
                                 <input id="f_flfimg" name="f_flfimg"
                                        type="file" multiple="multiple"
                                        onchange="previewAllImage(this,'i_flimgf');"
-                                       accept="*.png,*.jpg"/>
+                                       accept="image/gif,image/jpeg,image/jpg,image/png"/>
                             </a>
                         </div>
                         <div id="i_flimgf">

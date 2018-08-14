@@ -27,6 +27,7 @@ public class TruckWorkDayLogsPojo {
 	private String bjDate = "";
 	private int type = 0;
 	private String oil = "0";
+	private String oilV = "0";
 	private String distance = "0";// 路程
 	private String workSDate = "";
 	private String workEDate = "";
@@ -137,6 +138,14 @@ public class TruckWorkDayLogsPojo {
 
 	public void setWorkTime(String workTime) {
 		this.workTime = workTime;
+	}
+
+	public String getOilV() {
+		return oilV;
+	}
+
+	public void setOilV(String oilV) {
+		this.oilV = oilV;
 	}
 
 }

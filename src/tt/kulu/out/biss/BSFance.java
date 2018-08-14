@@ -224,7 +224,7 @@ public class BSFance {
 	 */
 	public BSObject do_deleteFance(BSObject m_bs) throws Exception {
 		JSONObject fretObj = new JSONObject();
-		String fid = m_bs.getPrivateMap().get("fanceid");
+		String fid = m_bs.getPrivateMap().get("pg_id");
 		BIFance fanceBI = new BIFance(m_bs);
 		if (fanceBI.deleteFanceById(fid) > 0) {
 			fretObj.put("r", 0);

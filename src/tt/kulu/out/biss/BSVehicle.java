@@ -6,9 +6,13 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import tt.kulu.bi.base.URLlImplBase;
 import tt.kulu.bi.dic.pojo.DicItemPojo;
+import tt.kulu.bi.logs.biclass.SysLogsBIMang;
+import tt.kulu.bi.logs.pojo.SysLogsPojo;
 import tt.kulu.bi.storage.pojo.EquipmentInstPojo;
 import tt.kulu.bi.truck.pojo.TruckWorkParasPojo;
 import tt.kulu.out.call.BIDic;
+import tt.kulu.out.call.BIEquipment;
+import tt.kulu.out.call.BILogin;
 import tt.kulu.out.call.BITruck;
 import tt.kulu.out.call.BIWatch;
 
@@ -108,7 +112,18 @@ public class BSVehicle {
 				oneObj.put("usermphone", onePojo.getWorkUser().getmPhone());
 			}
 
-			oneObj.put("oil", onePojo.getOil());
+			if (onePojo.getThisOilV().equals("")) {
+				oneObj.put(
+						"oil",
+						(!onePojo.getOil().equals("") ? URLlImplBase
+								.AllPrinceDiv(onePojo.getOil(), 100) : "0")
+								+ "毫米");
+			} else {
+				oneObj.put(
+						"oil",
+						(URLlImplBase.AllPrinceDiv(onePojo.getThisOilV(), 1000))
+								+ "升");
+			}
 			oneObj.put("oildiff", onePojo.getOilDiff());
 			oneObj.put(
 					"speed",
@@ -180,6 +195,9 @@ public class BSVehicle {
 	public BSObject do_updateVehicleParas(BSObject m_bs) throws Exception {
 		JSONObject retJSON = new JSONObject();
 		String dicid = m_bs.getPrivateMap().get("t_dicid");
+		SysLogsPojo oneLogs = new SysLogsPojo();
+		oneLogs.setCreateUser(BILogin.getLoginUser(m_bs));
+		oneLogs.setName("编辑云盒配置参数");
 		// 调用BI
 		BIDic dicBI = new BIDic(null, m_bs);
 		// 返回数据
@@ -244,6 +262,11 @@ public class BSVehicle {
 			dicBI.updateDicItem(oneItem);
 		}
 		retJSON.put("r", 0);
+		// 写日志
+		oneLogs.setType(1);
+		oneLogs.setContent("操作:" + oneLogs.getName());
+		SysLogsBIMang slbi = new SysLogsBIMang(oneLogs, m_bs);
+		slbi.start();
 		retJSON.put("error", URLlImplBase.ErrorMap.get(retJSON.getInt("r")));
 		m_bs.setRetrunObj(retJSON);
 		return m_bs;
@@ -269,22 +292,40 @@ public class BSVehicle {
 	public BSObject do_deleteOneVehicle(BSObject m_bs) throws Exception {
 		JSONObject retObj = new JSONObject();
 		retObj.put("r", 0);
+		SysLogsPojo oneLogs = new SysLogsPojo();
+		oneLogs.setCreateUser(BILogin.getLoginUser(m_bs));
 		String instid = m_bs.getPrivateMap().get("pg_inst");
 		String type = m_bs.getPrivateMap().get("pg_type");
 		int count = 0;
 		BITruck truckBI = new BITruck(null, m_bs);
-		if (type.equals("delete")) {
-			// 物理删除
-			count = truckBI.deleteOneVehicle(instid);
-		} else if (type.equals("state")) {
-			// 逻辑删除
-			count = truckBI.updateOneVehicleState(instid, 4);
-		} else if (type.equals("reset")) {
-			// 还原
-			count = truckBI.updateOneVehicleState(instid, 0);
-		}
-		if (count > 0) {
-			retObj.put("r", 0);
+		BIEquipment eqpBI = new BIEquipment(null, m_bs);
+		EquipmentInstPojo oneEqp = eqpBI.getOneEquipmentInstById(instid);
+		if (oneEqp != null) {
+			if (type.equals("delete")) {
+				// 物理删除
+				count = truckBI.deleteOneVehicle(instid);
+				oneLogs.setName("删除云盒");
+			} else if (type.equals("state")) {
+				// 逻辑删除
+				count = truckBI.updateOneVehicleState(instid, 4);
+				oneLogs.setName("设置云盒无效");
+			} else if (type.equals("reset")) {
+				// 还原
+				count = truckBI.updateOneVehicleState(instid, 0);
+				oneLogs.setName("还原无效云盒");
+			}
+			if (count > 0) {
+				retObj.put("r", 0);
+				// 写日志
+				oneLogs.setType(1);
+				oneLogs.setContent("操作:" + oneLogs.getName() + "；影响云环："
+						+ oneEqp.getName() + "；Token:" + oneEqp.getToken()
+						+ "；唯一标识:" + oneEqp.getWyCode() + "；物联网号码:"
+						+ oneEqp.getPhone() + "；ICCID号:" + oneEqp.getPara1()
+						+ "；关联用户:" + oneEqp.getMangUser().getName());
+				SysLogsBIMang slbi = new SysLogsBIMang(oneLogs, m_bs);
+				slbi.start();
+			}
 		}
 		retObj.put("error", URLlImplBase.ErrorMap.get(retObj.getInt("r")));
 		m_bs.setRetrunObj(retObj);
@@ -311,10 +352,23 @@ public class BSVehicle {
 	public BSObject do_updateAllVehicle(BSObject m_bs) throws Exception {
 		JSONObject retObj = new JSONObject();
 		retObj.put("r", 0);
+		SysLogsPojo oneLogs = new SysLogsPojo();
+		oneLogs.setCreateUser(BILogin.getLoginUser(m_bs));
 		String state = m_bs.getPrivateMap().get("pg_allstate");
 		BITruck truckBI = new BITruck(null, m_bs);
 		if (truckBI.updateAllVehicle(Integer.parseInt(state)) > 0) {
 			retObj.put("r", 0);
+			if (Integer.parseInt(state) == 0) {
+				oneLogs.setName("批量还原无效云盒");
+			} else if (Integer.parseInt(state) > 0) {
+				oneLogs.setName("批量设置云盒无效");
+			} else {
+				oneLogs.setName("批量删除云盒");
+			}
+			oneLogs.setType(1);
+			oneLogs.setContent("操作:" + oneLogs.getName());
+			SysLogsBIMang slbi = new SysLogsBIMang(oneLogs, m_bs);
+			slbi.start();
 		}
 		retObj.put("error", URLlImplBase.ErrorMap.get(retObj.getInt("r")));
 		m_bs.setRetrunObj(retObj);

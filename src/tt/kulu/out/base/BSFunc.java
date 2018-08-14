@@ -4,6 +4,9 @@ import java.util.ArrayList;
 
 import tt.kulu.bi.base.URLlImplBase;
 import tt.kulu.bi.function.pojo.MenuPojo;
+import tt.kulu.bi.logs.biclass.SysLogsBIMang;
+import tt.kulu.bi.logs.pojo.SysLogsPojo;
+import tt.kulu.out.call.BILogin;
 import tt.kulu.out.call.BIMenu;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -123,6 +126,7 @@ public class BSFunc {
 			oneObj.put("pId", oneMenu.getPmenuId());
 			oneObj.put("cnum", oneMenu.getChlMenuNum());
 			oneObj.put("url", oneMenu.getToPage());
+			oneObj.put("topflagv", oneMenu.getTopFlag());
 			oneObj.put("topflag", MenuPojo.TOPFLAG_NAME[oneMenu.getTopFlag()]);
 			oneObj.put("seq", oneMenu.getSeq());
 			oneObj.put("count", oneMenu.getCount());
@@ -149,6 +153,7 @@ public class BSFunc {
 					oneSubObj.put("pId", oneSubMenu.getPmenuId());
 					oneSubObj.put("cnum", oneSubMenu.getChlMenuNum());
 					oneSubObj.put("url", oneSubMenu.getToPage());
+					oneSubObj.put("topflagv", oneMenu.getTopFlag());
 					oneSubObj.put("topflag",
 							MenuPojo.TOPFLAG_NAME[oneSubMenu.getTopFlag()]);
 					oneSubObj.put("seq", oneSubMenu.getSeq());
@@ -245,6 +250,46 @@ public class BSFunc {
 			funcObj.put("name", oneMenu.getMenuName());
 			funcObj.put("fclass", oneMenu.getMenuClass());
 			fretObj.put("data", funcObj);
+		}
+		fretObj.put("error", URLlImplBase.ErrorMap.get(fretObj.getInt("r")));
+		m_bs.setRetrunObj(fretObj);
+		return m_bs;
+	}
+
+	/**
+	 * <p>
+	 * 方法名：do_updateOneFunc
+	 * </p>
+	 * <p>
+	 * 方法描述：更新应用
+	 * </p>
+	 * <p>
+	 * 输入参数：BSObject m_bs：BS框架业务对象
+	 * </p>
+	 * <p>
+	 * 输出参数：BSObject：BS框架业务对象
+	 * </p>
+	 */
+	public BSObject do_deleteOneFunc(BSObject m_bs) throws Exception {
+		JSONObject fretObj = new JSONObject();
+		fretObj.put("r", 990);
+		String id = (String) m_bs.getPrivateMap().get("pg_funid");
+		BIMenu menuBI = new BIMenu(null, m_bs);
+		MenuPojo oneMenu = menuBI.getMenuById(id);
+		int count = 0;
+		if (oneMenu != null) {
+			count = menuBI.deleteMenu(id);
+		}
+		if (count >= 0) {
+			fretObj.put("r", 0);
+			SysLogsPojo oneLogs = new SysLogsPojo();
+			oneLogs.setCreateUser(BILogin.getLoginUser(m_bs));
+			oneLogs.setName("删除功能菜单");
+			oneLogs.setType(1);
+			oneLogs.setContent("操作:" + oneLogs.getName() + "；删除功能菜单："
+					+ oneMenu.getMenuName());
+			SysLogsBIMang slbi = new SysLogsBIMang(oneLogs, m_bs);
+			slbi.start();
 		}
 		fretObj.put("error", URLlImplBase.ErrorMap.get(fretObj.getInt("r")));
 		m_bs.setRetrunObj(fretObj);

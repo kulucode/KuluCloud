@@ -75,7 +75,7 @@ function showRoleBase(_data, _type) {
 
 //保存角色
 function commitRole() {
-    if (confirm("是否保存角色信息？")) {
+    if (checkForm("rolebase-form") && confirm("是否保存角色信息？")) {
         doRefresh("rolebase-form", "DCROLE", "updateRole", "&in_type="
             + editType, function (_data) {
             if (_data.r == 0) {

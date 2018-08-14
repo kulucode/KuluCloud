@@ -15,6 +15,8 @@ import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 import tt.kulu.bi.base.URLlImplBase;
 import tt.kulu.bi.company.pojo.CompanyPojo;
+import tt.kulu.bi.logs.biclass.SysLogsBIMang;
+import tt.kulu.bi.logs.pojo.SysLogsPojo;
 import tt.kulu.bi.power.pojo.RolePojo;
 import tt.kulu.bi.user.pojo.LoginUserPojo;
 import tt.kulu.bi.user.pojo.OrgPojo;
@@ -26,6 +28,7 @@ import tt.kulu.out.call.BIUser;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import com.alibaba.fastjson.JSON;
 import com.tt4j2ee.BSCommon;
 import com.tt4j2ee.Const;
 import com.tt4j2ee.m.BSObject;
@@ -367,6 +370,8 @@ public class BSUser {
 	 */
 	public BSObject do_updateOneOrg(BSObject m_bs) throws Exception {
 		LoginUserPojo user = BILogin.getLoginUser(m_bs);
+		SysLogsPojo oneLogs = new SysLogsPojo();
+		oneLogs.setCreateUser(user);
 		JSONObject fretObj = new JSONObject();
 		fretObj.put("r", 990);
 		String type = m_bs.getPrivateMap().get("in_type");
@@ -377,8 +382,10 @@ public class BSUser {
 			oneOrg.getCreateStaff().setInstId(user.getUserInst());
 			oneOrg.setCreateDate(m_bs.getDateEx().getThisDate(0, 0));
 			count = userBI.insertOrg(oneOrg);
+			oneLogs.setName("新增机构");
 		} else if (type.equals("edit")) {
 			count = userBI.updateOrg(oneOrg);
+			oneLogs.setName("更新机构");
 		}
 		if (count >= 0) {
 			fretObj.put("r", 0);
@@ -386,6 +393,14 @@ public class BSUser {
 			funcObj.put("id", oneOrg.getId());
 			funcObj.put("name", oneOrg.getName());
 			fretObj.put("data", funcObj);
+
+			// 写日志
+			oneLogs.setType(1);
+			oneLogs.setContent("操作:" + oneLogs.getName() + "；影响机构："
+					+ oneOrg.getAllName().replaceAll(",", "-"));
+
+			SysLogsBIMang slbi = new SysLogsBIMang(oneLogs, m_bs);
+			slbi.start();
 		}
 		fretObj.put("error", URLlImplBase.ErrorMap.get(fretObj.getInt("r")));
 		m_bs.setRetrunObj(fretObj);
@@ -409,10 +424,23 @@ public class BSUser {
 	public BSObject do_delOneOrg(BSObject m_bs) throws Exception {
 		JSONObject fretObj = new JSONObject();
 		fretObj.put("r", 990);
+		SysLogsPojo oneLogs = new SysLogsPojo();
+		oneLogs.setCreateUser(BILogin.getLoginUser(m_bs));
 		BIUser userBI = new BIUser(null, m_bs);
-		int count = userBI.deleteOneOrg(m_bs.getPrivateMap().get("orgid"));
-		if (count >= 0) {
-			fretObj.put("r", 0);
+		OrgPojo onePojo = userBI.getOneOrgById(m_bs.getPrivateMap()
+				.get("orgid"));
+		if (onePojo != null) {
+			int count = userBI.deleteOneOrg(onePojo.getId());
+			if (count >= 0) {
+				fretObj.put("r", 0);
+				// 写日志
+				oneLogs.setName("删除机构");
+				oneLogs.setType(1);
+				oneLogs.setContent("操作:" + oneLogs.getName() + "；删除机构："
+						+ onePojo.getAllName().replaceAll(",", "-"));
+				SysLogsBIMang slbi = new SysLogsBIMang(oneLogs, m_bs);
+				slbi.start();
+			}
 		}
 		fretObj.put("error", URLlImplBase.ErrorMap.get(fretObj.getInt("r")));
 		m_bs.setRetrunObj(fretObj);
@@ -443,6 +471,8 @@ public class BSUser {
 		JSONObject paras = new JSONObject();
 		String sText = m_bs.getPrivateMap().get("pg_text");
 		paras.put("key", sText);
+		paras.put("state", 1);
+		paras.put("normal", 1);
 		ArrayList<UserPojo> list = userBI.getUserList(paras, 0, 20);
 		for (UserPojo oneUser : list) {
 			JSONObject oneObj = new JSONObject();
@@ -493,7 +523,7 @@ public class BSUser {
 		String havePhone = m_bs.getPrivateMap().get("pg_hasphone");
 		String notTruck = m_bs.getPrivateMap().get("pg_nottruck");
 		paras.put("key", sText);
-
+		paras.put("normal", "1");
 		if (role != null) {
 			paras.put("role", role.replaceAll(",", "','"));
 		}
@@ -748,6 +778,8 @@ public class BSUser {
 	public BSObject do_updateUser(BSObject m_bs) throws Exception {
 		JSONObject fretObj = new JSONObject();
 		fretObj.put("r", 990);
+		SysLogsPojo oneLogs = new SysLogsPojo();
+		oneLogs.setCreateUser(BILogin.getLoginUser(m_bs));
 		String type = m_bs.getPrivateMap().get("in_type");
 
 		UserPojo oneUser = this._getUserFromWeb(m_bs);
@@ -757,13 +789,21 @@ public class BSUser {
 			oneUser.setPassword("000000");
 			oneUser.getRoleList().add(new RolePojo("BASE_ROLE", "", ""));
 			count = userBI.insertUser(oneUser);
+			oneLogs.setName("新增用户");
 		} else if ("edit".equals(type)) {
 			oneUser.setInstId(m_bs.getPrivateMap().get("t_instid"));
 			count = userBI.updateUser(oneUser);
+			oneLogs.setName("更新用户");
 		}
 		if (count > 0) {
 			fretObj.put("r", 0);
 			fretObj.put("instid", oneUser.getInstId());
+			// 写日志
+			oneLogs.setType(1);
+			oneLogs.setContent("操作:" + oneLogs.getName() + "；影响用户："
+					+ oneUser.getName() + "[" + oneUser.getId() + "]");
+			SysLogsBIMang slbi = new SysLogsBIMang(oneLogs, m_bs);
+			slbi.start();
 		}
 		fretObj.put("error", URLlImplBase.ErrorMap.get(fretObj.getInt("r")));
 		m_bs.setRetrunObj(fretObj);
@@ -772,7 +812,7 @@ public class BSUser {
 
 	/**
 	 * <p>
-	 * 方法名：do_getOneUser
+	 * 方法名：do_deleteOneUser
 	 * </p>
 	 * <p>
 	 * 方法描述：得到一个用户初始化信息
@@ -790,22 +830,43 @@ public class BSUser {
 	public BSObject do_deleteOneUser(BSObject m_bs) throws Exception {
 		JSONObject retObj = new JSONObject();
 		retObj.put("r", 0);
+		SysLogsPojo oneLogs = new SysLogsPojo();
+		oneLogs.setCreateUser(BILogin.getLoginUser(m_bs));
 		String instid = m_bs.getPrivateMap().get("pg_inst");
 		String type = m_bs.getPrivateMap().get("pg_type");
 		int count = 0;
 		BIUser userBI = new BIUser(null, m_bs);
-		if (type.equals("delete")) {
-			// 物理删除
-			// count = userBI.deleteOneUser(instid);
-		} else if (type.equals("state")) {
-			// 逻辑删除
-			count = userBI.updateOneUserState(instid, 0);
-		} else if (type.equals("reset")) {
-			// 还原
-			count = userBI.updateOneUserState(instid, 1);
-		}
-		if (count > 0) {
-			retObj.put("r", 0);
+		UserPojo oneUser = userBI.getOneUser(instid);
+		if (oneUser != null) {
+			if (type.equals("delete")) {
+				// 物理删除
+				oneLogs.setName("删除无效用户");
+				count = userBI.deleteOneUser(instid);
+			} else if (type.equals("state")) {
+				// 逻辑删除
+				oneLogs.setName("设置用户无效");
+				count = userBI.updateOneUserState(instid, 0);
+			} else if (type.equals("reset")) {
+				// 还原
+				oneLogs.setName("无效用户还原");
+				count = userBI.updateOneUserState(instid, 1);
+			}
+			if (count > 0) {
+				retObj.put("r", 0);
+				// 写日志
+				oneLogs.setType(1);
+				oneLogs.setContent("操作:"
+						+ oneLogs.getName()
+						+ "；影响用户："
+						+ oneUser.getName()
+						+ "["
+						+ oneUser.getId()
+						+ "]；设置为"
+						+ (type.equals("state") ? UserPojo.STATE_NAME[0]
+								: UserPojo.STATE_NAME[1]));
+				SysLogsBIMang slbi = new SysLogsBIMang(oneLogs, m_bs);
+				slbi.start();
+			}
 		}
 		retObj.put("error", URLlImplBase.ErrorMap.get(retObj.getInt("r")));
 		m_bs.setRetrunObj(retObj);
@@ -866,8 +927,20 @@ public class BSUser {
 		String new_userkey = m_bs.getPrivateMap().get("t_userkey");
 		// 判断旧密码是否一致
 		BIUser userBI = new BIUser(null, m_bs);
-		userBI.updateUserKey(user, MD5Imp.enCode(new_userkey));
-		fretObj.put("r", 0);
+		UserPojo oneUser = userBI.getOneUser(user);
+		if (oneUser != null) {
+			userBI.updateUserKey(user, MD5Imp.enCode(new_userkey));
+			fretObj.put("r", 0);
+			// 写日志
+			SysLogsPojo oneLogs = new SysLogsPojo();
+			oneLogs.setCreateUser(BILogin.getLoginUser(m_bs));
+			oneLogs.setName("修改用户密码");
+			oneLogs.setType(1);
+			oneLogs.setContent("操作:" + oneLogs.getName() + "；影响用户："
+					+ oneUser.getName() + "[" + oneUser.getId() + "]");
+			SysLogsBIMang slbi = new SysLogsBIMang(oneLogs, m_bs);
+			slbi.start();
+		}
 		fretObj.put("error", URLlImplBase.ErrorMap.get(fretObj.getInt("r")));
 		m_bs.setRetrunObj(fretObj);
 		return m_bs;

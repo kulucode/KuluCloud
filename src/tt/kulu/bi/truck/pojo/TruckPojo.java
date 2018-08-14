@@ -1,5 +1,6 @@
 package tt.kulu.bi.truck.pojo;
 
+import net.sf.json.JSONObject;
 import tt.kulu.bi.area.pojo.AreaPojo;
 import tt.kulu.bi.user.pojo.OrgPojo;
 import tt.kulu.bi.user.pojo.UserPojo;
@@ -44,6 +45,7 @@ public class TruckPojo {
 	//
 	private String upNo = "";
 	private String upDate = "";
+	private JSONObject oilDef = new JSONObject();
 
 	private AreaPojo area = new AreaPojo();// 行政区域
 
@@ -199,6 +201,14 @@ public class TruckPojo {
 
 	public void setVideoNum(int videoNum) {
 		this.videoNum = videoNum;
+	}
+
+	public JSONObject getOilDef() {
+		return oilDef;
+	}
+
+	public void setOilDef(JSONObject oilDef) {
+		this.oilDef = oilDef;
 	}
 
 }

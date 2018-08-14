@@ -271,6 +271,39 @@ public class BSMenuDBMang extends BSDBBase {
 
 	/**
 	 * <p>
+	 * 方法名称: updateMenu
+	 * </p>
+	 * <p>
+	 * 方法功能描述: 更新一个菜单。
+	 * </p>
+	 * <p>
+	 * 输入参数描述: String where：输入的查询条件。
+	 * </p>
+	 * <p>
+	 * 输出参数描述: boolean
+	 * </p>
+	 * 
+	 * @throws Exception
+	 */
+	public int deleteMenu(String menuId) throws Exception {
+		int count = 0;
+		List<Object> vList = new ArrayList<Object>();
+		vList.add(menuId);
+		count = sqlHelper.updateBySql(
+				"delete from T_ROLE_MENU_R where MENU_ID=?", vList);
+		//
+		vList.add(menuId);
+		count += sqlHelper.updateBySql(
+				"delete from T_MENU_R where MENU_ID=? OR P_MENU_ID=?", vList);
+		//
+		vList.remove(0);
+		count += sqlHelper.updateBySql("delete from T_MENU where MENU_ID=?",
+				vList);
+		return count;
+	}
+
+	/**
+	 * <p>
 	 * 方法名称: deleteTopMenu
 	 * </p>
 	 * <p>

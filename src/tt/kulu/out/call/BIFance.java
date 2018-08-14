@@ -735,7 +735,7 @@ public class BIFance extends BSDBBase {
 
 	/**
 	 * <p>
-	 * 方法名称: deleteFanceById
+	 * 方法名称: doCheckPoineInFanceByTruck
 	 * </p>
 	 * <p>
 	 * 方法功能描述: 新增单个车辆定义数据。
@@ -805,6 +805,7 @@ public class BIFance extends BSDBBase {
 					+ oneEqpGeo.getSysDate().substring(0, 10));
 			oneUWDL.setOpType(0);
 			oneUWDL.setOil(String.valueOf(onePojo.getOilDeff()));
+			oneUWDL.setOilV(String.valueOf(onePojo.getValume()));
 			oneUWDL.setDistance(eqpDB.getGeometryLastDisdance(oneEqpGeo, 1));
 			if (!oneEqpGeo.getEqpInst().getTruck().getId().equals("")) {
 				// 判断是否在围栏内
@@ -876,6 +877,7 @@ public class BIFance extends BSDBBase {
 			oneStats.setEndDate(oneEqpGeo.getSysDate());
 			oneStats.setOil(oneUWDL.getOil());
 			oneStats.setOilDiff(String.valueOf(onePojo.getOilDeff()));
+			oneStats.setOilDiffV(oneUWDL.getOilV());
 			oneStats.setDistance(oneUWDL.getDistance());
 			count += truckBI.updateTruckWorkStatsData(sqlHelper, oneStats);
 			// 写入日工作日志

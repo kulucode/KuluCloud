@@ -17,9 +17,10 @@ public class PacketLocationReport {
 	public JSONObject extraMsgList = new JSONObject();// 位置附加信息项列表
 	public float oilLevel = 0;// 单位mm
 	public float oilDeff = 0;//
+	public double thisOilV = 0;// 当前容积
 	public int isAccOn;// AccOn表示车在工作
 	public boolean validPacket;//
-	private float valume = 0;
+	private double valume = 0;// 容积差
 
 	public int getAlertFlag() {
 		return alertFlag;
@@ -133,12 +134,20 @@ public class PacketLocationReport {
 		this.oilDeff = oilDeff;
 	}
 
-	public float getValume() {
+	public double getValume() {
 		return valume;
 	}
 
-	public void setValume(float valume) {
+	public void setValume(double valume) {
 		this.valume = valume;
+	}
+
+	public double getThisOilV() {
+		return thisOilV;
+	}
+
+	public void setThisOilV(double thisOilV) {
+		this.thisOilV = thisOilV;
 	}
 
 }

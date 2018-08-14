@@ -333,8 +333,7 @@ function addTruckPoint(_data) {
     }
 
     var _desc = "<div><strong>车辆：" + _oneD.truckname + "[" + (_oneD.fanceflg == 1 ? "在围栏内" : "在围栏外") + "]</strong></div>";
-    _desc += "<div><strong>油箱液面高度：" + _oneD.oil + "mm</strong></div>";
-    _desc += "<div><strong>油量高度消耗：" + _oneD.oildiff + "mm</strong></div>";
+    _desc += "<div><strong>当前油量：" + _oneD.oil + "</strong></div>";
     _desc += "<div><strong>车速：" + _oneD.speed + "km/h</strong></div>";
     _desc += "<div><strong>经度：" + _oneD.lon + "</strong></div>";
     _desc += "<div><strong>纬度：" + _oneD.lat + "</strong></div>";

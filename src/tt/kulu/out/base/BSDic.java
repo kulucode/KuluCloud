@@ -3,7 +3,10 @@ package tt.kulu.out.base;
 import tt.kulu.bi.base.URLlImplBase;
 import tt.kulu.bi.dic.pojo.DicItemPojo;
 import tt.kulu.bi.dic.pojo.DicPojo;
+import tt.kulu.bi.logs.biclass.SysLogsBIMang;
+import tt.kulu.bi.logs.pojo.SysLogsPojo;
 import tt.kulu.out.call.BIDic;
+import tt.kulu.out.call.BILogin;
 import net.sf.json.JSONObject;
 
 import com.tt4j2ee.BSGuid;
@@ -108,6 +111,8 @@ public class BSDic {
 	 */
 	public BSObject do_updateDic(BSObject m_bs) throws Exception {
 		String type = (String) m_bs.getPrivateMap().get("in_type");
+		SysLogsPojo oneLogs = new SysLogsPojo();
+		oneLogs.setCreateUser(BILogin.getLoginUser(m_bs));
 		DicPojo onePojo = new DicPojo();
 		onePojo.setId((String) m_bs.getPrivateMap().get("t_dicid"));
 		onePojo.setName((String) m_bs.getPrivateMap().get("t_dicname"));
@@ -117,13 +122,22 @@ public class BSDic {
 		int count = 0;
 		if (type.equals("new")) {
 			count = dicBI.insertDic(onePojo);
+			oneLogs.setName("新增数据字典");
 		} else if (type.equals("edit")) {
 			count = dicBI.updateDic(onePojo);
+			oneLogs.setName("编辑数据字典");
 		}
 		JSONObject fretObj = new JSONObject();
 		fretObj.put("id", onePojo.getId());
 		if (count > 0) {
 			fretObj.put("r", 0);
+			// 写日志
+			oneLogs.setType(1);
+			oneLogs.setContent("操作:" + oneLogs.getName() + "；影响数据字典："
+					+ onePojo.getName() + "[" + onePojo.getId() + "]");
+
+			SysLogsBIMang slbi = new SysLogsBIMang(oneLogs, m_bs);
+			slbi.start();
 		} else {
 			fretObj.put("r", 990);
 		}
@@ -222,6 +236,8 @@ public class BSDic {
 	 */
 	public BSObject do_updateDicItem(BSObject m_bs) throws Exception {
 		String type = (String) m_bs.getPrivateMap().get("in_type");
+		SysLogsPojo oneLogs = new SysLogsPojo();
+		oneLogs.setCreateUser(BILogin.getLoginUser(m_bs));
 		DicItemPojo onePojo = new DicItemPojo();
 		onePojo.getDic().setId((String) m_bs.getPrivateMap().get("t_dicid"));
 		onePojo.setId((String) m_bs.getPrivateMap().get("t_dicitemid"));
@@ -235,13 +251,23 @@ public class BSDic {
 		int count = 0;
 		if (type.equals("new")) {
 			count = dicBI.insertDicItem(onePojo);
+			oneLogs.setName("新增数据字典项目");
 		} else if (type.equals("edit")) {
 			count = dicBI.updateDicItem(onePojo);
+			oneLogs.setName("编辑数据字典项目");
 		}
 		JSONObject fretObj = new JSONObject();
 		fretObj.put("id", onePojo.getId());
 		if (count > 0) {
 			fretObj.put("r", 0);
+			// 写日志
+			oneLogs.setType(1);
+			oneLogs.setContent("操作:" + oneLogs.getName() + "；影响数据字典项目："
+					+ onePojo.getName() + "[" + onePojo.getDic().getId() + ","
+					+ onePojo.getId() + "]");
+
+			SysLogsBIMang slbi = new SysLogsBIMang(oneLogs, m_bs);
+			slbi.start();
 		} else {
 			fretObj.put("r", 990);
 		}

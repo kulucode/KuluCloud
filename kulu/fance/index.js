@@ -174,6 +174,19 @@ function commitFance() {
 
 }
 
+function deleteFance(_id) {
+    if (confirm("是否删除该围栏？")) {
+        doRefresh("", "FANCE", "deleteFance", "&pg_id="
+            + _id, function (_data) {
+            if (_data.r == 0) {
+                searchFance();
+            } else {
+                alert(_data.error);
+            }
+        });
+    }
+}
+
 function mapIni(_points, _center) {
     $("#container").html("");
     $("#container").height($("#fance-dlg-body").height());

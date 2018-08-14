@@ -61,7 +61,7 @@ public class BIUser extends BSDBBase {
 
 	/**
 	 * <p>
-	 * 方法名称: getEqpDefByRedis
+	 * 方法名称: getGroupByRedis
 	 * </p>
 	 * <p>
 	 * 方法功能描述: 从redis得到车辆类型
@@ -122,15 +122,14 @@ public class BIUser extends BSDBBase {
 		OrgPojo onePojo = this.getOneOrgById(orgId);
 		BIRedis redisBI = new BIRedis();
 		if (onePojo != null) {
-			redisBI.setStringData("KGROUP_" + orgId,
-					JSONObject.fromObject(onePojo).toString(),
+			redisBI.setMapData("KGROUP_MAP", orgId, JSON.toJSONString(onePojo),
 					URLlImplBase.REDIS_KULUDATA);
 		}
 	}
 
 	/**
 	 * <p>
-	 * 方法名称: setGroupToRedis
+	 * 方法名称: deleteGroupToRedis
 	 * </p>
 	 * <p>
 	 * 方法功能描述: 从redis得到车辆类型
@@ -149,7 +148,7 @@ public class BIUser extends BSDBBase {
 	 */
 	public void deleteGroupToRedis(String orgId) throws Exception {
 		BIRedis redisBI = new BIRedis();
-		redisBI.delData("KGROUP_" + orgId, URLlImplBase.REDIS_KULUDATA);
+		redisBI.delMapData("KGROUP_MAP", orgId, URLlImplBase.REDIS_KULUDATA);
 	}
 
 	/**
@@ -831,6 +830,11 @@ public class BIUser extends BSDBBase {
 						// 状态
 						where += " and t.USER_STATE=?";
 						vList.add(Integer.parseInt(v));
+					}
+
+					if (key.equals("normal")) {
+						// 状态
+						where += " and t.USER_INSTID not in ('UNKNOWN_USER','SUPER_ADMIN')";
 					}
 
 					if (key.equals("areaid")) {

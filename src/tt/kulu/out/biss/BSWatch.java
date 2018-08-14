@@ -7,10 +7,13 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import tt.kulu.bi.base.URLlImplBase;
 import tt.kulu.bi.dic.pojo.DicItemPojo;
+import tt.kulu.bi.logs.biclass.SysLogsBIMang;
+import tt.kulu.bi.logs.pojo.SysLogsPojo;
 import tt.kulu.bi.storage.pojo.EquipmentInstPojo;
 import tt.kulu.bi.user.pojo.LoginUserPojo;
 import tt.kulu.bi.user.pojo.UserWorkParasPojo;
 import tt.kulu.out.call.BIDic;
+import tt.kulu.out.call.BIEquipment;
 import tt.kulu.out.call.BILogin;
 import tt.kulu.out.call.BITruck;
 import tt.kulu.out.call.BIUser;
@@ -212,6 +215,9 @@ public class BSWatch {
 	public BSObject do_updateWatchParas(BSObject m_bs) throws Exception {
 		JSONObject retJSON = new JSONObject();
 		String dicid = m_bs.getPrivateMap().get("dicid");
+		SysLogsPojo oneLogs = new SysLogsPojo();
+		oneLogs.setName("编辑云环配置参数");
+		oneLogs.setCreateUser(BILogin.getLoginUser(m_bs));
 		// 调用BI
 		BIDic dicBI = new BIDic(null, m_bs);
 		// 返回数据
@@ -356,6 +362,11 @@ public class BSWatch {
 			oneItem.setValue2(m_bs.getPrivateMap().get("t_dicitem_10"));
 			dicBI.updateDicItem(oneItem);
 		}
+		// 写日志
+		oneLogs.setType(1);
+		oneLogs.setContent("操作:" + oneLogs.getName());
+		SysLogsBIMang slbi = new SysLogsBIMang(oneLogs, m_bs);
+		slbi.start();
 		retJSON.put("r", 0);
 		retJSON.put("error", URLlImplBase.ErrorMap.get(retJSON.getInt("r")));
 		m_bs.setRetrunObj(retJSON);
@@ -382,22 +393,40 @@ public class BSWatch {
 	public BSObject do_deleteOneWatch(BSObject m_bs) throws Exception {
 		JSONObject retObj = new JSONObject();
 		retObj.put("r", 0);
+		SysLogsPojo oneLogs = new SysLogsPojo();
+		oneLogs.setCreateUser(BILogin.getLoginUser(m_bs));
 		String instid = m_bs.getPrivateMap().get("pg_inst");
 		String type = m_bs.getPrivateMap().get("pg_type");
 		int count = 0;
 		BIWatch watchBI = new BIWatch(null, m_bs);
-		if (type.equals("delete")) {
-			// 物理删除
-			count = watchBI.deleteOneWatch(instid);
-		} else if (type.equals("state")) {
-			// 逻辑删除
-			count = watchBI.updateOneWatchState(instid, 4);
-		} else if (type.equals("reset")) {
-			// 还原
-			count = watchBI.updateOneWatchState(instid, 0);
-		}
-		if (count > 0) {
-			retObj.put("r", 0);
+		BIEquipment eqpBI = new BIEquipment(null, m_bs);
+		EquipmentInstPojo oneEqp = eqpBI.getOneEquipmentInstById(instid);
+		if (oneEqp != null) {
+			if (type.equals("delete")) {
+				// 物理删除
+				count = watchBI.deleteOneWatch(instid);
+				oneLogs.setName("删除云环");
+			} else if (type.equals("state")) {
+				// 逻辑删除
+				count = watchBI.updateOneWatchState(instid, 4);
+				oneLogs.setName("设置云环无效");
+			} else if (type.equals("reset")) {
+				// 还原
+				count = watchBI.updateOneWatchState(instid, 0);
+				oneLogs.setName("还原无效云环");
+			}
+			if (count > 0) {
+				retObj.put("r", 0);
+				// 写日志
+				oneLogs.setType(1);
+				oneLogs.setContent("操作:" + oneLogs.getName() + "；影响云环："
+						+ oneEqp.getName() + "；Token:" + oneEqp.getToken()
+						+ "；唯一标识:" + oneEqp.getWyCode() + "；物联网号码:"
+						+ oneEqp.getPhone() + "；关联用户:"
+						+ oneEqp.getMangUser().getName());
+				SysLogsBIMang slbi = new SysLogsBIMang(oneLogs, m_bs);
+				slbi.start();
+			}
 		}
 		retObj.put("error", URLlImplBase.ErrorMap.get(retObj.getInt("r")));
 		m_bs.setRetrunObj(retObj);
@@ -424,10 +453,23 @@ public class BSWatch {
 	public BSObject do_updateAllWatch(BSObject m_bs) throws Exception {
 		JSONObject retObj = new JSONObject();
 		retObj.put("r", 0);
+		SysLogsPojo oneLogs = new SysLogsPojo();
+		oneLogs.setCreateUser(BILogin.getLoginUser(m_bs));
 		String state = m_bs.getPrivateMap().get("pg_allstate");
 		BIWatch watchBI = new BIWatch(null, m_bs);
 		if (watchBI.updateAllWatch(Integer.parseInt(state)) > 0) {
 			retObj.put("r", 0);
+			if (Integer.parseInt(state) == 0) {
+				oneLogs.setName("批量还原无效云环");
+			} else if (Integer.parseInt(state) > 0) {
+				oneLogs.setName("批量设置云环无效");
+			} else {
+				oneLogs.setName("批量删除云环");
+			}
+			oneLogs.setType(1);
+			oneLogs.setContent("操作:" + oneLogs.getName());
+			SysLogsBIMang slbi = new SysLogsBIMang(oneLogs, m_bs);
+			slbi.start();
 		}
 		retObj.put("error", URLlImplBase.ErrorMap.get(retObj.getInt("r")));
 		m_bs.setRetrunObj(retObj);

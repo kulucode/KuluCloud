@@ -4,14 +4,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+
+import com.alibaba.fastjson.JSON;
 import com.tt4j2ee.BIRedis;
 
 import tt.kulu.bi.base.BSDBBase;
+import tt.kulu.bi.base.URLlImplBase;
 import tt.kulu.bi.power.dbclass.BSPowerDBMang;
 import tt.kulu.bi.power.pojo.RoleMenuPojo;
 import tt.kulu.bi.power.pojo.RolePojo;
 import tt.kulu.bi.power.pojo.RoleUserPojo;
 import tt.kulu.bi.user.dbclass.BSUserDBMang;
+import tt.kulu.bi.user.pojo.OrgPojo;
 import tt.kulu.bi.user.pojo.UserPojo;
 import net.sf.json.JSONObject;
 
@@ -39,6 +43,98 @@ import com.tt4j2ee.m.BSReturnPojo;
 public class BIPower extends BSDBBase {
 	public BIPower(SqlExecute sqlHelper, BSObject m_bs) throws Exception {
 		super(sqlHelper, m_bs);
+	}
+
+	/**
+	 * <p>
+	 * 方法名称: getGroupByRedis
+	 * </p>
+	 * <p>
+	 * 方法功能描述: 从redis得到车辆类型
+	 * </p>
+	 * <p>
+	 * 创建人: 梁浩
+	 * </p>
+	 * <p>
+	 * 输入参数描述: BSObject m_bs:BinaryStar框架参数集。
+	 * </p>
+	 * <p>
+	 * 输出参数描述: BSObject：BinaryStar框架参数集。
+	 * </p>
+	 * 
+	 * @throws Exception
+	 */
+	public RolePojo getRoleByRedis(String id) throws Exception {
+		RolePojo onePojo = new RolePojo();
+		BIRedis redisBI = new BIRedis();
+		String redisS = redisBI.getMapData("KROLE_MAP", id,
+				URLlImplBase.REDIS_KULUDATA);
+		if (redisS == null || redisS.trim().equals("")) {
+			// 从数据库的到
+			onePojo = this.getRoleById(id);
+			if (onePojo != null) {
+				redisBI.setMapData("KROLE_MAP", id, JSON.toJSONString(onePojo),
+						URLlImplBase.REDIS_KULUDATA);
+			}
+		} else {
+			onePojo = JSON.parseObject(redisS, RolePojo.class);
+		}
+		if (onePojo == null) {
+			onePojo = new RolePojo();
+		}
+		return onePojo;
+	}
+
+	/**
+	 * <p>
+	 * 方法名称: setGroupToRedis
+	 * </p>
+	 * <p>
+	 * 方法功能描述: 从redis得到车辆类型
+	 * </p>
+	 * <p>
+	 * 创建人: 梁浩
+	 * </p>
+	 * <p>
+	 * 输入参数描述: BSObject m_bs:BinaryStar框架参数集。
+	 * </p>
+	 * <p>
+	 * 输出参数描述: BSObject：BinaryStar框架参数集。
+	 * </p>
+	 * 
+	 * @throws Exception
+	 */
+	public void setRoleToRedis(String id) throws Exception {
+		RolePojo onePojo = this.getRoleById(id);
+		BIRedis redisBI = new BIRedis();
+		if (onePojo != null) {
+			redisBI.setMapData("KROLE_MAP", id, JSON.toJSONString(onePojo),
+					URLlImplBase.REDIS_KULUDATA);
+		}
+	}
+
+	/**
+	 * <p>
+	 * 方法名称: deleteRoleToRedis
+	 * </p>
+	 * <p>
+	 * 方法功能描述: 从redis得到车辆类型
+	 * </p>
+	 * <p>
+	 * 创建人: 梁浩
+	 * </p>
+	 * <p>
+	 * 输入参数描述: BSObject m_bs:BinaryStar框架参数集。
+	 * </p>
+	 * <p>
+	 * 输出参数描述: BSObject：BinaryStar框架参数集。
+	 * </p>
+	 * 
+	 * @throws Exception
+	 */
+	public void deleteRoleToRedis(String id) throws Exception {
+		BIRedis redisBI = new BIRedis();
+		redisBI.delMapData("KROLE_MAP", id, URLlImplBase.REDIS_KULUDATA);
 	}
 
 	/**
@@ -112,7 +208,7 @@ public class BIPower extends BSDBBase {
 				}
 				if (key.equals("key")) {
 					// 关键字
-					where += " and t.ROLE_ID=? and (t.ROLE_NAME like ? or t.ROLE_DESC like ?)";
+					where += " and (t.ROLE_ID=? OR t.ROLE_NAME like ? or t.ROLE_DESC like ?)";
 					vList.add(v);
 					vList.add("%" + v + "%");
 					vList.add("%" + v + "%");

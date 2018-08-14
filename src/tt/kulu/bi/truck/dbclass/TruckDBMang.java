@@ -32,6 +32,7 @@ import tt.kulu.out.call.BITruck;
 import tt.kulu.out.call.BIUser;
 import tt.kulu.out.call.BIWatch;
 
+import com.alibaba.fastjson.JSON;
 import com.tt4j2ee.BSGuid;
 import com.tt4j2ee.db.SqlExecute;
 import com.tt4j2ee.m.BSObject;
@@ -63,6 +64,36 @@ public class TruckDBMang extends BSDBBase {
 		this.truckBI = new BITruck(sqlHelper, m_bs);
 		this.areaBI = new BIArea(sqlHelper, m_bs);
 		this.userBI = new BIUser(m_bs);
+	}
+
+	/**
+	 * <p>
+	 * 方法名称: getNewToken
+	 * </p>
+	 * <p>
+	 * 方法功能描述: 得到8位token。
+	 * </p>
+	 * <p>
+	 * 输入参数描述:
+	 * </p>
+	 * <p>
+	 * 输出参数描述:
+	 * </p>
+	 * 
+	 * @throws Exception
+	 */
+	public String getNewToken() throws Exception {
+		// 20180817+000000
+		String token = (this.bsDate.getThisDate(0, 0).substring(0, 10))
+				.replaceAll("-", "");
+		ResultSet rs = this.sqlHelper
+				.queryBySql("SELECT nextval('kulu_eqp_token_seq') as SEQ_ID");
+		if (rs != null && rs.next()) {
+			token += String.format("%08d",
+					Integer.parseInt(rs.getString("SEQ_ID")));
+			rs.close();
+		}
+		return token;
 	}
 
 	/**
@@ -401,7 +432,8 @@ public class TruckDBMang extends BSDBBase {
 		strSQL.append(",TRUCK_INNAME");
 		strSQL.append(",TRUCK_UNO");
 		strSQL.append(",TRUCK_UDATE");
-		strSQL.append(") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+		strSQL.append(",TRUCK_OILDEF");
+		strSQL.append(") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
 		List<Object> vList = new ArrayList<Object>();
 		vList.add(onePojo.getId());
 		vList.add(onePojo.getName());
@@ -434,6 +466,7 @@ public class TruckDBMang extends BSDBBase {
 		} else {
 			vList.add(null);
 		}
+		vList.add(onePojo.getOilDef().toString());
 
 		count += this.sqlHelper.updateBySql(strSQL.toString(), vList);//
 		// 新增统计表
@@ -487,6 +520,7 @@ public class TruckDBMang extends BSDBBase {
 			strSQL.append(",TRUCK_INNAME=?");
 			strSQL.append(",TRUCK_UNO=?");
 			strSQL.append(",TRUCK_UDATE=?");
+			strSQL.append(",TRUCK_OILDEF=?");
 			strSQL.append(" where TRUCK_ID=?");
 			vList.clear();
 			vList.add(onePojo.getName());
@@ -519,6 +553,7 @@ public class TruckDBMang extends BSDBBase {
 			} else {
 				vList.add(null);
 			}
+			vList.add(onePojo.getOilDef().toString());
 			vList.add(onePojo.getId());
 			count = this.sqlHelper.updateBySql(strSQL.toString(), vList);
 		}
@@ -671,7 +706,7 @@ public class TruckDBMang extends BSDBBase {
 	public int insertVehicleData(PacketLocationReport onePojo,
 			EquipmentGeometryPojo oneEqpGeo) throws Exception {
 		int count = 0;
-		DecimalFormat decimalFormat = new DecimalFormat("0.00");
+		// DecimalFormat decimalFormat = new DecimalFormat("0.00");
 		// 写入数据
 		StringBuffer strSQL = new StringBuffer("insert into T_VEHICLE_DATA (");
 		strSQL.append("LOG_ID");
@@ -681,8 +716,9 @@ public class TruckDBMang extends BSDBBase {
 		strSQL.append(",OIL_LEVEL");
 		strSQL.append(",EQP_SPEED");
 		strSQL.append(",OIL_DIFF");
+		strSQL.append(",OIL_THISVOLUME");
 		strSQL.append(",OIL_VALUME");
-		strSQL.append(") values (?,?,?,?,?,?,?,?)");
+		strSQL.append(") values (?,?,?,?,?,?,?,?,?)");
 		List<Object> vList = new ArrayList<Object>();
 		vList.add(BSGuid.getRandomGUID());
 		vList.add(oneEqpGeo.getEqpInst().getInstId());
@@ -691,7 +727,8 @@ public class TruckDBMang extends BSDBBase {
 		vList.add(String.valueOf(onePojo.getOilLevel()));
 		vList.add(String.valueOf(onePojo.getSpeed()));
 		vList.add(String.valueOf(onePojo.getOilDeff()));
-		vList.add(decimalFormat.format(onePojo.getValume()));
+		vList.add(String.valueOf(onePojo.getThisOilV()));// 当前油量
+		vList.add(String.valueOf(onePojo.getValume()));// 当前消耗容积
 		count += this.sqlHelper.updateBySql(strSQL.toString(), vList);
 		return count;
 	}
@@ -720,7 +757,7 @@ public class TruckDBMang extends BSDBBase {
 		TruckWorkDayLogsPojo onePojo = null;
 		List<Object> vList = new ArrayList<Object>();
 		vList.add(id);
-		CachedRowSet rs = this.sqlHelper.queryCachedBySql(this
+		ResultSet rs = this.sqlHelper.queryBySql(this
 				._getTruckWorkDayLogsSelectSQL(" and t.LOG_ID=?", "")
 				.toString(), vList);
 		if (rs != null && rs.next()) {
@@ -809,11 +846,14 @@ public class TruckDBMang extends BSDBBase {
 				onePojo.setOil(URLlImplBase.AllPrince(onePojo.getOil(),
 						oneOldPojo.getOil()));
 				vList.add(onePojo.getOil());
+				onePojo.setOilV(URLlImplBase.AllPrince(onePojo.getOilV(),
+						oneOldPojo.getOilV()));
+				vList.add(onePojo.getOilV());
 				// 里程
 				vList.add(URLlImplBase.AllPrince(onePojo.getDistance(),
 						oneOldPojo.getDistance()));
 				vList.add(onePojo.getId());
-				strSQL.append("update T_TRUCK_WORK_DAY_LOGS set LOG_STATE=?,LOG_DATE=?,IN_DATE=?,OUT_DATE=?,LOG_BJDATE=?,LOG_OIL=?,LOG_DISTANCE=? where LOG_ID=?");
+				strSQL.append("update T_TRUCK_WORK_DAY_LOGS set LOG_STATE=?,LOG_DATE=?,IN_DATE=?,OUT_DATE=?,LOG_BJDATE=?,LOG_OIL=?,LOG_OILV=?,LOG_DISTANCE=? where LOG_ID=?");
 				count += this.sqlHelper.updateBySql(strSQL.toString(), vList);
 			} else {
 				// 工作时长
@@ -1153,7 +1193,7 @@ public class TruckDBMang extends BSDBBase {
 			strSQL.append(" where TRUCK_ID=?");
 			List<Object> vList = new ArrayList<Object>();
 			vList.add(Timestamp.valueOf(onePojo.getEndDate()));
-			vList.add(oneOldPojo.getOil());
+			vList.add(oneOldPojo.getOilDiffV());
 			vList.add(oneOldPojo.getOilDiff());
 			vList.add(oneOldPojo.getDistance());
 			vList.add(oneOldPojo.getTruck().getId());
@@ -1764,6 +1804,7 @@ public class TruckDBMang extends BSDBBase {
 				onePojo.put("oil", oneV.getOil());
 				onePojo.put("oildiff", oneV.getOilDiff());
 				onePojo.put("speed", oneV.getSpeed());
+				onePojo.put("thisoilv", oneV.getThisOilV());
 			}
 		}
 		return onePojo;
@@ -1798,6 +1839,7 @@ public class TruckDBMang extends BSDBBase {
 		strSQL.append(",t.OIL_DIFF");
 		strSQL.append(",t.OIL_VALUME");
 		strSQL.append(",t.EQP_WEIGHT");
+		strSQL.append(",t.OIL_THISVOLUME");
 		strSQL.append(" from T_VEHICLE_DATA t");
 		strSQL.append(" where t.EQP_INST=? and t.C_DATE is not null");
 		strSQL.append(" order by t.C_DATE desc,t.S_CDATE desc");
@@ -1812,6 +1854,9 @@ public class TruckDBMang extends BSDBBase {
 				onePojo.setSpeed(rs.getString("EQP_SPEED"));
 				onePojo.setGeoDate(rs.getString("S_CDATE"));
 				onePojo.setUpdateDate(rs.getString("C_DATE"));
+				if (rs.getString("OIL_THISVOLUME") != null) {
+					onePojo.setThisOilV(rs.getString("OIL_THISVOLUME"));
+				}
 			}
 			rs.close();
 		}
@@ -1908,6 +1953,7 @@ public class TruckDBMang extends BSDBBase {
 		strSQL.append(",t.TRUCK_UNO");
 		strSQL.append("," + SqlExecute.getDateToCharSql("t.TRUCK_UDATE")
 				+ " as TRUCK_UDATE");
+		strSQL.append(",t.TRUCK_OILDEF");
 		// 管理用户
 		strSQL.append(",t.TRUCK_MANGUSER");
 		strSQL.append(",tu.USER_ID");
@@ -1965,7 +2011,12 @@ public class TruckDBMang extends BSDBBase {
 			onePojo.setUpDate(rs.getString("TRUCK_UDATE"));
 		}
 		onePojo.setVideoNum(rs.getInt("VIDEO_COUNT"));
-
+		// 邮箱
+		if (rs.getString("TRUCK_OILDEF") != null
+				&& !rs.getString("TRUCK_OILDEF").equals("")) {
+			onePojo.setOilDef(JSONObject.fromObject(rs
+					.getString("TRUCK_OILDEF")));
+		}
 		// 管理员
 		if (rs.getString("TRUCK_MANGUSER") != null) {
 			onePojo.getMangUser().setInstId(rs.getString("TRUCK_MANGUSER"));
@@ -2006,6 +2057,7 @@ public class TruckDBMang extends BSDBBase {
 				+ " as LOG_BJDATE");
 		strSQL.append(",t.LOG_DISTANCE");
 		strSQL.append(",t.LOG_OIL");
+		strSQL.append(",t.LOG_OILV");
 		strSQL.append(",t.WORK_TIME");
 		strSQL.append("," + SqlExecute.getDateToCharSql("t.S_DATE")
 				+ " as S_DATE");
@@ -2038,7 +2090,7 @@ public class TruckDBMang extends BSDBBase {
 	}
 
 	// 加载一个资源实例对象
-	private TruckWorkDayLogsPojo _setOneTruckWorkDayLogsPojo(CachedRowSet rs)
+	private TruckWorkDayLogsPojo _setOneTruckWorkDayLogsPojo(ResultSet rs)
 			throws Exception {
 		TruckWorkDayLogsPojo onePojo = new TruckWorkDayLogsPojo();
 		// 设置群组信息
@@ -2046,6 +2098,9 @@ public class TruckDBMang extends BSDBBase {
 		onePojo.setType(rs.getInt("LOG_STATE"));
 		onePojo.setDate(rs.getString("LOG_DATE"));
 		onePojo.setOil(rs.getString("LOG_OIL"));
+		if (rs.getString("LOG_OILV") != null) {
+			onePojo.setOilV(rs.getString("LOG_OILV"));
+		}
 		onePojo.setDistance(rs.getString("LOG_DISTANCE"));
 		if (rs.getString("WORK_TIME") != null) {
 			onePojo.setWorkTime(rs.getString("WORK_TIME"));
@@ -2115,6 +2170,7 @@ public class TruckDBMang extends BSDBBase {
 		strSQL.append(",t.truck_name");
 		strSQL.append(",t.truck_no");
 		strSQL.append(",t.plate_num");
+		strSQL.append(",t.truck_inname");
 		strSQL.append(" from V_TRUCK_WORK_PARAS t");
 		strSQL.append(" where t.eqp_inst is not null");
 		if (where != null && !where.trim().equals("")) {
@@ -2138,6 +2194,7 @@ public class TruckDBMang extends BSDBBase {
 		onePojo.getEqpInst().getTruck().setNo(rs.getString("truck_no"));
 		onePojo.getEqpInst().getTruck().setName(rs.getString("truck_name"));
 		onePojo.getEqpInst().getTruck().setPlateNum(rs.getString("plate_num"));
+		onePojo.getEqpInst().getTruck().setInName(rs.getString("truck_inname"));
 		if (rs.getString("org_id") != null
 				&& !rs.getString("org_id").equals("")) {
 			onePojo.getEqpInst()
@@ -2156,6 +2213,9 @@ public class TruckDBMang extends BSDBBase {
 		if (oneNDate != null) {
 			if (oneNDate.containsKey("oil")) {
 				onePojo.setOil(oneNDate.getString("oil"));
+			}
+			if (oneNDate.containsKey("thisoilv")) {
+				onePojo.setThisOilV(oneNDate.getString("thisoilv"));
 			}
 			if (oneNDate.containsKey("speed")) {
 				onePojo.setSpeed(oneNDate.getString("speed"));
@@ -2546,11 +2606,15 @@ public class TruckDBMang extends BSDBBase {
 			if (oneNDate.containsKey("oil")) {
 				onePojo.setOil(oneNDate.getString("oil"));
 			}
+			if (oneNDate.containsKey("thisoilv")) {
+				onePojo.setThisOilV(oneNDate.getString("thisoilv"));
+			}
 			if (oneNDate.containsKey("speed")) {
 				onePojo.setSpeed(oneNDate.getString("speed"));
 			}
 			if (oneNDate.containsKey("oildiff")) {
-				onePojo.setOilDiff(oneNDate.getString("oildiff"));
+				onePojo.setOilDiff(URLlImplBase.AllPrinceDiv(
+						oneNDate.getString("oildiff"), 10));
 			}
 			if (oneNDate.containsKey("createDate")) {
 				onePojo.setOilDate(oneNDate.getString("createDate"));

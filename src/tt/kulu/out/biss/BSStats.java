@@ -197,8 +197,7 @@ public class BSStats {
 			oneObj.put("username", onePojo.getTruck().getMangUser().getName());
 			oneObj.put("userphone", onePojo.getTruck().getMangUser()
 					.getmPhone());
-			oneObj.put("oil",
-					URLlImplBase.AllPrinceDiv(onePojo.getOil(), 10000));
+			oneObj.put("oil", URLlImplBase.AllPrinceDiv(onePojo.getOil(), 1000));
 			oneObj.put("distance",
 					URLlImplBase.AllPrinceDiv(onePojo.getDistance(), 1000));
 			oneObj.put("worktimes",

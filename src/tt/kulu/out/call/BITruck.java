@@ -824,7 +824,6 @@ public class BITruck extends BSDBBase {
 			ep.printStackTrace();
 			throw ep;
 		}
-		this.setTruckDefToRedis(onePojo.getId());
 		return count;
 	}
 
@@ -1157,13 +1156,16 @@ public class BITruck extends BSDBBase {
 			}
 		}
 		count += quipmentDB.insertEquipmentGeometry(oneEqpGeo);
+        if (onePojo.getOilLevel() <= 0)
+            return count;
+
 		// 得到油量算法
 		// 得到上一条记录
-		DicItemPojo oneOilItem = dicBI.getDicItemByRedis("VEHICLE_PARAS_3");
-		String oilDiffMax = "1000";
-		if (oneOilItem != null && !oneOilItem.getValue2().equals("")) {
-			oilDiffMax = oneOilItem.getValue2();
-		}
+		// DicItemPojo oneOilItem = dicBI.getDicItemByRedis("VEHICLE_PARAS_3");
+		// String oilDiffMax = "1000";
+		// if (oneOilItem != null && !oneOilItem.getValue2().equals("")) {
+		// oilDiffMax = oneOilItem.getValue2();
+		// }
 		String lastDiff = "";
 		// String lastDiff = (String) sqlHelper
 		// .queryObjectBySql(
@@ -1176,44 +1178,34 @@ public class BITruck extends BSDBBase {
 		if (lastDiff == null || lastDiff.equals("")) {
 			lastDiff = "0";
 		}
-		float diff = Float.valueOf(lastDiff)
-				- Float.valueOf(onePojo.getOilLevel());
+		float diff = Float.valueOf(lastDiff) - Float.valueOf(onePojo.getOilLevel());
 		if (diff <= 0) {
 			diff = 0;
 		}
-		if (diff - Float.valueOf(oilDiffMax) >= 0) {
-			diff = 0;
-		}
-		float valume = 0;
+		// if (diff - Float.valueOf(oilDiffMax) >= 0) {
+		// // diff = 0;
+		// }
+		double valume = 0;
 		onePojo.setOilDeff(diff);
-		// 得到页面传感器的参数
-		vList.clear();
-		vList.add(oneEqpGeo.getEqpInst().getInstId());
-		EquipmentInstPojo oil = quipmentDB
-				.getOneEquipmentInstByWhere(
-						" and t.EQP_INST in (select v.EQP_INST from T_EQUIPMENT_INST_R v where v.P_EQP_INST=?) and t.EQP_DEF in (select v.EQP_CODE from T_EQUIPMENT_DEF v where v.EQP_TYPE='EQUIPMENT_DEFTYPE_2')",
-						"", vList);
-		if (oil != null) {
-			// 面积：mm(宽*厚*高)
-			if (!oil.getEqpDef().getPara1().equals("")
-					&& !oneEqpGeo.getEqpInst().getTruck().getDefine()
-							.getOilMJ().equals("")) {
-				String mj[] = oneEqpGeo.getEqpInst().getTruck().getDefine()
-						.getOilMJ().split("*");
-				if (mj.length > 1) {
-					valume = Float.valueOf(URLlImplBase.AllPrinceMul(
-							URLlImplBase.AllPrinceMul(mj[0], mj[1]), diff));
-				}
-				// valume = diff
-				// * Float.valueOf(oneEqpGeo.getEqpInst().getTruck()
-				// .getDefine().getOilMJ());
-				if (oil.getEqpDef().getPara1().toLowerCase().equals("mm")) {
-					// 毫升
-					valume = valume / 10000;
-				}
-			}
+		if (oneEqpGeo.getEqpInst().getTruck().getOilDef() != null) {
+			oneEqpGeo.getEqpInst().getTruck().getOilDef()
+					.put("X", (onePojo.getOilLevel()) / 100);
+			// 计算当前体积
+			valume = BITruck.getOilVolume(oneEqpGeo.getEqpInst().getTruck()
+					.getOilDef());
 		}
-		onePojo.setValume(valume);
+		if (diff > 0) {
+			// 得到页面传感器的参数
+			onePojo.setThisOilV(valume);// 当前油量
+			if (lastDate != null && lastDate.containsKey("thisoilv")) {
+				onePojo.setValume(lastDate.getDouble("thisoilv") - valume);// 容积差
+			} else {
+				onePojo.setValume(valume);
+			}
+		} else {
+			onePojo.setValume(0);
+			onePojo.setThisOilV(valume);// 当前油量
+		}
 		TruckDBMang truckDB = new TruckDBMang(sqlHelper, m_bs);
 		count += truckDB.insertVehicleData(onePojo, oneEqpGeo);
 		return count;
@@ -1277,8 +1269,8 @@ public class BITruck extends BSDBBase {
 		EquipmentInstPojo oneOldPojo = eqpBI.getOneEquipmentInstByWyCode(
 				sqlHelper, onePojo.getWyCode());
 		if (oneOldPojo != null) {
-			oneOldPojo.setOnlineState(1);
-			oneOldPojo.setToken(BSGuid.getRandomGUID());
+			oneOldPojo.setOnlineState(0);
+			oneOldPojo.setToken(truckDB.getNewToken());
 			onePojo.setToken(oneOldPojo.getToken());
 			count = eqpBI.updateEquipmentInst(sqlHelper, oneOldPojo);
 		}
@@ -3114,5 +3106,40 @@ public class BITruck extends BSDBBase {
 			throws Exception {
 		TruckDBMang truckDB = new TruckDBMang(sqlHelper, m_bs);
 		return truckDB.getVehicleNewestByInst(instId);
+	}
+
+	// 根据公式计算邮箱体积返回ml
+	public static double getOilVolume(JSONObject inParas) {
+		double value = 0;
+		double X = inParas.getDouble("X");
+		//
+		if (inParas.containsKey("L") && inParas.containsKey("W")
+				&& inParas.containsKey("H") && inParas.containsKey("R")) {
+			double L = inParas.getDouble("L");
+			double W = inParas.getDouble("W");
+			double H = inParas.getDouble("H");
+			double R = inParas.getDouble("R");
+			double N = 0;
+			if (X <= 0) {
+				value = 0;
+			} else if (X > 0 && X <= R) {
+				N = Math.acos((R - X) / R);
+				value = (((N - 0.5 * Math.sin(2 * N)) * L * Math.pow(R, 2) + (W - 2 * R)
+						* L * X)) / 1000;
+			} else if (X <= (H - R) && X > R) {
+				value = (0.5 * Math.PI * Math.pow(R, 2) * L + (W - 2 * R) * L
+						* R + (X - R) * L * W) / 1000;
+
+			} else if (X > (H - R) && X < H) {
+				N = Math.acos((X - (H - R)) / R);
+				value = ((H - 2 * R) * L * W + (W - 2 * R) * L * R + Math.PI
+						* Math.pow(R, 2) * L - (N - 0.5 * Math.sin(2 * N)) * L
+						* Math.pow(R, 2) + (W - 2 * R) * (X - (H - R)) * L) / 1000;
+			} else if (X >= H) {
+				value = ((H - 2 * R) * L * W + (W - 2 * R) * L * R + Math.PI
+						* Math.pow(R, 2) * L + (W - 2 * R) * L * R) / 1000;
+			}
+		}
+		return value;
 	}
 }

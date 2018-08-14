@@ -342,6 +342,60 @@ public class BIMenu extends BSDBBase {
 
 	/**
 	 * <p>
+	 * 方法名称: updateMenu
+	 * </p>
+	 * <p>
+	 * 方法功能描述: 修改菜单数据。
+	 * </p>
+	 * <p>
+	 * 输入参数描述:数据库操作类对象sqlHelper、菜单实体对象oneMenu
+	 * </p>
+	 * <p>
+	 * 输出参数描述:java.lang.Integer整型
+	 * </p>
+	 * 
+	 * @throws Exception
+	 * 
+	 */
+	public int deleteMenu(SqlExecute sqlHelper, String menuId) throws Exception {
+		BSMenuDBMang menuDB = new BSMenuDBMang(sqlHelper, m_bs);
+		return menuDB.deleteMenu(menuId);
+	}
+
+	/**
+	 * <p>
+	 * 方法名称: updateMenu
+	 * </p>
+	 * <p>
+	 * 方法功能描述: 修改菜单数据。
+	 * </p>
+	 * <p>
+	 * 输入参数描述:数据库操作类对象sqlHelper、菜单实体对象oneMenu
+	 * </p>
+	 * <p>
+	 * 输出参数描述:java.lang.Integer整型
+	 * </p>
+	 * 
+	 * @throws Exception
+	 * 
+	 */
+	public int deleteMenu(String menuId) throws Exception {
+		int count = 0;
+		SqlExecute sqlHelper = new SqlExecute();
+		try {
+			sqlHelper.setAutoCommit(false);
+			count = this.deleteMenu(sqlHelper, menuId);
+			sqlHelper.commit();
+		} catch (Exception ep) {
+			sqlHelper.rollback();
+			ep.printStackTrace();
+			throw ep;
+		}
+		return count;
+	}
+
+	/**
+	 * <p>
 	 * 方法名称: checkMenuIsMain
 	 * </p>
 	 * <p>

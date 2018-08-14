@@ -3,6 +3,8 @@ package tt.kulu.out.call;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import com.alibaba.fastjson.JSON;
 import com.tt4j2ee.BIRedis;
 
 import tt.kulu.bi.base.BSDBBase;
@@ -66,26 +68,24 @@ public class BIDic extends BSDBBase {
 	public DicItemPojo getDicItemByRedis(String itemId) throws Exception {
 		DicItemPojo onePojo = new DicItemPojo();
 		BIRedis redisBI = new BIRedis();
-		String redisS = redisBI.getStringData("KITEM_" + itemId,
+		String redisS = redisBI.getMapData("KDICITEM_MAP", itemId,
 				URLlImplBase.REDIS_KULUDATA);
 		if (redisS == null || redisS.trim().equals("")) {
 			// 从数据库的到
 			onePojo = this.getOneDicItemById(itemId);
 			if (onePojo != null) {
-				redisBI.setStringData("KITEM_" + itemId,
-						JSONObject.fromObject(onePojo).toString(),
-						URLlImplBase.REDIS_KULUDATA);
+				redisBI.setMapData("KDICITEM_MAP", itemId,
+						JSON.toJSONString(onePojo), URLlImplBase.REDIS_KULUDATA);
 			}
 		} else {
-			onePojo = (DicItemPojo) JSONObject.toBean(
-					JSONObject.fromObject(redisS), DicItemPojo.class);
+			onePojo = (DicItemPojo) JSON.parseObject(redisS, DicItemPojo.class);
 		}
 		return onePojo;
 	}
 
 	/**
 	 * <p>
-	 * 方法名称: getDicItemByRedis
+	 * 方法名称: setDicItemToRedis
 	 * </p>
 	 * <p>
 	 * 方法功能描述: 从redis得到数据字典项目
@@ -106,9 +106,8 @@ public class BIDic extends BSDBBase {
 		DicItemPojo onePojo = this.getOneDicItemById(itemId);
 		BIRedis redisBI = new BIRedis();
 		if (onePojo != null) {
-			redisBI.setStringData("KITEM_" + itemId,
-					JSONObject.fromObject(onePojo).toString(),
-					URLlImplBase.REDIS_KULUDATA);
+			redisBI.setMapData("KDICITEM_MAP", itemId,
+					JSON.toJSONString(onePojo), URLlImplBase.REDIS_KULUDATA);
 		}
 	}
 
