@@ -268,6 +268,7 @@ public class ReportDBMang extends BSDBBase {
 		strSQL.append("select ");
 		strSQL.append("t.TRUCK_ID");
 		strSQL.append(",t.TRUCK_NAME");
+		strSQL.append(",t.TRUCK_INNAME");
 		strSQL.append(",t.TRUCK_NO");
 		strSQL.append(",t.TD_ID");
 		strSQL.append(",t.A_ID");
@@ -295,6 +296,7 @@ public class ReportDBMang extends BSDBBase {
 		}
 		strSQL.append(" group by t.TRUCK_ID");
 		strSQL.append(",t.TRUCK_NAME");
+		strSQL.append(",t.TRUCK_INNAME");
 		strSQL.append(",t.TRUCK_NO");
 		strSQL.append(",t.TD_ID");
 		strSQL.append(",t.A_ID");
@@ -321,6 +323,7 @@ public class ReportDBMang extends BSDBBase {
 		TruckReportPojo onePojo = new TruckReportPojo();
 		onePojo.getTruck().setId(rs.getString("TRUCK_ID"));
 		onePojo.getTruck().setName(rs.getString("TRUCK_NAME"));
+		onePojo.getTruck().setInName(rs.getString("TRUCK_INNAME"));
 		if (rs.getString("TRUCK_NO") != null) {
 			onePojo.getTruck().setNo(rs.getString("TRUCK_NO"));
 		}

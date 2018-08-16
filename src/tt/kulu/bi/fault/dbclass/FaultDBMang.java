@@ -395,6 +395,7 @@ public class FaultDBMang extends BSDBBase {
 		// 关联车辆
 		strSQL.append(",t.FR_TRUCK");
 		strSQL.append(",frt.TRUCK_NAME");
+		strSQL.append(",frt.TRUCK_INNAME");
 		strSQL.append(",frt.TRUCK_NO");
 		strSQL.append(",frt.PLATE_NUM");
 		strSQL.append(",frt.TD_ID");
@@ -503,6 +504,7 @@ public class FaultDBMang extends BSDBBase {
 				&& !rs.getString("FR_TRUCK").equals("")) {
 			onePojo.getEqpInst().getTruck().setId(rs.getString("FR_TRUCK"));
 			onePojo.getEqpInst().getTruck().setName(rs.getString("TRUCK_NAME"));
+			onePojo.getEqpInst().getTruck().setInName(rs.getString("TRUCK_INNAME"));
 			if (rs.getString("TRUCK_NO") != null) {
 				onePojo.getEqpInst().getTruck().setNo(rs.getString("TRUCK_NO"));
 			}

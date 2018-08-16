@@ -1608,6 +1608,7 @@ public class EquipmentDBMang extends BSDBBase {
 		strSQL.append(",tru.PLATE_NUM");
 		strSQL.append(",tru.PLATE_COLOR");
 		strSQL.append(",tru.ORG_ID as TRUCK_ORG");
+		strSQL.append(",tru.TRUCK_INNAME");
 		// 位置
 		strSQL.append(",t.S_LAT");
 		strSQL.append(",t.S_LON");
@@ -1709,6 +1710,10 @@ public class EquipmentDBMang extends BSDBBase {
 						.setOrg(this.userBI.getGroupByRedis(rs
 								.getString("TRUCK_ORG")));
 			}
+            if (rs.getString("TRUCK_INNAME") != null) {
+                onePojo.getEqpInst().getTruck()
+                        .setInName(rs.getString("TRUCK_INNAME"));
+            }
 		}
 		if (rs.getString("EQP_LDATE") != null) {
 			onePojo.getEqpInst().setLastLoginDate(rs.getString("EQP_LDATE"));

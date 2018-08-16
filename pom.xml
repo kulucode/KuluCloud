@@ -20,7 +20,7 @@
 		<dependency>
 			<groupId>binarystar</groupId>
 			<artifactId>binarystar</artifactId>
-			<version>1.0.2</version>
+			<version>1.0.3</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-beanutils</groupId>

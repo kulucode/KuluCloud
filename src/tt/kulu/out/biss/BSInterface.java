@@ -1025,13 +1025,11 @@ public class BSInterface {
 				oneObj.put(
 						"oil",
 						(!onePojo.getOil().equals("") ? URLlImplBase
-								.AllPrinceDiv(onePojo.getOil(), 100) : "0")
-								+ "毫米");
+								.AllPrinceDiv(onePojo.getOil(), 100) : "0") + "毫米");
 			} else {
 				oneObj.put(
 						"oil",
-						(URLlImplBase.AllPrinceDiv(onePojo.getThisOilV(), 1000))
-								+ "升");
+						(URLlImplBase.AllPrinceDiv(onePojo.getThisOilV(), 1000)) + "升");
 			}
 			oneObj.put(
 					"oildiff",
@@ -1160,6 +1158,7 @@ public class BSInterface {
 			oneObj.put("truckid", onePojo.getEqpInst().getTruck().getId());
 			oneObj.put("trucknno", onePojo.getEqpInst().getTruck().getNo());
 			oneObj.put("truckname", onePojo.getEqpInst().getTruck().getName());
+            oneObj.put("truckinname", onePojo.getEqpInst().getTruck().getInName());
 			oneObj.put("trucktype", onePojo.getEqpInst().getTruck().getDefine()
 					.getName());
 			oneObj.put("truckbrand", onePojo.getEqpInst().getTruck()
@@ -1191,13 +1190,11 @@ public class BSInterface {
 				oneObj.put(
 						"oil",
 						(!onePojo.getOil().equals("") ? URLlImplBase
-								.AllPrinceDiv(onePojo.getOil(), 100) : "0")
-								+ "毫米");
+								.AllPrinceDiv(onePojo.getOil(), 100) : "0") + "毫米");
 			} else {
 				oneObj.put(
 						"oil",
-						(URLlImplBase.AllPrinceDiv(onePojo.getThisOilV(), 1000))
-								+ "升");
+						(URLlImplBase.AllPrinceDiv(onePojo.getThisOilV(), 1000)) + "升");
 			}
 			oneObj.put(
 					"oildiff",
@@ -1659,6 +1656,8 @@ public class BSInterface {
 							.getName());
 					allJOSN.put("platenum", onePojo.getEqpInst().getTruck()
 							.getPlateNum());
+					allJOSN.put("truckinname", onePojo.getEqpInst().getTruck()
+							.getInName());
 				}
 				// 起点
 				fdIndex++;
@@ -1775,6 +1774,8 @@ public class BSInterface {
 							.getName());
 					oneFDObj.put("platenum", onePojo.getEqpInst().getTruck()
 							.getPlateNum());
+					oneFDObj.put("truckinname", onePojo.getEqpInst().getTruck()
+							.getInName());
 				}
 			}
 		}
@@ -1904,6 +1905,7 @@ public class BSInterface {
 			oneObj.put("truckorg", onePojo.getTruck().getOrg().getAllName()
 					.replaceAll(",", "-"));
 			oneObj.put("truckname", onePojo.getTruck().getName());
+            oneObj.put("truckinname", onePojo.getTruck().getInName());
 			oneObj.put("platenum", onePojo.getTruck().getPlateNum());
 			oneObj.put("truckbrand", onePojo.getTruck().getDefine().getBrand());
 			oneObj.put("trucktype", onePojo.getTruck().getDefine().getName());
@@ -2299,6 +2301,7 @@ public class BSInterface {
 			oneObj.put("truckid", onePojo.getEqpInst().getTruck().getId());
 			oneObj.put("trucknno", onePojo.getEqpInst().getTruck().getNo());
 			oneObj.put("truckname", onePojo.getEqpInst().getTruck().getName());
+            oneObj.put("truckinname", onePojo.getEqpInst().getTruck().getInName());
 			oneObj.put("trucktype", onePojo.getEqpInst().getTruck().getDefine()
 					.getName());
 			if (onePojo.getEqpInst().getTruck().getOrg() != null) {

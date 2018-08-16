@@ -2193,6 +2193,7 @@ public class TruckDBMang extends BSDBBase {
 		onePojo.getEqpInst().getTruck().setId(rs.getString("truck_id"));
 		onePojo.getEqpInst().getTruck().setNo(rs.getString("truck_no"));
 		onePojo.getEqpInst().getTruck().setName(rs.getString("truck_name"));
+		onePojo.getEqpInst().getTruck().setInName(rs.getString("truck_inname"));
 		onePojo.getEqpInst().getTruck().setPlateNum(rs.getString("plate_num"));
 		onePojo.getEqpInst().getTruck().setInName(rs.getString("truck_inname"));
 		if (rs.getString("org_id") != null

@@ -116,13 +116,11 @@ public class BSVehicle {
 				oneObj.put(
 						"oil",
 						(!onePojo.getOil().equals("") ? URLlImplBase
-								.AllPrinceDiv(onePojo.getOil(), 100) : "0")
-								+ "毫米");
+								.AllPrinceDiv(onePojo.getOil(), 100) : "0") + "毫米");
 			} else {
 				oneObj.put(
 						"oil",
-						(URLlImplBase.AllPrinceDiv(onePojo.getThisOilV(), 1000))
-								+ "升");
+						(URLlImplBase.AllPrinceDiv(onePojo.getThisOilV(), 1000)) + "升");
 			}
 			oneObj.put("oildiff", onePojo.getOilDiff());
 			oneObj.put(
